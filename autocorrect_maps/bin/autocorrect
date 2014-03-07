@@ -1,0 +1,3 @@
+#! /bin/bash
+
+java -cp derived/autocorrect.jar ac.Main $*
