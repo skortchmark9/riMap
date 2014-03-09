@@ -54,6 +54,7 @@ public class KDTree<KDType extends KDimensionable> {
 	 */
 	public KDTree(Collection<KDType> collection) {
 		this(collection.iterator().next().getNumDimensions()); //call default constructor with dimension of first object in list.
+		
 		_root = this.recursiveBuild(collection, 0); //build a new KDTree from the collection.
 	}
 	
@@ -112,6 +113,75 @@ public class KDTree<KDType extends KDimensionable> {
 		KDType median;
 		int mid = size/2; //floor of size/2
 		median = list.get(mid); //get median object
+		
+		//create node, split list around median and recur
+			//if there is only one node left in the list, it's our median,
+			//so we're done with building the tree and we can return the 
+			//last node which we just created from the median.
+		KDNode node = new KDNode(median);
+		if (depth == 0)
+			_root = node;
+		
+		if (size > 2) {
+			node.putLeft(this.recursiveBuild(list.subList(0, mid), depth+1)); //Recur on sublist of everything before midpoint
+			node.putRight(this.recursiveBuild(list.subList(mid+1, size), depth+1)); //recur on sublist of everything after midpoint
+		} else if (size == 2) { //mid must be 1
+			if (list.get(0).compareAxis(list.get(1), axis) >= 0)
+				node.putRight(this.recursiveBuild(list.subList(0, 1), depth+1)); //the node before mid
+			else
+				node.putLeft(this.recursiveBuild(list.subList(0, 1), depth+1)); //node before mid
+		}
+		_size++;
+		return node;
+	}
+	
+	
+	/**
+	 * This method takes a collection of objects that implement
+	 * KDimensionable and recursively builds a balanced KD Tree 
+	 * from them.
+	 * 
+	 * If the KDTree's _k field (number of dimensions) has not been set,
+	 * 	Or if the depth (for whatever hellish reason) is negative,
+	 * 	Or if the list is empty,
+	 * 	an error message will print to STDERROR.
+	 *  
+	 * 
+	 * @param list - The list of KDimensionable objects
+	 * @param depth - The depth at which to add the nodes
+	 */
+	public KDNode recursiveBuildFaster(Collection<KDType> collection, int depth) {
+		List<KDType> list;
+		if(collection instanceof List<?>)
+			list = (List<KDType>)collection; //collection is already a List : cast it
+		else
+			list = new ArrayList<KDType>(collection); //build list from the collection
+		int size = list.size();
+		
+		if (_k < 1) {
+			System.err.println("ERROR: KDTree.recursiveBuild(): Number of Dimensions has not been defined.");
+			return null;
+		}
+		if (depth < 0) {
+			System.err.println("ERROR: KDTree.recursiveBuild(): Cannot build tree from a negative depth!");
+			return null;
+		}
+		if(size == 0) {
+			System.err.println("ERROR: KDTree.recursiveBuild(): Cannot build tree from an empty list.");
+			return null;
+		}
+		
+		int axis = depth % _k;	//the 'axis' is the dimension that the nodes should be compared by.
+								//it is determined by the current depth
+		
+		KDimensionComparator comparator = new KDimensionComparator(axis); //new comparator for each depth's axis
+		Collections.sort(list, comparator); //sort the list : ascending by axis
+		
+		//split list by median
+		KDType median;
+		int mid = size/2; //floor of size/2
+		median = list.get(mid); //get median object
+		list.remove(median);
 		
 		//create node, split list around median and recur
 			//if there is only one node left in the list, it's our median,
@@ -373,44 +443,6 @@ public class KDTree<KDType extends KDimensionable> {
 	public long size() {
 		return _size;
 	}
-	
-	
-	/**
-	 * Method used for testing.
-	 * It's purpose is to provide the Unit tester with
-	 * a way to check if children are contained in the
-	 * proper subtree. 
-	 * 
-	 * @param kd - the KDimensionable which will be held at the root of the returned subtree. 
-	 * @return
-	 * A subtree of the current tree whose root holds 
-	 * the given KDimensionable object.
-	 */
-	public KDTree<KDType> subtree(KDType kd) {
-		if (!this.contains(kd)) {
-			System.err.println("ERROR: KDTree.subtree(): This tree does not contain the specified object.");
-			return null;
-		}
-		
-		KDTree<KDType> subtree = new KDTree<>(kd.getNumDimensions());
-		subtree.setSubtreeRoot(this.find(kd));
-		return subtree;
-	}
-	
-	/**
-	 * <strong>THIS METHOD IS DANGEROUS.</strong><br>
-	 * It is used exclusively by the subtree() method in order
-	 * to easily return a subtree of this tree. This method 
-	 * should <strong>NEVER</strong> be called any other time.
-	 * <p>
-	 * <strong>The subtree method is used exclusively for testing.</strong>
-	 * 
-	 */
-	private void setSubtreeRoot(KDNode n) {
-		_root = n;
-	}
-	
-	
 	
 	
 	/**
