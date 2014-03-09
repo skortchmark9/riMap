@@ -21,7 +21,7 @@ public interface KDimensionable {
 	 * @param axis-	the axis to compare on
 	 * @return
 	 * <ul>
-	 * <li>	1 if this object has a larger coordinate compared to the given object
+	 * <li>	1 if this object has a larger coordinate compared to the parameter object
 	 * 		on the specified axis.</li>
 	 * <li> 0 if the coordinates are equal on the specified axis</li>
 	 * <li> -1 if this object's coordinate is lesser than the specified object's coordinate</li>

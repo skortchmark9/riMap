@@ -54,9 +54,28 @@ public class KDTree<KDType extends KDimensionable> {
 	 */
 	public KDTree(Collection<KDType> collection) {
 		this(collection.iterator().next().getNumDimensions()); //call default constructor with dimension of first object in list.
+		ArrayList<ArrayList<KDType>> superList = new ArrayList<>(_k);
+		for (int i = 0; i < _k; i++) {
+			ArrayList<KDType> l = new ArrayList<>(collection);
+			KDimensionComparator comparator = new KDimensionComparator(i); //compare nodes on axis i
+			Collections.sort(l, comparator); //sort the list using comparator : ascending by axis i
+			superList.add(l);
+		}
+		_root = this.recursiveBuildFaster(superList, 0); //build a new KDTree from the collection.
+	}
+	
+	
+	/**
+	 * This was the old constructor.
+	 * Used recursiveBuild() instead of recursiveBuildFaster() 
+	 */
+	/*
+	public KDTree(Collection<KDType> collection) {
+		this(collection.iterator().next().getNumDimensions()); //call default constructor with dimension of first object in list.
 		
 		_root = this.recursiveBuild(collection, 0); //build a new KDTree from the collection.
 	}
+	*/
 	
 	
 	/**
@@ -150,13 +169,8 @@ public class KDTree<KDType extends KDimensionable> {
 	 * @param list - The list of KDimensionable objects
 	 * @param depth - The depth at which to add the nodes
 	 */
-	public KDNode recursiveBuildFaster(Collection<KDType> collection, int depth) {
-		List<KDType> list;
-		if(collection instanceof List<?>)
-			list = (List<KDType>)collection; //collection is already a List : cast it
-		else
-			list = new ArrayList<KDType>(collection); //build list from the collection
-		int size = list.size();
+	public KDNode recursiveBuildFaster(ArrayList<ArrayList<KDType>> superList, int depth) {
+		int size = superList.get(0).size();
 		
 		if (_k < 1) {
 			System.err.println("ERROR: KDTree.recursiveBuild(): Number of Dimensions has not been defined.");
@@ -174,32 +188,28 @@ public class KDTree<KDType extends KDimensionable> {
 		int axis = depth % _k;	//the 'axis' is the dimension that the nodes should be compared by.
 								//it is determined by the current depth
 		
-		KDimensionComparator comparator = new KDimensionComparator(axis); //new comparator for each depth's axis
-		Collections.sort(list, comparator); //sort the list : ascending by axis
-		
 		//split list by median
 		KDType median;
 		int mid = size/2; //floor of size/2
-		median = list.get(mid); //get median object
-		list.remove(median);
+		median = superList.get(axis).get(mid); //get median object from desired axis-sorted list in superList 
 		
 		//create node, split list around median and recur
 			//if there is only one node left in the list, it's our median,
 			//so we're done with building the tree and we can return the 
 			//last node which we just created from the median.
 		KDNode node = new KDNode(median);
-		if (depth == 0)
-			_root = node;
+		if (depth == 0) _root = node; //set node to root if it's the first one
 		
-		if (size > 2) {
-			node.putLeft(this.recursiveBuild(list.subList(0, mid), depth+1)); //Recur on sublist of everything before midpoint
-			node.putRight(this.recursiveBuild(list.subList(mid+1, size), depth+1)); //recur on sublist of everything after midpoint
-		} else if (size == 2) { //mid must be 1
-			if (list.get(0).compareAxis(list.get(1), axis) >= 0)
-				node.putRight(this.recursiveBuild(list.subList(0, 1), depth+1)); //the node before mid
-			else
-				node.putLeft(this.recursiveBuild(list.subList(0, 1), depth+1)); //node before mid
-		}
+		//create new sets of branches, split around the median object.
+		Branches branches = new Branches(superList, mid, axis);
+		ArrayList<ArrayList<KDType>> less = branches.less; //all object less than or equal to (on current axis)
+		ArrayList<ArrayList<KDType>> more = branches.more; //all objects greater than (on current axis)
+		
+		if (!less.isEmpty())
+			node.putLeft(this.recursiveBuildFaster(less, depth+1));
+		if (!more.isEmpty())
+			node.putLeft(this.recursiveBuildFaster(more, depth+1));
+		
 		_size++;
 		return node;
 	}
@@ -262,7 +272,7 @@ public class KDTree<KDType extends KDimensionable> {
 		//recursively search the subtree which contains the test point.
 		boolean wentLeft = false;
 		int axis = depth % _k;
-		if (p.compareAxis(curr, axis) < 0) {
+		if (p.compareAxis(curr, axis) <= 0) {
 			this.recursiveNeighborSearch(currNode.getLeft(), depth+1);
 			wentLeft = true;
 		}	
@@ -348,11 +358,11 @@ public class KDTree<KDType extends KDimensionable> {
 				points.addAll(this.recursiveRadiusSearch(currNode.getRight(), depth+1, radius, testPoint));
 			} else {
 				//axis Differential is larger than radius. Move towards test point in search.
-				if (curr.getCoordinates()[axis] < testPoint.getCoordinates()[axis]) {
-					//axis of curr is less than test point : go right
+				if (curr.getCoordinates()[axis] <= testPoint.getCoordinates()[axis]) {
+					//axis of curr is less than or equal to test point : go right
 					points.addAll(this.recursiveRadiusSearch(currNode.getRight(), depth+1, radius, testPoint));
 				} else {
-					//axis of curr is greater or equal to test point : go left
+					//axis of curr is greater than test point, go left.
 					points.addAll(this.recursiveRadiusSearch(currNode.getLeft(), depth+1, radius, testPoint));
 				}
 			}
@@ -442,6 +452,64 @@ public class KDTree<KDType extends KDimensionable> {
 	
 	public long size() {
 		return _size;
+	}
+	
+	
+	
+	/**
+	 * A helper class that splits the 'list of lists'
+	 * into lists of lesser and greater. Used to build the tree so
+	 * that the list of nodes only has to be sorted 3 times,
+	 * (in the beginning- in the constructor).
+	 * 
+	 * @author emc3 / skortchm
+	 * 
+	 */
+	private class Branches {
+		
+		private ArrayList<ArrayList<KDType>> less, more; //each instance of Branches will be split into 
+											//lesser & greater based on the object at the median index.
+
+		Branches(ArrayList<ArrayList<KDType>> superList, int medianIndex, int axis) {
+			KDType medianVal = superList.get(axis).get(medianIndex); //get median object
+			double splittingPane = medianVal.getCoordinates()[axis]; //get splitting pane of median object
+			
+			//The length of sublist: the number of KDTypes.
+			int listSize = superList.get(0).size();
+
+			//Initializing less and more superLists.
+			less = new ArrayList<>(_k);
+			more = new ArrayList<>(_k);
+
+			for(int i = 0; i < _k; i++) {
+				//The sublists will be approximately half of the size of the initial, which is ~ the same as the median index.
+				ArrayList<KDType> tempLessList = new ArrayList<>(medianIndex);
+				//Less list will always have fewer elements, because it also has to handle =
+				ArrayList<KDType> tempMoreList = new ArrayList<>(medianIndex % 2 == 0 ? medianIndex : medianIndex + 1);
+
+				//We iterate through each sorted list, distributing elements to
+				//less and more based on comparison to the splitting pane. make sure to not add the median value to to either list.
+				if (i == axis) {
+					tempLessList = (ArrayList<KDType>) superList.get(i).subList(0, medianIndex);
+					tempMoreList = (ArrayList<KDType>) superList.get(i).subList(medianIndex+1, listSize);
+				} else {
+					//loop through all elements in list
+					for(int j = 0; j < listSize; j++) {
+						KDType temp = superList.get(i).get(j); //get the object in the list
+						int cmp = temp.compareAxis(medianVal, axis); //compare object to median object
+						
+						if (cmp > 0)
+							tempMoreList.add(temp);
+						else if (cmp < 0)
+							tempLessList.add(temp);
+						else if (cmp == 0 && !temp.equals(medianVal))
+							tempLessList.add(temp); //in case of same axis but not same object, add object to less list.
+					}
+				}
+				less.add(tempLessList);
+				more.add(tempMoreList);
+			}
+		}
 	}
 	
 	
