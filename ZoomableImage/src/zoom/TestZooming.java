@@ -36,7 +36,7 @@ public class TestZooming {
                 frame.setSize(800, 400);
                 frame.setLocationRelativeTo(null);
                 frame.setLayout(new BorderLayout());
-                final ZoomPane pane = new ZoomPane("A PICTURE'S FILEPATH GOES HERE");
+                final ZoomPane pane = new ZoomPane("/Users/samkortchmar/Desktop/Misc/Desktop Pictures/Bottom Center.jpg");
                 frame.add(new JScrollPane(pane));
                 frame.setVisible(true);
 
