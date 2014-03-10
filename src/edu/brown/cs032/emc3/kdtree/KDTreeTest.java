@@ -43,6 +43,10 @@ public class KDTreeTest {
 		assertTrue(tree.contains(l4));
 	}
 	
+	
+	/**
+	 * A very simple test to ensure that the neighbor test is working.
+	 */
 	@Test
 	public void simpleNeighborTest() {
 		Location l1 = new Location(0,0);
@@ -64,5 +68,32 @@ public class KDTreeTest {
 		assertTrue(results.contains(l3));
 		assertFalse(results.contains(l4));
 	}
-
+	
+	
+	/**
+	 * A very simple test to ensure that the radius test is working.
+	 */
+	@Test
+	public void simpleRadiusTest() {
+		Location l1 = new Location(0,0);
+		Location l2 = new Location(1,2);
+		Location l3 = new Location(2,3);
+		Location l4 = new Location(3,4);
+		ArrayList<Location> l = new ArrayList<>();
+		l.add(l1);
+		l.add(l2);
+		l.add(l3);
+		l.add(l4);
+		KDTree<Location> tree = new KDTree<>(l);
+		List<Location> results = tree.getObjectsWithinRadius(4, l1);
+		
+		assertTrue(results.size() == 1);
+		assertFalse(results.contains(l1));
+		assertTrue(results.contains(l2));
+		assertFalse(results.contains(l3));
+		assertFalse(results.contains(l4));
+	}
+	
+	
+	
 }
