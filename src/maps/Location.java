@@ -9,70 +9,98 @@ import edu.brown.cs032.emc3.kdtree.KDimensionable;
  * @author emc3 / skortchm
  */
 public class Location implements KDimensionable {
-	double lat, lon;
+	final double lat, lon;
+	final double[] coords;
 
 	/**
-	 * Default constructor
+	 * Default constructor<br>
+	 * Checks the latitude and longitude to make sure they are 
+	 * in range of acceptable values.
 	 * 
 	 */
 	public Location(double lat, double lon) {
 		this.lat = checkLatitude(lat);
 		this.lon = checkLongitude(lon);
-		
+		coords = new double[]{this.lat, this.lon};
 	}
 
-
-	@Override
-	public double[] getCoordinates() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.brown.cs032.emc3.kdtree.KDimensionable#compareAxis(edu.brown.cs032.emc3.kdtree.KDimensionable, int)
+	/**
+	 * @return an array of doubles containing the coordinates of
+	 * this location object in the format<br> 
+	 * <strong>{latitude, longitude}</strong>
 	 */
 	@Override
-	public int compareAxis(KDimensionable kd, int axis) {
-		// TODO Auto-generated method stub
-		return 0;
+	public double[] getCoordinates() {
+		return coords;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.brown.cs032.emc3.kdtree.KDimensionable#getNumDimensions()
+	
+	@Override
+	public int compareAxis(KDimensionable kd, int axis) {
+		if (axis > 1 || axis < 0) {
+			throw new IllegalArgumentException(String.format("Axis %d out of range: must be 1 or 0", axis));
+		}
+		double mine = coords[axis];
+		double other = kd.getCoordinates()[axis];
+		if (mine > other) {
+			return 1;
+		} else if (mine < other) {
+			return -1;
+		} else {
+			return 0;
+		}
+	}
+
+	/**
+	 * @return 2
 	 */
 	@Override
 	public int getNumDimensions() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 2;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.brown.cs032.emc3.kdtree.KDimensionable#distanceTo(edu.brown.cs032.emc3.kdtree.KDimensionable)
+
+	/**
+	 * @return the Haversine Distance between two Locations 
 	 */
 	@Override
 	public double distanceTo(KDimensionable kd) {
-		// TODO Auto-generated method stub
-		return 0;
+		// TODO: perhaps this should calculate the haversine Distance?
+		
+		//right now we are just returning Manhattan distance:
+		double[] otherCoords = kd.getCoordinates();
+		double latDiff = Math.abs(coords[0] - otherCoords[0]);
+		double lonDiff = Math.abs(coords[1] - otherCoords[1]);
+		
+		return latDiff + lonDiff;
 	}
 	
 	
 	/**
-	 * 
-	 * @param lon
-	 * @return
+	 * Checks the given longitude to see if it is within range.
+	 * between +/- 180
+	 * @param lon - the longitude to check
+	 * @return longitude if the longitude is within range.
+	 * @throws IllegalArgumentException if lon is out of range
 	 */
 	private double checkLongitude(double lon) {
-		// TODO Auto-generated method stub
-		return 0;
+		if (lon < -180.0 || lon > 180.0) {
+			throw new IllegalArgumentException(String.format("%f is out of range of earthly longitudes.", lon));
+		}
+		return lon;
 	}
 	
 	/**
-	 * 
-	 * @param lat
-	 * @return
+	 * Checks the given latitude to see if it is within range,
+	 * between +/- 90
+	 * @param lat -the latitude to check
+	 * @return latitude if the latitude is within range.
+	 * @throws IllegalArgumentException if lat is out of range
 	 */
 	private double checkLatitude(double lat) {
-		// TODO Auto-generated method stub
-		return 0;
+		if (lat < -90.0 || lat > 90.0) {
+			throw new IllegalArgumentException(String.format("%f is out of range of earthly latitudes.", lat));
+		}
+		return lat;
 	}
 }
