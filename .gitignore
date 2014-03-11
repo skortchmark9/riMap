@@ -1,3 +1,4 @@
 /derived
 /.DS_Store
-/data/*.tsv
+/data/baconfiles/
+/data/mapsfiles/
