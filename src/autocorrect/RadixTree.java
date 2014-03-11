@@ -190,12 +190,10 @@ public class RadixTree {
 					intermediateNode = new RadixTree(childPrefix, lastWord, true, child);
 				else {
 					intermediateNode = new RadixTree(childPrefix, lastWord, false, child);
-					if (childSuffix.length() > 0) //avoid empty strings
-						intermediateNode.insert(childSuffix, lastWord);
+					if (wordSuffix.length() > 0) //avoid empty strings
+						intermediateNode.insert(wordSuffix, lastWord);
 				}
-				
 				_children.put(firstChar, intermediateNode);
-				
 			}
 		}
 	}	
@@ -288,7 +286,7 @@ public class RadixTree {
 			while((line = bufferedReader.readLine()) !=null) { //Loops while bufferedReader can find a next line
 				for(String word : Utils.lineParse(line)) {
 					if (!word.equals("") && !this.search(word)) {
-						System.out.println("word not found: " + word);
+//						System.out.println("word not found: " + word);
 						outcome = false;
 
 					}
@@ -332,7 +330,7 @@ public class RadixTree {
 		if (carriedString.length() == fullWord.length())
 			return results;
 		
-		int charKey = fullWord.charAt(carriedString.length());
+		char charKey = fullWord.charAt(carriedString.length());
 
 		if (_children == null || _children.isEmpty())
 			return results;
