@@ -13,8 +13,8 @@ import org.junit.Test;
 
 public class RadixTreeTest {
 	
-	public final String dictionary = "/Users/Eli/school/cs032/CS032_Maps/autocorrect_maps/data/autocorrect/dictionary.txt";
-	public final String dickens = "/Users/Eli/school/cs032/CS032_Maps/autocorrect_maps/data/autocorrect/great_expectations.txt";
+	public final String dictionary = "./autocorrect_maps/data/autocorrect/dictionary.txt";
+	public final String dickens = "./autocorrect_maps/data/autocorrect/great_expectations.txt";
 	
 	@Test
 	public void lineParseTest() {
