@@ -1,3 +1,4 @@
 /derived
 /.DS_Store
 /data/*.tsv
+/**/.DS_Store
