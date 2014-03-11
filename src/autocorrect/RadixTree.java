@@ -190,8 +190,8 @@ public class RadixTree {
 					intermediateNode = new RadixTree(childPrefix, lastWord, true, child);
 				else {
 					intermediateNode = new RadixTree(childPrefix, lastWord, false, child);
-					if (childSuffix.length() > 0) //avoid empty strings
-						intermediateNode.insert(childSuffix, lastWord);
+					if (wordSuffix.length() > 0) //avoid empty strings
+						intermediateNode.insert(wordSuffix, lastWord);
 				}
 				
 				_children.put(firstChar, intermediateNode);
