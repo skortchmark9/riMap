@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.google.common.collect.HashMultiset;
-
 
 public class RadixTree {
 	/** Prefix tree which holds whole chunks of words. Most of the intense logic is done here.
@@ -19,208 +17,169 @@ public class RadixTree {
 	private String key;
 	private int freq;
 	private RadixTree[] children; //A 26 block array for alphabetical placement and instant access.
-	private HashMap<Character, RadixTree> _children = null;
-	private HashMultiset<String> bigramNeighbors = null;
+	private HashMap<String, Integer> bigramNeighbors;
 
-	
-	/**
-	 * Special constructor of the root node. The empty string 
-	 * does not affect the positioning of other nodes. 
-	 */
 	RadixTree() {
+		/**Special constructor of the root node. The empty string 
+		does not affect the positioning of other nodes. */
 		this.key = "";
 		this.freq = 0;
 	}
-	
-	
-	/**
-	 * Most basic constructor - create a new word node from scratch
-	 * Adds the previous node the the MultiSet.
-	 * @param word - the word to use as the key at this node
-	 */
-	private RadixTree(String word, String lastWord) {
+
+	//private RadixTree(String word, String lastWord) {
+	private RadixTree(String word) {
+		/**Most basic constructor - create a new word node from scratch */
 		this.key = word;
 		this.freq = 1;
-		if (bigramNeighbors == null) {
-			bigramNeighbors = HashMultiset.create();
-		}
-		bigramNeighbors.add(lastWord);
+		this.children = null;
+		if (this.bigramNeighbors == null) //Increments the number of bigram neighbors on insertion
+			this.bigramNeighbors = new HashMap<>();
+		Integer val = this.bigramNeighbors.get(lastWord);
+		this.bigramNeighbors.put(lastWord, (val == null) ? 1 : val + 1);
 	}
-
-	/**
-	 * Makes an intermediate node: creates a new node and 
-	 * then places oldNode as a child. Really important. 
-	 * Usually should be inserted into the Map where oldNode
-	 * (often called currentNode) was.
-	 *  
-	 * @param word - word to use as a key at this node
-	 * @param isWord - true if this word is an end point (full word)
-	 * @param oldNode - old node that this node replaces, becomes child of this node
-	 */
-	private RadixTree(String word, String lastWord, Boolean isWord, RadixTree oldNode) {
-		this.key = word;
-		_children = new HashMap<>();
-		_children.put(oldNode.key.charAt(0), oldNode);
-		if (isWord) { //if the intermediate node is a word end point
-			this.freq  = 1;
-			bigramNeighbors.add(lastWord);
-		}
-	}
-
 	
-	/** 
-	 * Increment the unigram frequency of this node. 
-	 */
+	//private RadixTree(String word,)
+
+	private RadixTree(String word, String lastWord, Boolean isWord, RadixTree oldNode) {
+		/**Makes an intermediate node: creates a new node and 
+		//then places oldNode as a child. Really important. 
+		 * Usually should be inserted into the array where oldNode
+		 * (often called currentNode) was. */
+		this.key = word;
+		this.children = new RadixTree[26];
+		this.children[oldNode.key.charAt(0) - 97] = oldNode;
+		if (isWord) { //if the intermediate node is a word endpoint
+			this.freq  = 1; 
+			this.addBigramNeighbor(lastWord);
+		}
+	}
+
 	private void incrementFreq() {
+		/** If a word exists that is already in the tree, we only want to increase
+		 *  the frequency of that node, not make a new node.*/
 		this.freq++;              
 	}
-	
-	/**
-	 * Add an occurrence of the parameter word to this node's
-	 * set of Bigram's.
-	 * @param lastWord - the word to add to the Bigram list.
-	 */
-	private void addBigramNeighbor(String lastWord) {
-		bigramNeighbors.add(lastWord);
-	}
-	
-	/**
-	 * @return
-	 * the unigram frequency of this node
-	 */
+
 	public int getFreq() {
 		return this.freq;
 	}
-	
-	/**
-	 * @return
-	 * True if this node is a end point (a full word)
-	 * The node is considered a word if its unigram frequency is
-	 * greater than 1.
-	 */
+
+	private void addBigramNeighbor(String lastWord) {
+		/** Adds a bigram neighbor to a the current node.*/
+		if (this.bigramNeighbors == null)
+			this.bigramNeighbors = new HashMap<>();
+		Integer val = this.bigramNeighbors.get(lastWord);
+		this.bigramNeighbors.put(lastWord, (val == null) ? 1 : val + 1);
+	}
+
 	public boolean isWord() {
 		return (this.getFreq() > 0);
 	}
-	
-	
-	/**
-	 * @return
-	 * True if this node's HashMap contains no elements (children)
-	 */
+
 	public boolean isEmpty() {
-		return (_children.isEmpty());
+		return (this.children == null);
 	}
-	
-	
-	/**
-	 * Constructs a radix from the given text file,
-	 * inserting the contents of each line. All text
-	 * is parsed by parseString before it is inserted.
-	 * @param fileName - path to the file to add.
-	 */
+
 	public void populateRadixTree(String fileName) {
+		/** Constructs a radix from the given text file,
+		 *  inserting the contents of each line. All text
+		 *  is parsed by parseString before it is inserted.*/
 		String line;
 		String lastWord = "";
-		
+
+
 		try {
 			FileReader fileReader = new FileReader(fileName); //Attempts to read the given file
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
-			
 			while((line = bufferedReader.readLine()) !=null) { //Loops while bufferedReader can find a next line
 				for(String word : Utils.lineParse(line)) { //passes parsing to lineParse
-					if (word.length() > 0)	{ //We really don't want any empty strings.
+					if (word.length() > 0)	{ //We rrreeeallly don't want any empty strings.
 						this.insert(word, lastWord);
 						lastWord = word;
 					}
-				}
-			}
-			
+										else if (word.length() == 1 && (word.equals("a") || word.equals("i"))) {
+						this.insert(word, lastWord);
+						lastWord = word;
+					} //This section is commented out because I believe it would break tests.
+				}		 //However, I think this is a good way to get around the problems with conjunctions
+			}			 //and other non-words sneaking into the trie.
 			bufferedReader.close(); 
-		} catch(FileNotFoundException ex) {
-			System.out.println("ERROR: File cannot be found at location " + fileName);
-			System.exit(1);//GTFO
-		} catch(IOException ex) {
+		}
+		catch(FileNotFoundException ex) {
+			System.out.println("ERROR: Unable to open file '" + fileName + "'");
+			System.exit(1);
+		}
+		catch(IOException ex) {
 			System.out.println("Error reading file '" + fileName + "'");
 		}
 	}
+	public void insert(String word) {
+		/** Quick, dirty, and really risky way of inserting a word.
+		 * Should only be used for testing purposes.*/
+		insert(word, "");
+	}
 
-	/**
-	 * Inserts a word into the given prefix tree. If the word exists already it will
-	 * simply increase its frequency of occurring.
-	 * @param word
-	 * @param lastWord
-	 */
 	public void insert(String word, String lastWord) {
-		char firstChar = word.charAt(0);
-		
-		if (_children == null) { //populates children if there are none
-			_children = new HashMap<>();
-			_children.put(firstChar, new RadixTree(word, lastWord));
-		} else if (!_children.containsKey(firstChar)) { //Same idea; if there is no child for firstChar
-			_children.put(firstChar, new RadixTree(word, lastWord));
-		} else {
-			//we know there is a child stored at firstChar
-			RadixTree child = _children.get(firstChar);
-			if (child.key.equals(word)) { //check if word contained in Tree already
-				child.incrementFreq();
-				child.addBigramNeighbor(lastWord);
-			} else {
-				//need to do some manipulation of tree structure:
-				int breakPoint = Utils.findBreakPoint(child.key, word); //find index at which 'word' and the key diverge
-				String childPrefix = child.key.substring(0, breakPoint);
-				String childSuffix = child.key.substring(breakPoint);
-				String wordSuffix  = word.substring(breakPoint);
-				
-				if (child.key.length() < word.length()) {
-					if (childSuffix.length() == 0) { //word exists in key.
-						child.insert(wordSuffix, lastWord); //recur to insert word as child's key
-						return;
-					}
-				} //in all other situations, make an intermediate node:
-				child.key = childSuffix; //set key of child to suffix, maintain all children.
-				RadixTree intermediateNode;
-				if (childPrefix.equals(word)) //behavior is slightly different if intermediate's key is word end
-					intermediateNode = new RadixTree(childPrefix, lastWord, true, child);
-				else {
-					intermediateNode = new RadixTree(childPrefix, lastWord, false, child);
-					if (childSuffix.length() > 0) //avoid empty strings
-						intermediateNode.insert(childSuffix, lastWord);
+		/** Inserts a word into the given prefix tree. If the word exists already it will
+		 *  simply increase its frequency of occurring. */
+		int wordIndex = word.charAt(0) - 97; //The place in the array where the focus will be
+		if (this.children == null) { //populates children if there are none
+			this.children = new RadixTree[26];
+			this.children[wordIndex] = new RadixTree(word, lastWord);
+		}
+		else if (this.children[wordIndex] == null) { //Same idea
+			this.children[wordIndex] = new RadixTree(word, lastWord);
+		}
+		else if (this.children[wordIndex].key.equals(word)) {
+			this.children[wordIndex].incrementFreq();
+			this.children[wordIndex].addBigramNeighbor(lastWord);
+			//If the word is already in the tree.
+		}
+		else {
+			RadixTree currentNode = this.children[wordIndex]; //the node in the position we want to insert into
+			int breakpoint = Utils.findBreakPoint(currentNode.key, word); // the index at which 'word' and the key diverge.
+			String currentNodePrefix = currentNode.key.substring(0, breakpoint); //first half of node
+			String currentNodeSuffix = currentNode.key.substring(breakpoint, currentNode.key.length()); //second half of node
+			String currentWordSuffix = word.substring(breakpoint, word.length()); //second half of word
+
+			if (currentNode.key.length() < word.length()) {
+				if (currentNodeSuffix.length() == 0) { //the word exists in the key. for example: word = cats, key = cat, CNS = 0; CWS = "s";
+					currentNode.insert(currentWordSuffix, lastWord); 	//recursive insert word into currentKey
+					return;
 				}
-				
-				_children.put(firstChar, intermediateNode);
-				
+			} //In all other situations, we need to make an intermediate node
+			currentNode.key = currentNodeSuffix; // we set the key of the current node to its suffix, while maintaining its children
+			// we make a new node with currentNode as a child and the prefix becoming the key of the intermediate node
+			RadixTree intermediateNode;
+			if (currentNodePrefix.equals(word)) //behavior is slightly different if intermediate node would be a word end.
+				intermediateNode = new RadixTree(currentNodePrefix, lastWord, true, currentNode);
+			else {
+				intermediateNode = new RadixTree(currentNodePrefix, lastWord, false, currentNode);
+				if (currentWordSuffix.length() > 0) //REEEEALLY don't want empty strings.
+					intermediateNode.insert(currentWordSuffix, lastWord);
 			}
+			this.children[wordIndex] = intermediateNode;
 		}
 	}	
-	
-	/**
-	 * Returns true if the parameter word is in this node
-	 * @param word - the word to search for
-	 * @return true if the word can be found in this node, false otherwise.
-	 */
+
 	public boolean search(String word) {
+		/**tells you if a word is in the given node.
+		 *  Can't use the isWord method because we need to input a word. */
 		return this.getFreq(word) > 0;
 	}
-	
-	/**
-	 * This method is overloaded.
-	 * Searches for a word in the tree and
-	 * returns its frequency.
-	 * 
-	 * @param word - word to find frequency of.
-	 * @return - frequency of the parameter word in this node
-	 */
+
 	public int getFreq(String word) {
-		char firstChar = word.charAt(0);
-		
-		if (_children == null || _children.isEmpty()) return 0;
-		
+		/** Note this method is overloaded. Searches for a word in the tree and returns its frequency. */
+		int wordIndex = word.charAt(0) - 97;   //Traverses prefix tree looking for the 
+		if (this.children == null) 
+			return 0;
 		else {
-			RadixTree currentNode = _children.get(firstChar);
+			RadixTree currentNode = this.children[wordIndex];
+
 			if (currentNode == null)
 				return 0;
 			else if (currentNode.key.equals(word))
-				return currentNode.freq;
+				return currentNode.getFreq();
 			else {
 				if (currentNode.key.length() > word.length())
 					return 0;
@@ -229,31 +188,19 @@ public class RadixTree {
 			}
 		}
 	}
-	
-	
-	/**
-	 * Searches the tree for the bigramNeighbors of a given word. 
-	 * Used mostly for testing 
-	 * @param word - word to find bigramNeighbors of.
-	 * @return a map of the bigram neighbors.
-	 */
+
 	public HashMap<String, Integer> getBigramNeighbors(String word) {
-		char firstChar = word.charAt(0);
+		/**Searches the tree for the bigramNeighbors of a given word. Used mostly for testing */
+		int wordIndex = word.charAt(0) - 97;
 		HashMap<String, Integer> defaultMap = new HashMap<>();
-		
-		if (_children == null || _children.isEmpty()) return defaultMap;
-		
+		if (this.children == null) 
+			return defaultMap;
 		else {
-			RadixTree currentNode = _children.get(firstChar);
+			RadixTree currentNode = this.children[wordIndex];
 			if (currentNode == null)
 				return defaultMap;
-			else if (currentNode.key.equals(word)) {
-				//convert hashMultiset to HashMap
-				for (String str : currentNode.bigramNeighbors) {
-					defaultMap.put(str, currentNode.bigramNeighbors.count(str));
-				}
-				return defaultMap;
-			}
+			else if (currentNode.key.equals(word))
+				return currentNode.bigramNeighbors;
 			else {
 				if (currentNode.key.length() > word.length())
 					return defaultMap;
@@ -265,13 +212,8 @@ public class RadixTree {
 
 
 
-	/**
-	 * Searches the tree for every word of a given text. used for testing
-	 * 
-	 * @param fileName
-	 * @return
-	 */
 	public boolean searchThru(String fileName) {
+		/**Searches the tree for every word of a given text. used for testing*/
 		String line;
 		boolean outcome = true;
 
@@ -324,13 +266,12 @@ public class RadixTree {
 		LinkedList<Suggestion> results = new LinkedList<>();
 		if (carriedString.length() == fullWord.length())
 			return results;
-		
-		int charKey = fullWord.charAt(carriedString.length());
+		int wordIndex = fullWord.charAt(carriedString.length()) - 97;
 
-		if (_children == null || _children.isEmpty())
+		if (this.children == null)
 			return results;
 		else {
-			RadixTree followingNode = _children.get(charKey);
+			RadixTree followingNode = this.children[wordIndex];
 			int fwLength = fullWord.length();
 			String potentialWord;
 
@@ -373,16 +314,16 @@ public class RadixTree {
 		if (level > maxDistance)
 			return results;
 		else {
-			if (_children == null || _children.isEmpty())
+			if (this.children == null)
 				return results;
 			else {
-				for (RadixTree child : _children.values()) { //Adds all children to the list of suggestions
+				for (RadixTree child : this.children) { //Adds all children to the list of suggestions
 					if (child!=null && child.isWord()) { //Freq checks if they are words.
 						results.add(new Suggestion(fullWord + this.key + child.key, child.getFreq(), level, child.bigramNeighbors));
 					}
 				}
-				for (RadixTree child : _children.values()){ //Recursively searches through children.
-					if (child != null && child._children != null && !child._children.isEmpty()) {
+				for (RadixTree child : this.children){ //Recursively searches through children.
+					if (child != null && child.children != null) {
 						results.addAll(child.findAllSuffixes(fullWord + this.key, level + 1, maxDistance));
 					}
 				}
@@ -406,7 +347,7 @@ public class RadixTree {
 		int[] initRow = new int[rootWord.length() + 1];
 		for (int i = 0; i <= rootWord.length(); i++) //Initializes the array 1,2....n
 			initRow[i] = i;							 //This represents the amount of edits required
-		for(RadixTree child : _children.values())		 //To reach the empty string.
+		for(RadixTree child : this.children)		 //To reach the empty string.
 			if(child != null)
 				results.addAll(child.nodeLD(rootWord, "", initRow, maxLED)); //Passes along the rest of the
 		return results; 											 //work to nodeLD.
@@ -428,8 +369,8 @@ public class RadixTree {
 		if (led <= maxLED)			 		 //LED value in their bottom right corner.
 			if (this.isWord())				 //Ours is 1D,so  it's just the rightmost slot.
 				results.add(new Suggestion(wordFragment + this.key, this.getFreq(), Constants.max, led, this.bigramNeighbors));
-		if (_children != null && !_children.isEmpty()) //We don't have the info here to set the rtDistance now. ^
-			for(RadixTree rt : _children.values()) //recur on children.
+		if (this.children != null) //We don't have the info here to set the rtDistance now. ^
+			for(RadixTree rt : this.children) //recur on children.
 				if (rt != null)
 					results.addAll(rt.nodeLD(rootWord, wordFragment + this.key, currentRow, maxLED));
 
@@ -461,13 +402,13 @@ public class RadixTree {
 
 	private List<Suggestion> possibleWhiteSpaceBreaks(String currentWord) {
 		/** Returns all possible suggestions in which the first word is definitely a word.*/
-		char charKey;
+		int wordIndex;
 		RadixTree thisNode = this;
 		List<Suggestion> results = new LinkedList<>();
 		for (int i = 0; i < currentWord.length(); i++) {			
-			charKey = currentWord.charAt(i);
-			if (_children != null && !_children.isEmpty()) {
-				RadixTree currentNode = _children.get(charKey);
+			wordIndex = currentWord.charAt(i) - 97;
+			if (thisNode.children != null) {
+				RadixTree currentNode = thisNode.children[wordIndex];
 				if (currentNode != null) {
 					//					System.out.println("Here is the current node: " + currentNode.toString() + " its freq: " + currentNode.getFreq());
 					if (currentNode.isWord()) {
