@@ -2,3 +2,5 @@
 /.DS_Store
 /data/baconfiles/
 /data/mapsfiles/
+/data/*.tsv
+/**/.DS_Store

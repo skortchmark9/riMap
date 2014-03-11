@@ -3,13 +3,18 @@
  */
 package maps;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import edu.brown.cs032.emc3.kdtree.KDimensionable;
 
 /**
  * @author emc3 / skortchm
  */
 public class Location implements KDimensionable {
-	final double lat, lon;
+	final String name;
+	final String id;
+	final List<String> wayIDs;
 	final double[] coords;
 
 	/**
@@ -18,10 +23,22 @@ public class Location implements KDimensionable {
 	 * in range of acceptable values.
 	 * 
 	 */
-	public Location(double lat, double lon) {
-		this.lat = checkLatitude(lat);
-		this.lon = checkLongitude(lon);
-		coords = new double[]{this.lat, this.lon};
+	public Location(double latitude, double longitude) {
+		Double lat = checkLatitude(latitude);
+		Double lon = checkLongitude(longitude);
+		coords = new double[]{lat, lon};
+		//TODO make me work!
+		this.name = "";
+		this.id = "";
+		this.wayIDs = new LinkedList<>();
+	}
+	
+	public double getLat() {
+		return coords[0];
+	}
+	
+	public double getLon() {
+		return coords[1];
 	}
 
 	/**

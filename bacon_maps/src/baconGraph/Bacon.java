@@ -28,10 +28,10 @@ public class Bacon {
 		nodes = new HashMap<Integer, BaconNode>();
 		this.r = r;
 		boolean problem = false;		
-			String ID = r.indexFile.getXByY("id", lastActor);
+		String ID = r.indexFile.getXByY("id", lastActor);
 		if (ID == null) {
-		System.out.println(String.format("ERROR: Could not find: %s in Index File", lastActor));
-		System.exit(1);
+			System.out.println(String.format("ERROR: Could not find: %s in Index File", lastActor));
+			System.exit(1);
 		}
 	}
 
@@ -86,11 +86,11 @@ public class Bacon {
 		//Here we create and place the root node in the graph.
 		while (!q.isEmpty()) {
 			//The current nearest node is polled and consulted.
-			
+
 			BaconNode currentNode = q.poll();
 			Actor currentActor = currentNode.getValue();
-		//	System.out.println(currentActor + " distance: " + currentNode.getDistance());
-		//	System.out.println("Starting loop now: ");
+			//	System.out.println(currentActor + " distance: " + currentNode.getDistance());
+			//	System.out.println("Starting loop now: ");
 			final long startTime = System.currentTimeMillis();
 			//Added to visited set/the graph
 			nodes.put(currentNode.hashCode(), currentNode);
@@ -133,10 +133,8 @@ public class Bacon {
 						}
 					}
 				}
-		//		System.out.println("Number of movies to consider:  " + mov + "\n Actors considered: " + actors);
 
 			}
-//			System.out.println("Time: " + (System.currentTimeMillis() - startTime) + "ms");
 		}
 	}
 }
