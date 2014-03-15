@@ -6,6 +6,8 @@ import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Searchable file which reads from the disk, without reading the file into memory.
@@ -17,32 +19,38 @@ public class BinarySearchFile implements AutoCloseable {
 
 	RandomAccessFile raf; // the random access file to be searched
 	private static final Charset UTF8 = Charset.forName("UTF-8"); // the type of encoding.
-	ParseType pt; // what we are looking for in the file; what kind of file it is. 
 	HashMap<String, Integer> parsePattern;
 	HashMap<Long, Long> nextNewLines;
 	HashMap<Long, Long> prevNewLines;
-
-	enum ParseType {
-		NODES, WAYS, INDEX
-	}
+	String sortingCol;
 
 	/** 
 	 * Main constructor of the BinarySearchFile.
-	 * automatically closes if it fails top open it correctly. 
+	 * automatically closes if it fails top open it correctly.
+	 * Very generic, this class allows you to specify the sorting principle and
+	 * important columns in the binary search file.
 	 * @param filePath - the path to the file
 	 * @param pt - what kind of file it is, what information we are seeking.
 	 * @throws IOException = if we can't read the file for some reason. 
 	 */
-	BinarySearchFile(String filePath, ParseType pt) {
+	BinarySearchFile(String filePath, String sortingCol, String ...importantCols) throws IOException {
 		try {
 			raf = new RandomAccessFile(filePath, "r");				
 		} catch(FileNotFoundException ex) {
 			System.out.println("ERROR: Unable to open file '" + filePath + "'");
 			System.exit(1);
 		}
-		this.pt = pt; 
 		nextNewLines = new HashMap<>();
 		prevNewLines = new HashMap<>();
+		parsePattern = readHeader(nextNewLine(0, raf.length()));
+		for(String colID : importantCols) {
+			if (!parsePattern.containsKey(colID)) {
+				System.out.println("ERROR: file header not formatted correctly");
+				System.exit(0);
+				break;
+			}
+		}
+		this.sortingCol = sortingCol;
 	}
 
 	/** Attempts to read the header of an index, actors, or films file.
@@ -62,16 +70,12 @@ public class BinarySearchFile implements AutoCloseable {
 			for(int i = 0; i < headerPieces.length; i++) {
 				results.put(headerPieces[i], i);
 			}
-			//TODO: SHOULD WE GET RID OF THIS OR MAKE IT BETTER (MORE SPECIFIC)
-			if (!(results.containsKey("id") || results.containsKey("name"))) {
-				System.out.println("ERROR: file header not formatted correctly");
-				return null;
-			}
 			return results;
 		}  catch (IOException e) {
 			return null;
 		}
 	}
+
 
 	/**
 	 * Cool function designed to minimize the number of binary searches. 
@@ -92,7 +96,7 @@ public class BinarySearchFile implements AutoCloseable {
 		String[] lineArray = Constants.tab.split(line);
 		for(int i = 0; i < xs.length; i++) {
 			String x = xs[i];
-			if (x.equals("name") || x.equals("id") || x.equals("start") || x.equals("end") || x.equals("ways")) { //maybe an enum?
+			if (parsePattern.containsKey(x)) {
 				//We use the parsePattern we must have defined in search to get the data for each column.
 				Integer numTabs = parsePattern.get(x);
 				if (numTabs != null && lineArray.length >= numTabs) {
@@ -121,7 +125,9 @@ public class BinarySearchFile implements AutoCloseable {
 			long length;
 			length = raf.length();
 			long secondLine = nextNewLine(0, length);
-			parsePattern = readHeader(secondLine); //Establishes the parsePattern to read
+			if (parsePattern == null){
+				parsePattern = readHeader(secondLine); //Establishes the parsePattern to read
+			}
 			//the CSV with. 
 			if (parsePattern == null) {
 				return null; //If there is a problem we can't read it, or search it. 
@@ -132,7 +138,7 @@ public class BinarySearchFile implements AutoCloseable {
 			if (wordPosition < 0) {
 				return null;
 			}
-			//wordPosition is the postion of the word, but we want the whole line. 
+			//wordPosition is the position of the word, but we want the whole line. 
 			long lineStart = prevNewLine(wordPosition, 0) + 1;
 			long lineEnd = nextNewLine(wordPosition, length);
 			int lineLength = (int) (lineEnd - lineStart);
@@ -197,7 +203,7 @@ public class BinarySearchFile implements AutoCloseable {
 	}
 
 	public long  getByTabs(long followingNewLine, long bottom) throws IOException {
-		long lastTab = skipTabs(followingNewLine, bottom, parsePattern.get(pt == ParseType.INDEX ? "name" : "id"));
+		long lastTab = skipTabs(followingNewLine, bottom, parsePattern.get(sortingCol));
 		return lastTab;
 	}
 
@@ -252,6 +258,34 @@ public class BinarySearchFile implements AutoCloseable {
 		else {
 			return end;
 		}
+	}
+	
+	List<String> readChunks() throws IOException {
+		return readChunks(Constants.numThreads);
+	}
+	
+	List<String> readChunks(int numThreads) throws IOException {
+		LinkedList<String> chunks = new LinkedList<>();
+		long chunkSize = raf.length() / numThreads + 1;
+		for(int i = 0; i < Constants.numThreads; i++) {
+			chunks.addAll(readChunk(chunkSize * (i - 1), chunkSize * i));
+		}
+		return chunks;
+	}
+	
+	List<String> readChunk(long start, long end) throws IOException {
+		List<String> lines = new LinkedList<>();
+		long lineStart = 0;
+		long lineEnd = 0;
+		while (lineStart < end) {
+			lineEnd = nextNewLine(lineStart, end);
+			byte[] line = new byte[(int) (lineEnd - lineStart)];
+			raf.seek(lineStart);
+			raf.read(line);
+			lines.add(string(line));
+			lineStart = lineEnd;
+		}
+		return lines;
 	}
 
 	/**
@@ -329,7 +363,6 @@ public class BinarySearchFile implements AutoCloseable {
 			return beginning;
 		}
 	}
-
 
 	/** 
 	 * from class, lexicographically compares two byte[]s.

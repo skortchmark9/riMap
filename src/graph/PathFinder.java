@@ -12,22 +12,22 @@ import java.util.PriorityQueue;
 public class PathFinder<T extends PathNode<T>> {
 	PathNode<T> source;
 	PathNode<T> dest;
-	Map<Integer, PathNode<T>> consideredNodes;
+	Map<String, PathNode<T>> consideredNodes;
 
 	//	PathFinder(String srcName, String dstName, Resources r) {
 	//Should we take two nodes or two names?
 	PathFinder(PathNode<T> source, PathNode<T> dest) {
 		this.source = source;
 		this.dest = dest;
-		consideredNodes = new HashMap<Integer, PathNode<T>>();
+		consideredNodes = new HashMap<String, PathNode<T>>();
 	}
 
 	public void getPath() {
 		//Populates 'nodes' and performs djikstra's algorithm, assigning distances
 		//and previous nodes to each one.
 		constructGraphToDest(source);
-		PathNode<T> sourceNode = consideredNodes.get(source.hashCode());
-		PathNode<T> destNode = consideredNodes.get(dest.hashCode());
+		PathNode<T> sourceNode = consideredNodes.get(source.getName());
+		PathNode<T> destNode = consideredNodes.get(dest.getName());
 		if (sourceNode == null || destNode == null) {
 			System.out.println(String.format("%s -/- %s", source.getName(), dest.getName()));
 			System.exit(0);
@@ -65,13 +65,13 @@ public class PathFinder<T extends PathNode<T>> {
 	private void constructGraphToDest(PathNode<T> source) {
 		source.setDistance(0.0);
 		source.setAStarDistance(source.getDistanceTo(dest) + source.getDistance());
-		consideredNodes.put(source.hashCode(), source);
+		consideredNodes.put(source.getName(), source);
 		PriorityQueue<PathNode<T>> fringe = new PriorityQueue<>();
 		fringe.offer(source);
 		while (!fringe.isEmpty()) {
 			PathNode<T> currentNode = fringe.poll();
 			T nodeValue = currentNode.getValue();
-			consideredNodes.put(currentNode.hashCode(), currentNode);
+			consideredNodes.put(nodeValue.getName(), currentNode);
 			//TODO define equality relationship here. Do we really want to check this way?
 			if (currentNode.getValue().equals(dest.getValue())) {
 				break;
@@ -97,7 +97,7 @@ public class PathFinder<T extends PathNode<T>> {
 							edgeTarget.setPrevious(currentNode);
 							edgeTarget.setAStarDistance(edgeTarget.getDistance() + edgeTarget.getDistanceTo(dest));
 						}
-						consideredNodes.put(edgeTarget.hashCode(), edgeTarget);
+						consideredNodes.put(edgeTarget.getName(), edgeTarget);
 						if (!existsInGraph) {
 							fringe.add(edgeTarget);
 						}

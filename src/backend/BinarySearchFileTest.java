@@ -12,19 +12,19 @@ import org.junit.Test;
 public class BinarySearchFileTest {
 	
 	
-	String films = "./data/files/films.tsv";
+	String films = "./data/baconfiles/films.tsv";
 	// Figure this out with TAs
 	@Test
 	public void FindUTF8() throws IOException {
-		BinarySearchFile b = new BinarySearchFile("./data/suites/ta-files/testIndex.tsv", BinarySearchFile.ParseType.INDEX);
+		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
 		assertTrue(b.getXsByY("Miya雅vi Medium", "id")[0].equals("/m/01vvyc_"));
 		b.close();
 	}
-	/*
+	
 	
 	@Test
 	public void FindFifty() throws IOException {
-		BinarySearchFile b = new BinarySearchFile("./data/suites/ta-files/testIndex.tsv", BinarySearchFile.ParseType.INDEX);
+		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
 		assertTrue(b.getXsByY("50 Cent", "id")[0].equals("/m/01vvyc_"));
 		b.close();
 	}
@@ -34,7 +34,7 @@ public class BinarySearchFileTest {
 
 	@Test
 	public void TestXsByY() throws Exception {
-		BinarySearchFile b = new BinarySearchFile(films, BinarySearchFile.ParseType.FILM);
+		BinarySearchFile b = new BinarySearchFile(films, "id", "id", "name", "starring");
 		String[] nameAndStarring = b.getXsByY("/m/011_p6", "name", "starring");
 		System.out.println(Arrays.toString(nameAndStarring));
 		assertTrue(nameAndStarring[0].equals("Thunderbolt"));
@@ -44,14 +44,14 @@ public class BinarySearchFileTest {
 
 	@Test
 	public void WrongKey() throws Exception {
-		Resources r = new Resources();
-		assertTrue(null == r.indexFile.getXsByY("Taylor Lautner", "NEKEY"));
+		Resources r = new Resources(1);
+		assertTrue(null == Resources.indexFile.getXsByY("Taylor Lautner", "NEKEY"));
 		r.closeResources();
 	} 
 
 	@Test
 	public void TabbyBinarySearch() throws IOException {
-		BinarySearchFile b = new BinarySearchFile(films, BinarySearchFile.ParseType.FILM);	
+		BinarySearchFile b = new BinarySearchFile(films, "id", "id", "name", "starring");	
 		assertTrue(b.getXsByY("/m/0hzcwhy", "name")[0].equals("Watch Juice"));
 		b.close();
 	}
@@ -59,25 +59,17 @@ public class BinarySearchFileTest {
 	@Test
 	public void BinarySearchNotThere() throws Exception {
 		//I don't think we want this behavior.
-		Resources r = new Resources();
-		assertTrue(r.indexFile.getXsByY("Taylor Badass", "name") == null);
+		Resources r = new Resources(1);
+		assertTrue(Resources.indexFile.getXsByY("Taylor Badass", "name") == null);
 		r.closeResources();
 	} 
 
 
 	@Test
 	public void ActorCorrectLength() throws Exception {
-		Resources r = new Resources();
-		System.out.println("\n\n" + r.indexFile.search("Taylor Swift"));
+		Resources r = new Resources(1);
+		System.out.println("\n\n" + Resources.indexFile.search("Taylor Swift"));
 		assertTrue(r.indexFile.search("Taylor Swift").equals("Taylor Swift\t/m/0dl567"));
-		r.closeResources();
-	}
-
-	@Test
-	public void SearchByName2() throws Exception {
-		Resources r = new Resources();
-//		System.out.println(r.indexFile.search("Laurel Bryce"));
-		assertTrue(true);
 		r.closeResources();
 	}
 	
@@ -95,14 +87,14 @@ public class BinarySearchFileTest {
 
 	@Test
 	public void BinarySearch1() throws IOException {
-		BinarySearchFile b = new BinarySearchFile(films, BinarySearchFile.ParseType.FILM);
+		BinarySearchFile b = new BinarySearchFile(films, "id", "id", "name", "starring");
 		assertTrue(b.getXsByY("/m/038lhw", "name")[0].equals("Mo' Better Blues"));
 		b.close();
 	}
 
 	@Test
 	public void BinarySearchTest() throws Exception {
-		Resources r = new Resources();
+		Resources r = new Resources(1);
 		assertTrue(r.indexFile.search("Fabio Stallone").equals("Fabio Stallone\t/m/07z32y_"));
 		r.closeResources();
 	}
@@ -118,7 +110,7 @@ public class BinarySearchFileTest {
 	
 	@Test
 	public void BinarySearch2() throws IOException {
-		BinarySearchFile b = new BinarySearchFile(films, BinarySearchFile.ParseType.FILM);
+		BinarySearchFile b = new BinarySearchFile(films, "id", "id", "name", "starring");
 //		System.out.println(b.search("/m/0ds29fr"));
 		assertTrue(b.getXsByY("/m/0ds29fr", "name")[0].equals("Singularity"));
 		b.close();
@@ -127,18 +119,18 @@ public class BinarySearchFileTest {
 	
 	@Test
 	public void BinarySearch() throws IOException {
-		BinarySearchFile b = new BinarySearchFile(films, BinarySearchFile.ParseType.FILM);	
+		BinarySearchFile b = new BinarySearchFile(films, "id", "id", "name", "starring");	
 		assertTrue(b.getXsByY("/m/0fvp0c", "name") != null);
 		b.close();
 	}
 	
 	@Test
 	public void testNewLine() throws Exception {
-		Resources r = new Resources();
-		RandomAccessFile raf = r.indexFile.raf;
+		Resources r = new Resources(1);
+		RandomAccessFile raf = Resources.indexFile.raf;
 		long start = 77;
-		long newLineStart = r.indexFile.prevNewLine(start, 0);
-		long pos = r.indexFile.nextNewLine(start, raf.length());
+		long newLineStart = Resources.indexFile.prevNewLine(start, 0);
+		long pos = Resources.indexFile.nextNewLine(start, raf.length());
 		raf.seek(newLineStart);
 		byte[] word = new byte[(int) (pos - newLineStart)];
 		raf.read(word);
@@ -156,15 +148,15 @@ public class BinarySearchFileTest {
 	}
 	@Test
 	public void SearchByName() throws Exception {
-		Resources r = new Resources();
-		assertTrue(r.indexFile.search("Samuel L. Jackson").equals("Samuel L. Jackson\t/m/0f5xn"));
+		Resources r = new Resources(1);
+		assertTrue(Resources.indexFile.search("Samuel L. Jackson").equals("Samuel L. Jackson\t/m/0f5xn"));
 		r.closeResources();
 	}
 	
 	@Test
 	public void SearchMoviesByID() throws Exception {
-		Resources r = new Resources();
-		assertTrue(r.moviesFile.getXsByY("/m/02x3lt7", "name")[0].equals("Hannah Montana: The Movie"));
+		Resources r = new Resources(1);
+		assertTrue(Resources.waysFile.getXsByY("/m/02x3lt7", "name")[0].equals("Hannah Montana: The Movie"));
 		r.closeResources();
 	}
 /*

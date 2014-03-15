@@ -42,6 +42,10 @@ public class Node implements KDimensionable {
 	public List<String> getWayIDs() {
 		return wayIDs;
 	}
+	
+	public String getID() {
+		return id;
+	}
 
 	/**
 	 * @return an array of doubles containing the coordinates of

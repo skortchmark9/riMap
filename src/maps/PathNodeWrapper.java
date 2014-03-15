@@ -14,7 +14,7 @@ public class PathNodeWrapper implements PathNode<Node> {
 	
 	//NOTE: Eclipse gives compile errors when the map has PathNodes.
 	private Map<String, Edge<? extends PathNode<Node>>> neighbors;
-	private PathNodeWrapper previous;
+	private PathNode<Node> previous;
 	
 	PathNodeWrapper(Node value) {
 		this.value = value;
@@ -33,7 +33,6 @@ public class PathNodeWrapper implements PathNode<Node> {
 					}
 				}
 			}
-			//TODO: get neighbors from file from the value from
 			return neighbors;
 	}
 
@@ -75,13 +74,12 @@ public class PathNodeWrapper implements PathNode<Node> {
 
 	@Override
 	public void setPrevious(PathNode<Node> n) {
-		previous = new PathNodeWrapper(n);
+		previous = n;
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return getValue().getID();
 	}
 
 	@Override

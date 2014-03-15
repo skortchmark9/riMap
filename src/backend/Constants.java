@@ -9,4 +9,9 @@ public class Constants {
 	public static final Pattern digits = Pattern.compile("\\D");
 	public static final int BufferLength = 1024;
 
+	/**
+	 * For threaded file reading into KD Tree
+	 */
+	public static final int numThreads = 0;
+
 }
