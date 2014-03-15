@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import maps.Location;
-
 import org.junit.Test;
 
 /**
@@ -25,18 +23,18 @@ public class KDTreeTest {
 	 */
 	@Test
 	public void simpleTest() {
-		Location l1 = new Location(0,0);
-		Location l2 = new Location(1,2);
-		Location l3 = new Location(2,3);
-		Location l4 = new Location(3,4);
-		Location[] locations = new Location[] {
+		KDStub l1 = new KDStub(0,0);
+		KDStub l2 = new KDStub(1,2);
+		KDStub l3 = new KDStub(2,3);
+		KDStub l4 = new KDStub(3,4);
+		KDStub[] locations = new KDStub[] {
 			l1,
 			l2,
 			l3,
 			l4
 		};
-		List<Location> list = Arrays.asList(locations);
-		KDTree<Location> tree = new KDTree<>(list);
+		List<KDStub> list = Arrays.asList(locations);
+		KDTree<KDStub> tree = new KDTree<>(list);
 		assertTrue(tree.contains(l1));
 		assertTrue(tree.contains(l2));
 		assertTrue(tree.contains(l3));
@@ -49,18 +47,18 @@ public class KDTreeTest {
 	 */
 	@Test
 	public void simpleNeighborTest() {
-		Location l1 = new Location(0,0);
-		Location l2 = new Location(1,2);
-		Location l3 = new Location(2,3);
-		Location l4 = new Location(3,4);
-		ArrayList<Location> l = new ArrayList<>();
+		KDStub l1 = new KDStub(0,0);
+		KDStub l2 = new KDStub(1,2);
+		KDStub l3 = new KDStub(2,3);
+		KDStub l4 = new KDStub(3,4);
+		ArrayList<KDStub> l = new ArrayList<>();
 		l.add(l1);
 		l.add(l2);
 		l.add(l3);
 		l.add(l4);
 		
-		KDTree<Location> tree = new KDTree<>(l);
-		List<Location> results = tree.getNearestNeighbors(2, l1);
+		KDTree<KDStub> tree = new KDTree<>(l);
+		List<KDStub> results = tree.getNearestNeighbors(2, l1);
 		
 		assertTrue(results.size() == 2);
 		assertFalse(results.contains(l1));
@@ -75,18 +73,18 @@ public class KDTreeTest {
 	 */
 	@Test
 	public void simpleRadiusTest() {
-		Location l1 = new Location(0,0);
-		Location l2 = new Location(1,2);
-		Location l3 = new Location(2,3);
-		Location l4 = new Location(3,4);
-		ArrayList<Location> l = new ArrayList<>();
+		KDStub l1 = new KDStub(0,0);
+		KDStub l2 = new KDStub(1,2);
+		KDStub l3 = new KDStub(2,3);
+		KDStub l4 = new KDStub(3,4);
+		ArrayList<KDStub> l = new ArrayList<>();
 		l.add(l1);
 		l.add(l2);
 		l.add(l3);
 		l.add(l4);
-		KDTree<Location> tree = new KDTree<>(l);
-		List<Location> results = tree.getObjectsWithinRadius(4, l1);
-		
+		KDTree<KDStub> tree = new KDTree<>(l);
+		int radius = 3;
+		List<KDStub> results = tree.getObjectsWithinRadius(Math.pow(radius, 2), l1);
 		assertTrue(results.size() == 1);
 		assertFalse(results.contains(l1));
 		assertTrue(results.contains(l2));
