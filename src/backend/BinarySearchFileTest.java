@@ -43,6 +43,11 @@ public class BinarySearchFileTest {
 	}
 
 	
+	@Test
+	public void jCompSpecialsTest() throws IOException {
+		
+	}
+	
 	
 	@Test
 	public void FindFifty() throws IOException {
