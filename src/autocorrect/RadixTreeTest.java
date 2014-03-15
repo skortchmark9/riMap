@@ -2,19 +2,29 @@ package autocorrect;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.junit.Test;
 
 public class RadixTreeTest {
 	
 	public final String dictionary = "./autocorrect_maps/data/autocorrect/dictionary.txt";
 	public final String dickens = "./autocorrect_maps/data/autocorrect/great_expectations.txt";
+	
+	
+	@Test
+	public void whitespaceTest1() {
+		/** Testing to see if it will identify the correct break in compounded words.*/
+		RadixTree rt = new RadixTree();
+		rt.populateRadixTree(dickens);
+		boolean outcome = true;
+		for(Suggestion s : rt.whitespace("hishat")) {
+			if (!s.equals(new Suggestion("his hat")))
+				outcome = false;
+		}
+		assertTrue(outcome);
+	}
+
 	
 	@Test
 	public void lineParseTest() {
@@ -33,7 +43,7 @@ public class RadixTreeTest {
 	
 	@Test
 	public void rtMultipleInsertTest() {
-		/** Tests for frequencies working correctly*/
+		// Tests for frequencies working correctly
 		RadixTree rt = new RadixTree();
 		rt.insert("cat");
 		rt.insert("catfish");
@@ -46,7 +56,7 @@ public class RadixTreeTest {
 	
 	@Test
 	public void rtIntermediateTest() {
-		/** Tests for intermediate nodes working correctly*/
+		// Tests for intermediate nodes working correctly
 		RadixTree rt = new RadixTree();
 		String [] words = {"cat", "catfish", "cart"};
 		for(String s : words)
@@ -54,7 +64,6 @@ public class RadixTreeTest {
 		boolean outcome = true;
 		for(String s : words)
 			if (!rt.search(s)) {
-				System.out.println(s);
 				outcome = false;
 			}
 		assertTrue(outcome);
@@ -62,7 +71,7 @@ public class RadixTreeTest {
 	
 	@Test
 	public void getPrefixSuggestionsTest1() {
-		/** Can we generate prefix suggestions? */
+		// Can we generate prefix suggestions? 
 		RadixTree rt = new RadixTree();
 		rt.populateRadixTree(dickens);
 		System.out.println(rt.getPrefixSuggestions("akim", 10));
@@ -85,7 +94,7 @@ public class RadixTreeTest {
 	
 	@Test
 	public void levenshteinTest1() {
-		/** Test against reference implementation.*/
+		// Test against reference implementation.
 		RadixTree rt = new RadixTree();
 		rt.populateRadixTree(dictionary);
 		boolean outcome = true;
@@ -98,7 +107,7 @@ public class RadixTreeTest {
 	
 	@Test
 	public void levenshteinTest2() {
-		/** Test against reference implementation.*/
+		// Test against reference implementation.
 		RadixTree rt = new RadixTree();
 		rt.populateRadixTree(dickens);
 		boolean outcome = true;
@@ -110,21 +119,8 @@ public class RadixTreeTest {
 	}
 	
 	@Test
-	public void whitespaceTest1() {
-		/** Testing to see if it will identify the correct break in compounded words.*/
-		RadixTree rt = new RadixTree();
-		rt.populateRadixTree(dickens);
-		boolean outcome = true;
-		for(Suggestion s : rt.whitespace("hishat")) {
-			if (!s.equals(new Suggestion("his hat")))
-				outcome = false;
-		}
-		assertTrue(outcome);
-	}
-	
-	@Test
 	public void whitespaceTest2() {
-		/** Testing to make sure BOTH outputted words are found in the tree.*/
+		//Testing to make sure BOTH outputted words are found in the tree.
 		RadixTree rt = new RadixTree();
 		rt.insert("hi", "my");
 		rt.insert("there", "b");
@@ -134,7 +130,7 @@ public class RadixTreeTest {
 	
 	@Test
 	public void whitespaceTest3() {
-		/** Testing to see if it will identify the correct break in compounded words.*/
+		// Testing to see if it will identify the correct break in compounded words.
 		RadixTree rt = new RadixTree();
 		rt.populateRadixTree(dickens);
 		rt.insert("hi");
@@ -150,7 +146,7 @@ public class RadixTreeTest {
 
 	@Test
 	public void bigramNeighborsTest1() {
-		/** Testing....*/
+		// Testing....
 		RadixTree rt = new RadixTree();
 		rt.populateRadixTree(dickens);
 		rt.insert("hat", "ballin");
@@ -161,7 +157,6 @@ public class RadixTreeTest {
 	
 	@Test
 	public void bigramProbabilityTest1() {
-		/** Testing...*/
 		RadixTree rt = new RadixTree();
 		rt.insert("hat", "ballin");
 		rt.insert("hat", "ballin");
@@ -172,7 +167,7 @@ public class RadixTreeTest {
 		rt.insert("the", "ballin");
 		assertTrue(rt.getBigramNeighbors("hat").containsValue(5));
 	}
-	
+
 	
 	/*
     @Test

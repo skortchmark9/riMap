@@ -1,7 +1,5 @@
 package autocorrect;
 
-import java.util.HashMap;
-
 import com.google.common.collect.HashMultiset;
 
 public class Suggestion {

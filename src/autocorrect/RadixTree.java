@@ -471,10 +471,10 @@ public class RadixTree {
 		List<Suggestion> results = new LinkedList<>();
 		for (int i = 0; i < currentWord.length(); i++) {			
 			charKey = currentWord.charAt(i);
-			if (_children != null && !_children.isEmpty()) {
-				RadixTree currentNode = _children.get(charKey);
+			if (thisNode._children != null && !thisNode._children.isEmpty()) {
+				RadixTree currentNode = thisNode._children.get(charKey);
 				if (currentNode != null) {
-					//					System.out.println("Here is the current node: " + currentNode.toString() + " its freq: " + currentNode.getFreq());
+					System.out.println("Here is the current node: " + currentNode.toString() + " its freq: " + currentNode.getFreq());
 					if (currentNode.isWord()) {
 						int breakpoint = i + currentNode.key.length();
 						if (breakpoint < currentWord.length())
