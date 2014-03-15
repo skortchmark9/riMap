@@ -12,6 +12,6 @@ public class Constants {
 	/**
 	 * For threaded file reading into KD Tree
 	 */
-	public static final int numThreads = 0;
+	public static final int numThreads = 10;
 
 }

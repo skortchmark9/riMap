@@ -14,6 +14,16 @@ public class BinarySearchFileTest {
 	
 	String films = "./data/baconfiles/films.tsv";
 	// Figure this out with TAs
+	
+	@Test
+	public void testReadChunks() throws IOException {
+		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
+		System.out.println(b.readChunks("name", "id"));
+		b.close();
+		assertTrue(true);
+	}
+	
+
 	@Test
 	public void FindUTF8() throws IOException {
 		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
@@ -29,9 +39,6 @@ public class BinarySearchFileTest {
 		b.close();
 	}
 	
-
-
-
 	@Test
 	public void TestXsByY() throws Exception {
 		BinarySearchFile b = new BinarySearchFile(films, "id", "id", "name", "starring");
@@ -55,7 +62,7 @@ public class BinarySearchFileTest {
 		assertTrue(b.getXsByY("/m/0hzcwhy", "name")[0].equals("Watch Juice"));
 		b.close();
 	}
-
+	
 	@Test
 	public void BinarySearchNotThere() throws Exception {
 		//I don't think we want this behavior.

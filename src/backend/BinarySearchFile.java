@@ -86,13 +86,13 @@ public class BinarySearchFile implements AutoCloseable {
 	 * @param xs keywords - "name", "id", "film", "starring"
 	 * @return a string array that corresponds to the order of the varargs keywords passed into it.
 	 */
-	public String[] getXsByY(String y, String ...xs) {
+	private String[] getXs(String line, String ...xs) {
 		//Searches for the entry we are looking for
-		String line = search(y);
 		if (line == null) {
 			return null;
 		}
 		//Splits up the linearray for quick searching.
+		String[] resultsArray = new String[xs.length];
 		String[] lineArray = Constants.tab.split(line);
 		for(int i = 0; i < xs.length; i++) {
 			String x = xs[i];
@@ -100,7 +100,8 @@ public class BinarySearchFile implements AutoCloseable {
 				//We use the parsePattern we must have defined in search to get the data for each column.
 				Integer numTabs = parsePattern.get(x);
 				if (numTabs != null && lineArray.length >= numTabs) {
-					xs[i] = lineArray[numTabs]; //We replace the key with the sought information.
+					String s = lineArray[numTabs];
+					resultsArray[i] = s; //We replace the key with the sought information.
 				}
 				else {
 					System.out.println("ERROR: header file and data not aligned");
@@ -112,7 +113,11 @@ public class BinarySearchFile implements AutoCloseable {
 				return null;
 			}
 		}
-		return xs;
+		return resultsArray;
+	}
+	
+	public String[] getXsByY(String y, String ...xs) {
+		return getXs(search(y), xs);
 	}
 
 	/**
@@ -260,30 +265,35 @@ public class BinarySearchFile implements AutoCloseable {
 		}
 	}
 	
-	List<String> readChunks() throws IOException {
-		return readChunks(Constants.numThreads);
+	
+	public List<List<String>> readChunks(String...xs) throws IOException {
+		return readChunks(Constants.numThreads, xs);
 	}
 	
-	List<String> readChunks(int numThreads) throws IOException {
-		LinkedList<String> chunks = new LinkedList<>();
-		long chunkSize = raf.length() / numThreads + 1;
-		for(int i = 0; i < Constants.numThreads; i++) {
-			chunks.addAll(readChunk(chunkSize * (i - 1), chunkSize * i));
+	private List<List<String>> readChunks(int numThreads, String...xs) throws IOException {
+		List<List<String>> chunks = new LinkedList<>();
+		Long length = raf.length();
+		Long secondLine = nextNewLine(0, length);
+		long chunkSize = (length - secondLine) / numThreads + 1;
+		for(int i = 1; i <= Constants.numThreads; i++) {
+			long chunkEnd = (i == Constants.numThreads) ? length : nextNewLine(secondLine + (chunkSize * i), length) + 1;
+			long chunkStart = nextNewLine((secondLine + (chunkSize * (i - 1))), chunkEnd) + 1;
+			chunks.addAll(readChunk(chunkStart, chunkEnd, xs));
 		}
 		return chunks;
 	}
 	
-	List<String> readChunk(long start, long end) throws IOException {
-		List<String> lines = new LinkedList<>();
-		long lineStart = 0;
+	private List<List<String>> readChunk(long start, long end, String...xs) throws IOException {
+		List<List<String>> lines = new LinkedList<>();
+		long lineStart = start;
 		long lineEnd = 0;
 		while (lineStart < end) {
 			lineEnd = nextNewLine(lineStart, end);
 			byte[] line = new byte[(int) (lineEnd - lineStart)];
 			raf.seek(lineStart);
 			raf.read(line);
-			lines.add(string(line));
-			lineStart = lineEnd;
+			lines.add(Arrays.asList(getXs(string(line), xs)));
+			lineStart = lineEnd + 1;
 		}
 		return lines;
 	}
@@ -296,6 +306,9 @@ public class BinarySearchFile implements AutoCloseable {
 	 * @throws IOException - in case of problems with raf. 
 	 */
 	public long nextNewLine(long start, long end) throws IOException {
+		if (start > end) {
+			return end;
+		}
 		Long cachedNewLine = nextNewLines.get(start);
 		if (cachedNewLine != null) {
 			return cachedNewLine;
