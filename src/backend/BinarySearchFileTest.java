@@ -1,4 +1,4 @@
-package maps;
+package backend;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;

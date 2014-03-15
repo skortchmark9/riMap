@@ -5,7 +5,7 @@ package graph;
  *
  * @param <T> the type of value to be stored in nodes of the graph
  */
-public interface Edge<K extends Node<?>> {
+public interface Edge<K extends PathNode<?>> {
 	K getTarget();
 	String getName();
 	double getWeight();

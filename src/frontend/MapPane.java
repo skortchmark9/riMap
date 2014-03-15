@@ -12,7 +12,7 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
-import maps.Location;
+import maps.Node;
 
 public class MapPane extends JPanel {
 
@@ -23,8 +23,8 @@ public class MapPane extends JPanel {
 	private float scale = 1f;
 	private final int WIDTH = 700;
 	private final int HEIGHT = 700;
-	private List<Location> startLocs;
-	private List<Location> endLocs;
+	private List<Node> startLocs;
+	private List<Node> endLocs;
 
 
 	MapPane(String fileName)   {
@@ -63,8 +63,8 @@ public class MapPane extends JPanel {
 
 		g2d.setColor(Color.WHITE);
 		for(int i = 0; i < startLocs.size(); i++) {
-			Location startLoc = startLocs.get(i);
-			Location endLoc = endLocs.get(i);
+			Node startLoc = startLocs.get(i);
+			Node endLoc = endLocs.get(i);
 			g.drawLine((int) startLoc.getLon(), (int) startLoc.getLat(), (int) endLoc.getLon(), (int) endLoc.getLat());
 		}
 	}
@@ -72,8 +72,8 @@ public class MapPane extends JPanel {
 
 	void parseWay(String way) {
 		String[] locs = way.split("\t");
-		startLocs.add(new Location(Double.parseDouble(locs[0]), Double.parseDouble(locs[1])));
-		endLocs.add(new Location(Double.parseDouble(locs[2]), Double.parseDouble(locs[3])));
+//		startLocs.add(new PathNode(Double.parseDouble(locs[0]), Double.parseDouble(locs[1])));
+//		endLocs.add(new PathNode(Double.parseDouble(locs[2]), Double.parseDouble(locs[3])));
 	}
 }
 

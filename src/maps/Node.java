@@ -11,8 +11,7 @@ import edu.brown.cs032.emc3.kdtree.KDimensionable;
 /**
  * @author emc3 / skortchm
  */
-public class Location implements KDimensionable {
-	final String name;
+public class Node implements KDimensionable {
 	final String id;
 	final List<String> wayIDs;
 	final double[] coords;
@@ -23,14 +22,13 @@ public class Location implements KDimensionable {
 	 * in range of acceptable values.
 	 * 
 	 */
-	public Location(double latitude, double longitude) {
+	public Node(String id, double latitude, double longitude, List<String> ways) {
 		Double lat = checkLatitude(latitude);
 		Double lon = checkLongitude(longitude);
 		coords = new double[]{lat, lon};
 		//TODO make me work!
-		this.name = "";
-		this.id = "";
-		this.wayIDs = new LinkedList<>();
+		this.id = id;
+		this.wayIDs = ways;
 	}
 	
 	public double getLat() {
@@ -39,6 +37,10 @@ public class Location implements KDimensionable {
 	
 	public double getLon() {
 		return coords[1];
+	}
+	
+	public List<String> getWayIDs() {
+		return wayIDs;
 	}
 
 	/**
@@ -75,6 +77,14 @@ public class Location implements KDimensionable {
 	public int getNumDimensions() {
 		return 2;
 	}
+	
+	public double manhattanDistanceTo(KDimensionable kd) {
+		double[] otherCoords = kd.getCoordinates();
+		double latDiff = Math.abs(coords[0] - otherCoords[0]);
+		double lonDiff = Math.abs(coords[1] - otherCoords[1]);
+		
+		return latDiff + lonDiff;
+	}
 
 
 	/**
@@ -83,14 +93,9 @@ public class Location implements KDimensionable {
 	@Override
 	public double distanceTo(KDimensionable kd) {
 		// TODO: perhaps this should calculate the haversine Distance?
-		
 		//right now we are just returning Manhattan distance:
-		double[] otherCoords = kd.getCoordinates();
-		double latDiff = Math.abs(coords[0] - otherCoords[0]);
-		double lonDiff = Math.abs(coords[1] - otherCoords[1]);
-		
-		return latDiff + lonDiff;
-	}
+		return this.manhattanDistanceTo(kd);
+		}
 	
 	
 	/**

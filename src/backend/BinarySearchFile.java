@@ -1,6 +1,4 @@
-package maps;
-
-import graph.Constants;
+package backend;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -25,7 +23,7 @@ public class BinarySearchFile implements AutoCloseable {
 	HashMap<Long, Long> prevNewLines;
 
 	enum ParseType {
-		ACTOR, INDEX, FILM
+		NODES, WAYS, INDEX
 	}
 
 	/** 
@@ -47,10 +45,6 @@ public class BinarySearchFile implements AutoCloseable {
 		prevNewLines = new HashMap<>();
 	}
 
-	BinarySearchFile(String filePath) {
-		this(filePath, ParseType.INDEX);
-	}
-
 	/** Attempts to read the header of an index, actors, or films file.
 	 * Assumes the first line starts at 0 and headerEnd is the end of the first line.
 	 * @param headerEnd - end of first line.
@@ -65,10 +59,10 @@ public class BinarySearchFile implements AutoCloseable {
 			String[] headerPieces = Constants.tab.split(header);
 			//Divides up the pieces of the header into individual columns. 
 			HashMap<String, Integer> results = new HashMap<>(3);
-			//TODO Change for maps specific stuff.
 			for(int i = 0; i < headerPieces.length; i++) {
 				results.put(headerPieces[i], i);
 			}
+			//TODO: SHOULD WE GET RID OF THIS OR MAKE IT BETTER (MORE SPECIFIC)
 			if (!(results.containsKey("id") || results.containsKey("name"))) {
 				System.out.println("ERROR: file header not formatted correctly");
 				return null;
@@ -98,7 +92,7 @@ public class BinarySearchFile implements AutoCloseable {
 		String[] lineArray = Constants.tab.split(line);
 		for(int i = 0; i < xs.length; i++) {
 			String x = xs[i];
-			if (x.equals("name") || x.equals("id") || x.equals("film") || x.equals("starring")) { //maybe an enum?
+			if (x.equals("name") || x.equals("id") || x.equals("start") || x.equals("end") || x.equals("ways")) { //maybe an enum?
 				//We use the parsePattern we must have defined in search to get the data for each column.
 				Integer numTabs = parsePattern.get(x);
 				if (numTabs != null && lineArray.length >= numTabs) {

@@ -1,30 +1,45 @@
 package maps;
 
 import graph.Edge;
+import backend.Resources;
 
-public class Way implements Edge<PathNode> {
+public class Way implements Edge<PathNodeWrapper> {
 	
-	PathNode target;
-	Way(PathNode p) {
-		target = p;
+	PathNodeWrapper target;
+	String name;
+	Node start;
+	String uniqueID;
+	
+	/** 
+	 * We probably shouldn't use this too often.
+	 * @param uniqueID
+	 * @param r
+	 */
+	
+	Way(String uniqueID, String name, Node start, PathNodeWrapper end) {
+		this.uniqueID = uniqueID;
+		this.name = name;
+		this.start = start;
+		this.target = end;
 	}
 
+	/**
+	 * Gets the PathNode this WAY is pointing to - is its end coordinate.
+	 * 
+	 */
 	@Override
-	public PathNode getTarget() {
-		// TODO Auto-generated method stub
-		return null;
+	public PathNodeWrapper getTarget() {
+		return target;
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return name;
 	}
 
 	@Override
 	public double getWeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return start.distanceTo(target.getValue());
 	}
 
 }

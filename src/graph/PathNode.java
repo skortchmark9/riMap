@@ -7,19 +7,19 @@ import java.util.Map;
  *
  * @param <T> - the type of value to be stored in the node. 
  */
-public interface Node<T> {
-	Map<Integer, Edge<? extends Node<T>>> getNeighbors();
-	Edge<? extends Node<T>> getNeighbor(int hashcode);
+public interface PathNode<T> {
+	Map<String, Edge<? extends PathNode<T>>> getNeighbors();
+	Edge<? extends PathNode<T>> getNeighbor(String key);
 	T getValue();
 	double getDistance();
 	void setDistance(Double d);
 	double getAStarDistance();
 	void setAStarDistance(Double d);
-	Node<T> getPrevious();
-	void setPrevious(Node<T> n);
+	PathNode<T> getPrevious();
+	void setPrevious(PathNode<T> n);
 	@Override
 	int hashCode();
 	String getName();
-	double getDistanceTo(Node<T> n2);
-	int compareTo(Node<T> other);
+	double getDistanceTo(PathNode<T> n2);
+	int compareTo(PathNode<T> other);
 }

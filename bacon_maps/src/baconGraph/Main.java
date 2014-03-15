@@ -13,7 +13,7 @@ public class Main {
 		try {
 			Resources r = new Resources(args[2], args[3], args[4]);
 			Bacon b = new Bacon(args[0], args[1], r);
-			b.getPath(); 
+			b.getPath();
 			final long endTime = System.currentTimeMillis();
 			r.closeResources();
 			System.out.println("TIME TAKEN: " + (endTime - startTime));
