@@ -141,7 +141,8 @@ public class RadixTreeTest {
 		rt.insert("shat");
 		
 		boolean outcome = true;
-		for(Suggestion s : rt.whitespace("hishat")) {
+		List<Suggestion> suggestions = rt.whitespace("hishat");
+		for(Suggestion s : suggestions) {
 			if (!(s.equals(new Suggestion("his hat")) || s.equals(new Suggestion("hi shat"))))
 					outcome = false;
 		}
