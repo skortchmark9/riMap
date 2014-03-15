@@ -18,7 +18,7 @@ public class BinarySearchFileTest {
 	@Test
 	public void testReadChunks() throws IOException {
 		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
-		System.out.println(b.readChunks("name", "id"));
+//		System.out.println(b.readChunks("name", "id"));
 		b.close();
 		assertTrue(true);
 	}
@@ -27,9 +27,21 @@ public class BinarySearchFileTest {
 	@Test
 	public void FindUTF8() throws IOException {
 		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
+		System.out.println(b.search("Miya雅vi Medium"));
 		assertTrue(b.getXsByY("Miya雅vi Medium", "id")[0].equals("/m/01vvyc_"));
 		b.close();
 	}
+	
+	//Why does the below work but not the above ?
+
+	@Test
+	public void FindUTF8Again() throws IOException {
+		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
+		System.out.println(b.search("안소희"));
+		assertTrue(b.getXsByY("Miya雅vi Medium", "id")[0].equals("/m/01vvyc_"));
+		b.close();
+	}
+
 	
 	
 	@Test
@@ -43,7 +55,6 @@ public class BinarySearchFileTest {
 	public void TestXsByY() throws Exception {
 		BinarySearchFile b = new BinarySearchFile(films, "id", "id", "name", "starring");
 		String[] nameAndStarring = b.getXsByY("/m/011_p6", "name", "starring");
-		System.out.println(Arrays.toString(nameAndStarring));
 		assertTrue(nameAndStarring[0].equals("Thunderbolt"));
 		assertTrue(nameAndStarring[1].equals("/m/02ysx,/m/06mwbj,/m/0ksbyz,/m/03jl2r,/m/05bwd6"));
 		b.close();
@@ -75,8 +86,7 @@ public class BinarySearchFileTest {
 	@Test
 	public void ActorCorrectLength() throws Exception {
 		Resources r = new Resources(1);
-		System.out.println("\n\n" + Resources.indexFile.search("Taylor Swift"));
-		assertTrue(r.indexFile.search("Taylor Swift").equals("Taylor Swift\t/m/0dl567"));
+		assertTrue(Resources.indexFile.search("Taylor Swift").equals("Taylor Swift\t/m/0dl567"));
 		r.closeResources();
 	}
 	

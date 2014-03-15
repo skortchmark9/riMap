@@ -184,8 +184,6 @@ public class BinarySearchFile implements AutoCloseable {
 			raf.seek(lastTab + 1);
 			byte[] testLine = new byte[word.length];
 			raf.read(testLine);
-			out(string(word));
-			out(string(testLine));
 			int cmp = compare(word, testLine);
 			if (cmp < 0 && !lastSearch) {
 				return search(word, top, followingNewLine);
@@ -266,34 +264,45 @@ public class BinarySearchFile implements AutoCloseable {
 	}
 	
 	
-	public List<List<String>> readChunks(String...xs) throws IOException {
+	public List<List<String>> readChunks(String...xs) {
 		return readChunks(Constants.numThreads, xs);
 	}
 	
-	private List<List<String>> readChunks(int numThreads, String...xs) throws IOException {
+	private List<List<String>> readChunks(int numThreads, String...xs) {
 		List<List<String>> chunks = new LinkedList<>();
-		Long length = raf.length();
-		Long secondLine = nextNewLine(0, length);
+		try {
+		long length = raf.length();
+		long secondLine = nextNewLine(0, length);
 		long chunkSize = (length - secondLine) / numThreads + 1;
 		for(int i = 1; i <= Constants.numThreads; i++) {
 			long chunkEnd = (i == Constants.numThreads) ? length : nextNewLine(secondLine + (chunkSize * i), length) + 1;
 			long chunkStart = nextNewLine((secondLine + (chunkSize * (i - 1))), chunkEnd) + 1;
 			chunks.addAll(readChunk(chunkStart, chunkEnd, xs));
 		}
+		}
+		catch (IOException e) {
+			System.err.println("ERROR: readChunks could not read the file.");
+		}
 		return chunks;
 	}
 	
-	private List<List<String>> readChunk(long start, long end, String...xs) throws IOException {
+	private List<List<String>> readChunk(long start, long end, String...xs) {
 		List<List<String>> lines = new LinkedList<>();
 		long lineStart = start;
 		long lineEnd = 0;
 		while (lineStart < end) {
-			lineEnd = nextNewLine(lineStart, end);
-			byte[] line = new byte[(int) (lineEnd - lineStart)];
-			raf.seek(lineStart);
-			raf.read(line);
-			lines.add(Arrays.asList(getXs(string(line), xs)));
-			lineStart = lineEnd + 1;
+			try {
+				lineEnd = nextNewLine(lineStart, end);
+				byte[] line = new byte[(int) (lineEnd - lineStart)];
+				raf.seek(lineStart);
+				raf.read(line);
+				lines.add(Arrays.asList(getXs(string(line), xs)));
+				lineStart = lineEnd + 1;
+			} catch (IOException e) {
+				//TODO we should discuss the behavior here - 
+				//how do we want to handle it if we can't read a chunk
+				return lines;
+			}
 		}
 		return lines;
 	}
