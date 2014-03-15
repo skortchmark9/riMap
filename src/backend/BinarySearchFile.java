@@ -18,7 +18,7 @@ import java.util.List;
 public class BinarySearchFile implements AutoCloseable {
 
 	RandomAccessFile raf; // the random access file to be searched
-	private static final Charset UTF8 = Charset.forName("UTF-8"); // the type of encoding.
+	private static Charset UTF8 = Charset.forName("UTF-8"); // the type of encoding.
 	HashMap<String, Integer> parsePattern;
 	HashMap<Long, Long> nextNewLines;
 	HashMap<Long, Long> prevNewLines;
