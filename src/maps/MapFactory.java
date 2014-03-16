@@ -15,7 +15,7 @@ public class MapFactory {
 		if (wayInfo == null) {
 			return null;
 		}
-		Node loc = createNode(wayInfo[1]);
+		Node loc = createNode(wayInfo[1]); //XXX: shouldn't we be using the references to nodes we already have
 		if (loc == null) {
 			return null;
 		} else {
