@@ -1,6 +1,7 @@
 package maps;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -12,8 +13,14 @@ import backend.Resources;
 import edu.brown.cs032.emc3.kdtree.KDTree;
 public class MapFactory {
 	
+	private static HashMap<String, Node> nodes = new HashMap<>();
+	private static HashMap<String, Way> ways= new HashMap<>();
+	
 	static Way createWay(String wayID) {
-		////////YOU ARE HERE: FIND OUT WHY THE TARGET OF WAYS IS THE SAME AS THE START
+		Way possibleWay= ways.get(wayID);
+		if (possibleWay != null) {
+			return possibleWay;
+		}
 		String[] wayInfo = Resources.waysFile.getXsByY(wayID, "name", "start", "end");
 		if (wayInfo == null) {
 			return null;
@@ -23,14 +30,16 @@ public class MapFactory {
 		if (startLoc == null || endLoc == null) {
 			return null;
 		} else {
-			return new Way(wayID, wayInfo[0], startLoc, new PathNodeWrapper(endLoc));
+			Way resultWay = new Way(wayID, wayInfo[0], startLoc, new PathNodeWrapper(endLoc));
+			ways.put(wayID, resultWay);
+			return resultWay;
 		}
 	}
 
 	
 	//TODO : Potentially we could store the nodes created somewhere so that if
 	//we encounter them again we can just call them from a HashMap or something.
-	static Node createNode(String nodeID, String latitude, String longitude, String ways) {
+	private static Node createNode(String nodeID, String latitude, String longitude, String ways) {
 		double lat = 0;
 		double lon = 0;
 		List<String> waysList;
@@ -42,13 +51,20 @@ public class MapFactory {
 			return null;
 		}
 		try {
-			return new Node(nodeID, lat, lon, waysList);
+			Node node = new Node(nodeID, lat, lon, waysList);
+			nodes.put(nodeID, node);
+			return node;
 		} catch (IllegalArgumentException e) {
 			return null;
 		}
 	}
 	
 	static Node createNode(String nodeID) {
+		Node possibleNode = nodes.get(nodeID);
+		if (possibleNode != null) {
+			return possibleNode;
+		}
+		//^ So that we don't need to make the system call if we don't have to.
 		String[] nodeInfo = Resources.nodesFile.getXsByY(nodeID, "latitude", "longitude", "ways");
 		if (nodeInfo == null) {
 			return null;
