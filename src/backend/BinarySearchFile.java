@@ -181,7 +181,7 @@ public class BinarySearchFile implements AutoCloseable {
 					break;
 				}
 			}			
-			return readChunk(rangeStart, rangeEnd, xs);
+			return readChunk(rangeStart + 1, rangeEnd + 1, xs);
 	} catch (IOException e) {
 		return null;
 	}
