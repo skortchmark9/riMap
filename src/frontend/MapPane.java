@@ -1,4 +1,6 @@
 package frontend;
+import graph.Edge;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -13,6 +15,7 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import maps.Node;
+import maps.Way;
 
 public class MapPane extends JPanel {
 
@@ -25,7 +28,8 @@ public class MapPane extends JPanel {
 	private static int PIXEL_HEIGHT = 700;
 	private List<Node> startLocs;
 	private List<Node> endLocs;
-	
+	private List<Way> renderedWays;
+	//TODO: List of Ways to be drawn instead of 2 different lists ^
 
 
 	MapPane(String fileName)   {
@@ -76,5 +80,6 @@ public class MapPane extends JPanel {
 //		startLocs.add(new PathNode(Double.parseDouble(locs[0]), Double.parseDouble(locs[1])));
 //		endLocs.add(new PathNode(Double.parseDouble(locs[2]), Double.parseDouble(locs[3])));
 	}
+
 }
 
