@@ -22,7 +22,15 @@ public class Way implements Edge<PathNodeWrapper> {
 		this.start = start;
 		this.target = end;
 	}
-
+	
+	/**
+	 * @return the node representing the start point of this way
+	 * (opposite the target)
+	 */
+	public Node getStart() {
+		return start;
+	}
+	
 	/**
 	 * Gets the PathNode this WAY is pointing to - is its end coordinate.
 	 * 
