@@ -20,16 +20,17 @@ public class MapPane extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private float scale = 1f;
-	private final int WIDTH = 700;
-	private final int HEIGHT = 700;
+	private double scale = 1.0;
+	private static int PIXEL_WIDTH = 700;
+	private static int PIXEL_HEIGHT = 700;
 	private List<Node> startLocs;
 	private List<Node> endLocs;
+	
 
 
 	MapPane(String fileName)   {
 		setBackground(Color.black);
-		this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+		this.setPreferredSize(new Dimension(PIXEL_WIDTH, PIXEL_HEIGHT));
 		startLocs = new LinkedList<>();
 		endLocs = new LinkedList<>();
 		String line;
@@ -56,10 +57,10 @@ public class MapPane extends JPanel {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
 
-		g2d.drawLine(0, 0, WIDTH - 1, 0);
-		g2d.drawLine(0, 0, 0, HEIGHT - 1);
-		g2d.drawLine(WIDTH - 1, 0, WIDTH - 1, HEIGHT - 1);
-		g2d.drawLine(0, HEIGHT - 1, WIDTH - 1, HEIGHT - 1);
+		g2d.drawLine(0, 0, PIXEL_WIDTH - 1, 0);
+		g2d.drawLine(0, 0, 0, PIXEL_HEIGHT - 1);
+		g2d.drawLine(PIXEL_WIDTH - 1, 0, PIXEL_WIDTH - 1, PIXEL_HEIGHT - 1);
+		g2d.drawLine(0, PIXEL_HEIGHT - 1, PIXEL_WIDTH - 1, PIXEL_HEIGHT - 1);
 
 		g2d.setColor(Color.WHITE);
 		for(int i = 0; i < startLocs.size(); i++) {

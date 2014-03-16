@@ -106,4 +106,8 @@ public class MapFactory {
 		System.out.println("Done: " + (System.currentTimeMillis() - start) + "s");
 		return new KDTree<Node>(nodeList);
 	}
+	
+	public static List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+		return null;
+	}
 }

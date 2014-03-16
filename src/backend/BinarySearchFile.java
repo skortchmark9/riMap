@@ -82,9 +82,9 @@ public class BinarySearchFile implements AutoCloseable {
 	 * If we are consulting an entry for information about its name for example,
 	 * we can save ourselves a search later by also getting any information we 
 	 * need from that line. 
-	 * @param y - the search key we are using.
-	 * @param xs keywords - "name", "id", "film", "starring"
-	 * @return a string array that corresponds to the order of the varargs keywords passed into it.
+	 * @param line - the line containing the info we want to return.
+	 * @param xs - keywords, i.e. the fields to be returned. e.g. in Bacon: "name", "id", "film", "starring"
+	 * @return a string array that corresponds to the order of the argument array of keywords passed into it.
 	 */
 	private String[] getXs(String line, String ...xs) {
 		//Searches for the entry we are looking for
