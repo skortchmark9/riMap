@@ -1,6 +1,8 @@
 package backend;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
@@ -18,7 +20,7 @@ public class BinarySearchFileTest {
 	@Test
 	public void testReadChunks() throws IOException {
 		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
-//		System.out.println(b.readChunks("name", "id"));
+		//System.out.println(b.readChunks("name", "id"));
 		b.close();
 		assertTrue(true);
 	}
@@ -26,9 +28,9 @@ public class BinarySearchFileTest {
 
 	@Test
 	public void FindUTF8() throws IOException {
-		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
-		System.out.println(b.search("Miya雅vi Medium"));
-		assertTrue(b.getXsByY("Miya雅vi Medium", "id")[0].equals("/m/01vvyc_"));
+		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/index.tsv", "name", "name", "id");
+		System.out.println(b.search("雅-miyavi-"));
+		assertTrue(b.getXsByY("雅-miyavi-", "id")[0].equals("/m/01qkwf8"));
 		b.close();
 	}
 	
@@ -36,12 +38,38 @@ public class BinarySearchFileTest {
 
 	@Test
 	public void FindUTF8Again() throws IOException {
-		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
+		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/index.tsv", "name", "name", "id");
 		System.out.println(b.search("안소희"));
-		assertTrue(b.getXsByY("Miya雅vi Medium", "id")[0].equals("/m/01vvyc_"));
+		assertTrue(b.getXsByY("Íñigo Garcés", "id")[0].equals("/m/0c09t3g"));
 		b.close();
 	}
 
+	/**
+	 * Tests to make sure jCompare is handling special characters correctly.
+	 */
+	@Test
+	public void jCompSpecialsTest() throws IOException {
+		BufferedReader r = new BufferedReader(new FileReader("./data/baconfiles/special-chars/index_any_special.tsv"));
+		String line = r.readLine(); //reads the header
+		String line2 = "blah"; //so that line2 does not start as null
+		while(line != null && line2 != null) {
+			line = r.readLine();
+			if(line == null) continue;
+			String name1 = line.split("\t")[0];
+			line2 = r.readLine();
+			if (line2 == null) continue;
+			String name2 = line2.split("\t")[0];
+			//System.out.println(name1 + " : " + name2);
+			int cmp = BinarySearchFile.jCompare(name1.getBytes(), name2.getBytes());
+			if (!(cmp < 0)) {
+				System.err.println("jCompare Failed! Compare returned: " + cmp);
+				System.err.println("\tfirst: " + name1);
+				System.err.println("\tsecond: " + name2);
+				assertTrue(false);
+			}
+		}
+		r.close();
+	}
 	
 	
 	@Test
