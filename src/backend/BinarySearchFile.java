@@ -99,8 +99,12 @@ public class BinarySearchFile implements AutoCloseable {
 			if (parsePattern.containsKey(x)) {
 				//We use the parsePattern we must have defined in search to get the data for each column.
 				Integer numTabs = parsePattern.get(x);
-				if (numTabs != null && lineArray.length >= numTabs) {
-					String s = lineArray[numTabs];
+				if (numTabs != null) {
+					//If no field exists for this column, just put an empty string in where the data would go. 
+					String s = "";
+					if (lineArray.length > numTabs) {
+						s = lineArray[numTabs];
+					}
 					resultsArray[i] = s; //We replace the key with the sought information.
 				}
 				else {
@@ -252,7 +256,7 @@ public class BinarySearchFile implements AutoCloseable {
 			//We return the last tab index to keep with the convention of next/prevNewLine.
 			if (tabsFound == numTabs) {
 				return start + i;
-			} 
+			}
 		}
 		//if we haven't found it yet.
 		if (start + arraySize < end) {
@@ -278,11 +282,13 @@ public class BinarySearchFile implements AutoCloseable {
 			long chunkEnd = (i == Constants.numThreads) ? length : nextNewLine(secondLine + (chunkSize * i), length) + 1;
 			long chunkStart = nextNewLine((secondLine + (chunkSize * (i - 1))), chunkEnd) + 1;
 			chunks.addAll(readChunk(chunkStart, chunkEnd, xs));
+			System.out.println("Finished chunk: " + (i - 1) + " of: " + Constants.numThreads);
 		}
 		}
 		catch (IOException e) {
 			System.err.println("ERROR: readChunks could not read the file.");
 		}
+		System.out.println("Finished Reading");
 		return chunks;
 	}
 	

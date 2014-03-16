@@ -5,9 +5,25 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class MapsCLI {
+import backend.Backend;
 
-	MapsCLI() {
+public class MapsCLI implements Runnable{
+	
+	Backend b;
+
+	MapsCLI(Backend b) {
+		this.b = b;
+		run();
+	}
+	public static void main(String[] args) {
+		Backend b;
+		try {
+			b = new Backend(args);
+			new MapsCLI(b);
+		} catch (IOException e) {
+			System.err.print("ERROR: Could not load backend");
+			System.exit(1);
+		}
 	}
 	
 	public void run() {
@@ -27,7 +43,7 @@ public class MapsCLI {
 			else if (userInput.equals("")) //Empty line is exit as well.
 				break;
 			else {
-				new PathTester(userInput);
+				new PathTester(userInput, b);
 			}
 		}
 	}

@@ -1,5 +1,6 @@
 package maps;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -11,16 +12,17 @@ import backend.Constants;
 public class MapFactory {
 	
 	static Way createWay(String wayID) {
+		////////YOU ARE HERE: FIND OUT WHY THE TARGET OF WAYS IS THE SAME AS THE START
 		String[] wayInfo = Resources.waysFile.getXsByY(wayID, "name", "start", "end");
 		if (wayInfo == null) {
 			return null;
 		}
-		Node loc = createNode(wayInfo[1]);
-		if (loc == null) {
+		Node startLoc = createNode(wayInfo[1]);
+		Node endLoc = createNode(wayInfo[2]);
+		if (startLoc == null || endLoc == null) {
 			return null;
 		} else {
-		PathNodeWrapper pnw = new PathNodeWrapper(loc);
-			return new Way(wayID, wayInfo[0], loc, pnw);
+			return new Way(wayID, wayInfo[0], startLoc, new PathNodeWrapper(endLoc));
 		}
 	}
 
@@ -54,8 +56,19 @@ public class MapFactory {
 		}
 	}
 	
+	static Node createIntersection(String streetName1, String streetName2) {
+		List<String> street1nodeLists = Resources.indexFile.getNodeLists;
+		List<String> street1nodeIDs = new ArrayList<>();
+		for(String nodeList : street1nodeLists) {
+			street1nodeIDs.addAll(Arrays.asList(Constants.comma.split(nodeList)));
+		}
+	}
+	
 	public static KDTree<Node> createKDTree() {
+		System.out.println("Reading nodes");
 		List<List<String>> nodes = Resources.nodesFile.readChunks("id", "latitude", "longitude", "ways");
+		long start = System.currentTimeMillis();
+		System.out.println("Initializing KDTree");
 		List<Node> nodeList = new LinkedList<>();
 		//Iterators here because we are parsing a lot of data and we want to make the best use of our
 		//underlying datastructure. The wrapper list is a LinkedList and the underlying one is an arrayList.
@@ -69,6 +82,7 @@ public class MapFactory {
 				}
 			}
 		}
+		System.out.println("Done: " + (System.currentTimeMillis() - start) + "s");
 		return new KDTree<Node>(nodeList);
 	}
 }

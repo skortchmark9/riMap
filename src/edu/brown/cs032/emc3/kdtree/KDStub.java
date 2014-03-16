@@ -4,7 +4,7 @@ public class KDStub implements KDimensionable {
 
 	double[] domain;
 
-	KDStub(double x, double y) {
+	public KDStub(double x, double y) {
 		domain = new double[2];
 		domain[0] = x;
 		domain[1] = y;
