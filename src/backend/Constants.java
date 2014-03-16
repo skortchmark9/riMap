@@ -8,6 +8,8 @@ public class Constants {
 	public static final Pattern comma = Pattern.compile(",");
 	public static final Pattern digits = Pattern.compile("\\D");
 	public static final Pattern quotes = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
+	public static final float MIN_ZOOM = 0.1f;
+	public static final float MAX_ZOOM = 2.0f;
 
 	public static final int BufferLength = 1024;
 
