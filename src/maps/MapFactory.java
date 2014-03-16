@@ -10,6 +10,12 @@ import java.util.Set;
 import backend.Constants;
 import backend.Resources;
 import edu.brown.cs032.emc3.kdtree.KDTree;
+
+/**
+ * 
+ * @author emc3 / skortchm
+ *
+ */
 public class MapFactory {
 	
 	static Way createWay(String wayID) {
