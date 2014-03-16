@@ -12,6 +12,12 @@ import autocorrect.RadixTree;
 import backend.Constants;
 import backend.Resources;
 import edu.brown.cs032.emc3.kdtree.KDTree;
+
+/**
+ * 
+ * @author emc3 / skortchm
+ *
+ */
 public class MapFactory {
 	
 	private static HashMap<String, Node> nodes = new HashMap<>();
