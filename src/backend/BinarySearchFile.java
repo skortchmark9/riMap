@@ -82,9 +82,9 @@ public class BinarySearchFile implements AutoCloseable {
 	 * If we are consulting an entry for information about its name for example,
 	 * we can save ourselves a search later by also getting any information we 
 	 * need from that line. 
-	 * @param y - the search key we are using.
-	 * @param xs keywords - "name", "id", "film", "starring"
-	 * @return a string array that corresponds to the order of the varargs keywords passed into it.
+	 * @param line - the line containing the info we want to return.
+	 * @param xs - keywords, i.e. the fields to be returned. e.g. in Bacon: "name", "id", "film", "starring"
+	 * @return a string array that corresponds to the order of the argument array of keywords passed into it.
 	 */
 	private String[] getXs(String line, String ...xs) {
 		//Searches for the entry we are looking for
@@ -99,7 +99,7 @@ public class BinarySearchFile implements AutoCloseable {
 			if (parsePattern.containsKey(x)) {
 				//We use the parsePattern we must have defined in search to get the data for each column.
 				Integer numTabs = parsePattern.get(x);
-				if (numTabs != null && lineArray.length >= numTabs) {
+				if (numTabs != null && lineArray.length > numTabs) {
 					String s = lineArray[numTabs];
 					resultsArray[i] = s; //We replace the key with the sought information.
 				}
@@ -121,7 +121,9 @@ public class BinarySearchFile implements AutoCloseable {
 	}
 
 	/**
-	 * The real search command the above two methods use. Binary searches through the raf.
+	 * The real search command the above two methods use. 
+	 * Binary searches through the raf.
+	 * 
 	 * @param searchCode - the key string we are searching for. 
 	 * @return - the line the key is on, or null if it's not found. 
 	 */
