@@ -1,14 +1,15 @@
 package maps;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
-import edu.brown.cs032.emc3.kdtree.KDTree;
-import backend.Resources;
 import backend.Constants;
+import backend.Resources;
+import edu.brown.cs032.emc3.kdtree.KDTree;
 public class MapFactory {
 	
 	static Way createWay(String wayID) {
@@ -56,11 +57,31 @@ public class MapFactory {
 		}
 	}
 	
-	static Node createIntersection(String streetName1, String streetName2) {
-		List<String> street1nodeLists = Resources.indexFile.getNodeLists;
-		List<String> street1nodeIDs = new ArrayList<>();
-		for(String nodeList : street1nodeLists) {
-			street1nodeIDs.addAll(Arrays.asList(Constants.comma.split(nodeList)));
+	public static Node createIntersection(String streetName1, String streetName2) {
+		String intersection = null;
+		List<List<String>> street1nodeLists = Resources.indexFile.searchMultiples(streetName1, "node");
+		Set<String> street1nodeIDs = new HashSet<>();
+		for(List<String> nodeList : street1nodeLists) {
+			for(String nodes : nodeList) {
+				street1nodeIDs.addAll(Arrays.asList(Constants.comma.split(nodes)));				
+			}
+		}
+		List<List<String>> street2nodeLists = Resources.indexFile.searchMultiples(streetName2, "node");
+		for(List<String> nodeList : street2nodeLists) {
+			for(String nodes : nodeList) {
+				for(String node : Constants.comma.split(nodes)) {
+					if (street1nodeIDs.contains(node)) {
+						//TODO: What if multiples?
+						intersection = node;
+						break;
+					}
+				}
+			}
+		}
+		if (intersection == null) {
+			return null;
+		} else {
+			return createNode(intersection);
 		}
 	}
 	

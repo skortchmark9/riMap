@@ -7,6 +7,8 @@ public class Constants {
 	public static final Pattern tab = Pattern.compile("\t");
 	public static final Pattern comma = Pattern.compile(",");
 	public static final Pattern digits = Pattern.compile("\\D");
+	public static final Pattern quotes = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
+
 	public static final int BufferLength = 1024;
 
 	/**
