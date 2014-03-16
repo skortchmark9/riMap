@@ -127,8 +127,7 @@ public class BinarySearchFile implements AutoCloseable {
 	 */
 	String search(String searchCode) {
 		try {
-			long length;
-			length = raf.length();
+			long length = raf.length();
 			long secondLine = nextNewLine(0, length);
 			if (parsePattern == null){
 				parsePattern = readHeader(secondLine); //Establishes the parsePattern to read
@@ -180,11 +179,15 @@ public class BinarySearchFile implements AutoCloseable {
 					lastSearch = true;
 				}
 			}
-			long lastTab = getByTabs(followingNewLine, bottom);
+			long lastTab = skipTabs(followingNewLine, bottom, parsePattern.get(sortingCol));
 			raf.seek(lastTab + 1);
-			byte[] testLine = new byte[word.length];
-			raf.read(testLine);
-			int cmp = compare(word, testLine);
+			//XXX: changing to only do one read, with an extra byte
+			byte[] tempField = new byte[word.length + 1]; //get one extra byte for use in the else clause below
+			raf.read(tempField);
+			byte[] testField = Arrays.copyOfRange(tempField, 0, word.length); //returns the test field without the extra byte (second index is exclusive)
+			System.out.println(string(tempField));
+			int follow = tempField[tempField.length-1]; //returns the extra byte
+			int cmp = compare(word, testField);
 			if (cmp < 0 && !lastSearch) {
 				return search(word, top, followingNewLine);
 			}
@@ -192,7 +195,7 @@ public class BinarySearchFile implements AutoCloseable {
 				return search(word, followingNewLine, bottom);
 			}
 			else {
-				int follow = raf.read(); //either returns byte or -1 (end of file~)
+				//int follow = raf.read(); //either returns byte or -1 (end of file~)
 				if (follow == '\t' || follow == '\n') { //Could we save time by eliminating this read?
 					return lastTab + 1;
 				} else {
@@ -206,8 +209,7 @@ public class BinarySearchFile implements AutoCloseable {
 	}
 
 	public long  getByTabs(long followingNewLine, long bottom) throws IOException {
-		long lastTab = skipTabs(followingNewLine, bottom, parsePattern.get(sortingCol));
-		return lastTab;
+		return skipTabs(followingNewLine, bottom, parsePattern.get(sortingCol));
 	}
 
 	/** 
@@ -417,9 +419,11 @@ public class BinarySearchFile implements AutoCloseable {
 				}
 			}
 		}
-		if (b.length < a.length) {
+		//strings are equal up to a's length
+		if (a.length < b.length) {
 			return -1;
 		}
+		//strings are equal
 		return 0;
 	}
 
