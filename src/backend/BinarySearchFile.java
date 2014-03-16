@@ -83,7 +83,7 @@ public class BinarySearchFile implements AutoCloseable {
 	 * we can save ourselves a search later by also getting any information we 
 	 * need from that line. 
 	 * @param line - the line containing the info we want to return.
-	 * @param xs - keywords, i.e. the fields to be returned. e.g. in Bacon: "name", "id", "film", "starring"
+	 * @param xs - keywords, i.e. the fields to be returned. e.g. in Bacon: "name", "id", "film", "starring"...
 	 * @return a string array that corresponds to the order of the argument array of keywords passed into it.
 	 */
 	private String[] getXs(String line, String ...xs) {
@@ -215,14 +215,21 @@ public class BinarySearchFile implements AutoCloseable {
 	}
 
 	/** 
-	 * Creates a string from a byte[]
-	 * @param bytes - the byte[]
-	 * @return - the output string. 
+	 * Creates a string from a byte[] using the UTF-8 character set.
+	 * 
+	 * @param bytes - the byte array
+	 * @return 
+	 * the string created from the bytes. 
 	 */
 	public static String string(byte[] bytes) {
 		return new String(bytes, UTF8);
 	}
-
+	
+	
+	/**
+	 * Wrapper for System.out print stream
+	 * @param s  - string to print to standard out
+	 */
 	public static void out(String s) {
 		System.out.println(s);
 	}
