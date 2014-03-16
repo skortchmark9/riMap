@@ -71,4 +71,8 @@ public class MapFactory {
 		}
 		return new KDTree<Node>(nodeList);
 	}
+	
+	public static List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+		return null;
+	}
 }
