@@ -7,7 +7,7 @@ import java.util.Map;
  *
  * @param <T> - the type of value to be stored in the node. 
  */
-public interface PathNode<T> {
+public interface PathNode<T> extends Comparable<PathNode<T>> {
 	Map<String, Edge<? extends PathNode<T>>> getNeighbors();
 	Edge<? extends PathNode<T>> getNeighbor(String key);
 	T getValue();

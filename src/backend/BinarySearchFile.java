@@ -99,8 +99,12 @@ public class BinarySearchFile implements AutoCloseable {
 			if (parsePattern.containsKey(x)) {
 				//We use the parsePattern we must have defined in search to get the data for each column.
 				Integer numTabs = parsePattern.get(x);
-				if (numTabs != null && lineArray.length > numTabs) {
-					String s = lineArray[numTabs];
+				if (numTabs != null) {
+					//If no field exists for this column, just put an empty string in where the data would go. 
+					String s = "";
+					if (lineArray.length > numTabs) {
+						s = lineArray[numTabs];
+					}
 					resultsArray[i] = s; //We replace the key with the sought information.
 				}
 				else {
@@ -115,15 +119,76 @@ public class BinarySearchFile implements AutoCloseable {
 		}
 		return resultsArray;
 	}
-	
+
 	public String[] getXsByY(String y, String ...xs) {
 		return getXs(search(y), xs);
 	}
 
+	public List<List<String>> searchMultiples(String searchCode, String...xs) {
+		try {
+			long length = raf.length();
+			long secondLine = nextNewLine(0, length);
+			if (parsePattern == null){
+				parsePattern = readHeader(secondLine); //Establishes the parsePattern to read
+			}
+			//the CSV with. 
+			if (parsePattern == null) {
+				return null; //If there is a problem we can't read it, or search it. 
+			}
+			//SecondLine because we want to skip the header for the actual search. 
+			//The real recursive engine of search. We'll get there in a second. 
+			long wordPosition = search(searchCode.getBytes(UTF8), secondLine, length);
+			if (wordPosition < 0) {
+				return null;
+			}
+			//wordPosition is the position of the word, but we want the whole line. 
+			long rangeStart = prevNewLine(wordPosition, 0);
+			long rangeEnd = nextNewLine(wordPosition, length);
+			byte[] searchCodeBytes = searchCode.getBytes();
+
+			//Searches previous lines.
+			while(rangeStart > 0) {
+				long prevLine = prevNewLine(rangeStart, 0);
+				long tab = getByTabs(prevLine, rangeStart);
+				raf.seek(tab + 1);
+				byte[] tempField = new byte[searchCodeBytes.length + 1]; //get one extra byte for use in the else clause below
+				raf.read(tempField);
+				out(string(tempField));
+				byte[] testField = Arrays.copyOfRange(tempField, 0, searchCodeBytes.length); //returns the test field without the extra byte (second index is exclusive)
+				int follow = tempField[tempField.length-1]; //returns the extra byte
+				int cmp = compare(searchCodeBytes, testField);
+				if (cmp == 0 && (follow == '\t' || follow == '\n')) {
+					rangeStart = prevLine;
+				} else {
+					break;
+				}
+			}
+			
+			//Searches following lines.
+			while(rangeEnd < length) {
+				long nextLine = nextNewLine(rangeEnd, length) + 1;
+				long tab = getByTabs(nextLine, length);
+				raf.seek(tab);
+				byte[] tempField = new byte[searchCodeBytes.length + 1]; //get one extra byte for use in the else clause below
+				raf.read(tempField);
+				out(string(tempField));
+				byte[] testField = Arrays.copyOfRange(tempField, 0, searchCodeBytes.length); //returns the test field without the extra byte (second index is exclusive)
+				int follow = tempField[tempField.length-1]; //returns the extra byte
+				int cmp = compare(searchCodeBytes, testField);
+				if (cmp == 0 && (follow == '\t' || follow == '\n')) {
+					rangeEnd = nextLine;
+				} else {
+					break;
+				}
+			}			
+			return readChunk(rangeStart, rangeEnd, xs);
+	} catch (IOException e) {
+		return null;
+	}
+	}
+
 	/**
-	 * The real search command the above two methods use. 
-	 * Binary searches through the raf.
-	 * 
+	 * The real search command the above two methods use. Binary searches through the raf.
 	 * @param searchCode - the key string we are searching for. 
 	 * @return - the line the key is on, or null if it's not found. 
 	 */
@@ -187,7 +252,6 @@ public class BinarySearchFile implements AutoCloseable {
 			byte[] tempField = new byte[word.length + 1]; //get one extra byte for use in the else clause below
 			raf.read(tempField);
 			byte[] testField = Arrays.copyOfRange(tempField, 0, word.length); //returns the test field without the extra byte (second index is exclusive)
-			System.out.println(string(tempField));
 			int follow = tempField[tempField.length-1]; //returns the extra byte
 			int cmp = compare(word, testField);
 			if (cmp < 0 && !lastSearch) {
@@ -210,8 +274,8 @@ public class BinarySearchFile implements AutoCloseable {
 		}
 	}
 
-	public long  getByTabs(long followingNewLine, long bottom) throws IOException {
-		return skipTabs(followingNewLine, bottom, parsePattern.get(sortingCol));
+	public long  getByTabs(long newLine, long bottom) throws IOException {
+		return skipTabs(newLine, bottom, parsePattern.get(sortingCol));
 	}
 
 	/** 
@@ -263,7 +327,7 @@ public class BinarySearchFile implements AutoCloseable {
 			//We return the last tab index to keep with the convention of next/prevNewLine.
 			if (tabsFound == numTabs) {
 				return start + i;
-			} 
+			}
 		}
 		//if we haven't found it yet.
 		if (start + arraySize < end) {
@@ -273,34 +337,39 @@ public class BinarySearchFile implements AutoCloseable {
 			return end;
 		}
 	}
-	
-	
+
+
 	public List<List<String>> readChunks(String...xs) {
 		return readChunks(Constants.numThreads, xs);
 	}
-	
+
 	private List<List<String>> readChunks(int numThreads, String...xs) {
 		List<List<String>> chunks = new LinkedList<>();
 		try {
-		long length = raf.length();
-		long secondLine = nextNewLine(0, length);
-		long chunkSize = (length - secondLine) / numThreads + 1;
-		for(int i = 1; i <= Constants.numThreads; i++) {
-			long chunkEnd = (i == Constants.numThreads) ? length : nextNewLine(secondLine + (chunkSize * i), length) + 1;
-			long chunkStart = nextNewLine((secondLine + (chunkSize * (i - 1))), chunkEnd) + 1;
-			chunks.addAll(readChunk(chunkStart, chunkEnd, xs));
-		}
+			long length = raf.length();
+			long secondLine = nextNewLine(0, length);
+			long chunkSize = (length - secondLine) / numThreads + 1;
+			for(int i = 1; i <= Constants.numThreads; i++) {
+				long chunkEnd = (i == Constants.numThreads) ? length : nextNewLine(secondLine + (chunkSize * i), length) + 1;
+				long chunkStart = nextNewLine((secondLine + (chunkSize * (i - 1))), chunkEnd) + 1;
+				chunks.addAll(readChunk(chunkStart, chunkEnd, xs));
+				System.out.println("Finished chunk: " + (i - 1) + " of: " + Constants.numThreads);
+			}
 		}
 		catch (IOException e) {
 			System.err.println("ERROR: readChunks could not read the file.");
 		}
+		System.out.println("Finished Reading");
 		return chunks;
 	}
-	
+
 	private List<List<String>> readChunk(long start, long end, String...xs) {
 		List<List<String>> lines = new LinkedList<>();
 		long lineStart = start;
 		long lineEnd = 0;
+		//FIXME now that I'm looking at this it's actually so slow....many read
+		//calls is stupid, we already have the size of the range we want to
+		//search - read it in memory and then look.
 		while (lineStart < end) {
 			try {
 				lineEnd = nextNewLine(lineStart, end);

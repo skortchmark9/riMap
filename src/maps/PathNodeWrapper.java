@@ -4,22 +4,20 @@ import java.util.List;
 import java.util.Map;
 
 import graph.Edge;
-import backend.Resources;
 import graph.PathNode;
 public class PathNodeWrapper implements PathNode<Node> {
 	
 	private final Node value;
-	private double distance;
-	private double aStarDistance;
+	private double distance = Double.POSITIVE_INFINITY;
+	private double aStarDistance = Double.POSITIVE_INFINITY;
 	
 	//NOTE: Eclipse gives compile errors when the map has PathNodes.
 	private Map<String, Edge<? extends PathNode<Node>>> neighbors;
 	private PathNode<Node> previous;
 	
-	PathNodeWrapper(Node value) {
+	public PathNodeWrapper(Node value) {
 		this.value = value;
 	}
-
 
 	@Override
 	public Map<String, Edge<? extends PathNode<Node>>> getNeighbors() {
@@ -29,7 +27,7 @@ public class PathNodeWrapper implements PathNode<Node> {
 				for(String wayID : wayIDs) {
 					Way w = MapFactory.createWay(wayID);
 					if (w != null) {
-						neighbors.put(wayID, w);
+						neighbors.put(w.getTarget().getName(), w);
 					}
 				}
 			}
@@ -90,5 +88,10 @@ public class PathNodeWrapper implements PathNode<Node> {
 	@Override
 	public int compareTo(PathNode<Node> other) {
 		return Double.compare(getAStarDistance(), other.getAStarDistance());
+	}
+	
+	@Override
+	public String toString() {
+		return "PW: " + getValue().toString();
 	}
 }

@@ -6,16 +6,52 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 
 import org.junit.Test;
 
 
 public class BinarySearchFileTest {
-	
-	
 	String films = "./data/baconfiles/films.tsv";
 	// Figure this out with TAs
+	
+	@Test
+	public void testSearchMultiples() {
+		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
+			System.out.println(b.searchMultiples("10th Avenue", "name", "nodes"));
+		} catch (IOException e) {
+			e.printStackTrace();
+			assertTrue(false);
+		}
+	}
+	
+	
+	/*
+	@Test
+	public void testStringParse() {
+		List<String> matchList = new LinkedList<>();
+		String test = "hey \"this is\" a string";
+		Matcher regexMatcher = Constants.quotes.matcher(test);
+		while (regexMatcher.find()) {
+			  if (regexMatcher.group(1) != null) {
+			        // Add double-quoted string without the quotes
+			        matchList.add(regexMatcher.group(1));
+			    } else if (regexMatcher.group(2) != null) {
+			        // Add single-quoted string without the quotes
+			        matchList.add(regexMatcher.group(2));
+			    } else {
+			        // Add unquoted word
+			        matchList.add(regexMatcher.group());
+			    }
+		}
+		assertTrue(matchList.contains("hey"));
+		assertTrue(matchList.contains("this is"));
+		assertTrue(matchList.contains("a"));
+		assertTrue(matchList.contains("string"));
+	}
+	
 	
 	@Test
 	public void testReadChunks() throws IOException {
@@ -44,9 +80,6 @@ public class BinarySearchFileTest {
 		b.close();
 	}
 
-	/**
-	 * Tests to make sure jCompare is handling special characters correctly.
-	 */
 	@Test
 	public void jCompSpecialsTest() throws IOException {
 		BufferedReader r = new BufferedReader(new FileReader("./data/baconfiles/special-chars/index_any_special.tsv"));

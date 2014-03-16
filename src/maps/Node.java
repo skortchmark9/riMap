@@ -3,7 +3,7 @@
  */
 package maps;
 
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 
 import edu.brown.cs032.emc3.kdtree.KDimensionable;
@@ -128,5 +128,19 @@ public class Node implements KDimensionable {
 			throw new IllegalArgumentException(String.format("%f is out of range of earthly latitudes.", lat));
 		}
 		return lat;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		/** A pretty soft equals - just checks if suggestions have the same string.*/
+		if (o == this) return true;
+		if (!(o instanceof Node)) return false;
+		Node s = (Node) o;
+		return (this.getID().equals(s.getID()));
+	}
+	
+	@Override
+	public String toString() {
+		return "ID: " + id + "COORDS: " + Arrays.toString(coords);
 	}
 }

@@ -1,26 +1,29 @@
 package maps;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
-import edu.brown.cs032.emc3.kdtree.KDTree;
-import backend.Resources;
 import backend.Constants;
+import backend.Resources;
+import edu.brown.cs032.emc3.kdtree.KDTree;
 public class MapFactory {
 	
 	static Way createWay(String wayID) {
+		////////YOU ARE HERE: FIND OUT WHY THE TARGET OF WAYS IS THE SAME AS THE START
 		String[] wayInfo = Resources.waysFile.getXsByY(wayID, "name", "start", "end");
 		if (wayInfo == null) {
 			return null;
 		}
-		Node loc = createNode(wayInfo[1]); //XXX: shouldn't we be using the references to nodes we already have
-		if (loc == null) {
+		Node startLoc = createNode(wayInfo[1]);
+		Node endLoc = createNode(wayInfo[2]);
+		if (startLoc == null || endLoc == null) {
 			return null;
 		} else {
-		PathNodeWrapper pnw = new PathNodeWrapper(loc);
-			return new Way(wayID, wayInfo[0], loc, pnw);
+			return new Way(wayID, wayInfo[0], startLoc, new PathNodeWrapper(endLoc));
 		}
 	}
 
@@ -54,8 +57,39 @@ public class MapFactory {
 		}
 	}
 	
+	public static Node createIntersection(String streetName1, String streetName2) {
+		String intersection = null;
+		List<List<String>> street1nodeLists = Resources.indexFile.searchMultiples(streetName1, "node");
+		Set<String> street1nodeIDs = new HashSet<>();
+		for(List<String> nodeList : street1nodeLists) {
+			for(String nodes : nodeList) {
+				street1nodeIDs.addAll(Arrays.asList(Constants.comma.split(nodes)));				
+			}
+		}
+		List<List<String>> street2nodeLists = Resources.indexFile.searchMultiples(streetName2, "node");
+		for(List<String> nodeList : street2nodeLists) {
+			for(String nodes : nodeList) {
+				for(String node : Constants.comma.split(nodes)) {
+					if (street1nodeIDs.contains(node)) {
+						//TODO: What if multiples?
+						intersection = node;
+						break;
+					}
+				}
+			}
+		}
+		if (intersection == null) {
+			return null;
+		} else {
+			return createNode(intersection);
+		}
+	}
+	
 	public static KDTree<Node> createKDTree() {
+		System.out.println("Reading nodes");
 		List<List<String>> nodes = Resources.nodesFile.readChunks("id", "latitude", "longitude", "ways");
+		long start = System.currentTimeMillis();
+		System.out.println("Initializing KDTree");
 		List<Node> nodeList = new LinkedList<>();
 		//Iterators here because we are parsing a lot of data and we want to make the best use of our
 		//underlying datastructure. The wrapper list is a LinkedList and the underlying one is an arrayList.
@@ -69,6 +103,7 @@ public class MapFactory {
 				}
 			}
 		}
+		System.out.println("Done: " + (System.currentTimeMillis() - start) + "s");
 		return new KDTree<Node>(nodeList);
 	}
 	
