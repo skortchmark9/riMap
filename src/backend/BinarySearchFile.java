@@ -379,8 +379,6 @@ public class BinarySearchFile implements AutoCloseable {
 				}
 			}
 		} catch (IOException e) {
-			//TODO we should discuss the behavior here - 
-			//how do we want to handle it if we can't read a chunk
 			return lines;
 		}
 		return lines;

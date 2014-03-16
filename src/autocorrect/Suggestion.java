@@ -20,8 +20,8 @@ public class Suggestion {
 	Suggestion(String word, int freq, HashMultiset<String> neighbors) {
 		this.word = word;
 		this.freq = freq;
-		this.rtDistance = Constants.max; //We take these into account. 
-		this.led = Constants.max;		//In our suggestions.
+		this.rtDistance = AutoCorrectConstants.max; //We take these into account. 
+		this.led = AutoCorrectConstants.max;		//In our suggestions.
 		this.neighbors = neighbors;
 	}
 	
@@ -29,7 +29,7 @@ public class Suggestion {
 		this.word = word;
 		this.freq = freq;
 		this.rtDistance = rtDistance;
-		this.led = Constants.max;
+		this.led = AutoCorrectConstants.max;
 		this.neighbors = neighbors;
 	}
 	
@@ -51,15 +51,15 @@ public class Suggestion {
 	
 	private int smartEvaluate(String previousWord) {
 		/** Evaluates suggestion as per README*/
-		int val = this.freq * Constants.unigramWeight;
-		if (this.rtDistance != Constants.max) //unassigned
-			val += this.rtDistance * Constants.rtDistanceWeight;
-		if (this.led != Constants.max)
+		int val = this.freq * AutoCorrectConstants.unigramWeight;
+		if (this.rtDistance != AutoCorrectConstants.max) //unassigned
+			val += this.rtDistance * AutoCorrectConstants.rtDistanceWeight;
+		if (this.led != AutoCorrectConstants.max)
 			if (this.led == 0)
-				return Constants.max;
+				return AutoCorrectConstants.max;
 			else
-				val = val - (this.led * Constants.ledWeight);
-			val += this.bigramProbability(previousWord) * Constants.bigramWeight;
+				val = val - (this.led * AutoCorrectConstants.ledWeight);
+			val += this.bigramProbability(previousWord) * AutoCorrectConstants.bigramWeight;
 		return val;
 	}
 	

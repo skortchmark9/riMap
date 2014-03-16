@@ -2,16 +2,38 @@ package autocorrect;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import maps.MapFactory;
+
 import org.junit.Test;
+
+import backend.BinarySearchFile;
+import backend.Resources;
 
 public class RadixTreeTest {
 	
 	public final String dictionary = "./autocorrect_maps/data/autocorrect/dictionary.txt";
 	public final String dickens = "./autocorrect_maps/data/autocorrect/great_expectations.txt";
+	
+	
+	public final String ways = "./data/mapsfiles/ways.tsv";
+	public final String nodes = "./data/mapsfiles/nodes.tsv";
+	public final String index = "./data/mapsfiles/index.tsv";
+	
+	@Test public void initialACTest() {
+		try {
+			new Resources(ways, nodes, index);
+			RadixTree rt = MapFactory.createRadixTree();
+			
+		} catch (IOException e) {
+			assertTrue(false);
+			e.printStackTrace();
+		}
+	}
 	
 	
 	@Test

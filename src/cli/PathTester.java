@@ -23,9 +23,12 @@ public class PathTester {
 	PathTester(String s, Backend b) {
 		this.b = b;
 		CLIParse(s);
-		if (source == null || dest == null) {
-			System.out.println("ERROR: COULD NOT FIND SOURCE OR DEST");
-		} else {
+		if (source == null) {
+			System.out.println("ERROR: COULD NOT FIND SOURCE.");
+		} else if (dest == null) {
+			System.out.println("ERROR: COULD NOT FIND DEST.");
+		}
+		else {
 		PathFinder<PathNodeWrapper, Node> p = new PathFinder<PathNodeWrapper, Node>(new PathNodeWrapper(source), new PathNodeWrapper(dest));
 		p.getPath();
 		}

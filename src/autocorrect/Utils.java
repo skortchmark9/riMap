@@ -35,7 +35,7 @@ public class Utils {
 		 *  the array it spits out isn't always perfect about whitespace - so we need to check to
 		 *  make sure we don't insert the #*!U)*# empty string.
 		 */
-		return line.toLowerCase().replaceAll(Constants.parsePattern, " ").trim().split("\\s+");
+		return line.toLowerCase().replaceAll(AutoCorrectConstants.parsePattern, " ").trim().split("\\s+");
 	}
 	
 	public static String arrayParse(String[] array) {

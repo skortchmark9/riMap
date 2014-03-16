@@ -1,7 +1,7 @@
 package autocorrect;
 
-public class Constants {
-	/** Holds constant information. */
+public class AutoCorrectConstants {
+	/** Holds constants for autocorrect. */
 	public final static String parsePattern = "\\s*[^a-z ]"; //used in lineparser for separating out words
 
 	public final static int maxRTD = 5; //Maximum nodes past the given word we will traverse in search of suffixes

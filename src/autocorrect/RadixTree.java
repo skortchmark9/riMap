@@ -18,7 +18,6 @@ public class RadixTree {
 	 *  the space load balanced by the relative lack of nodes. (versus a normal trie)  */
 	private String key;
 	private int freq;
-	private RadixTree[] children; //A 26 block array for alphabetical placement and instant access.
 	private HashMap<Character, RadixTree> _children = null;
 	private HashMultiset<String> bigramNeighbors = null;
 
@@ -27,7 +26,7 @@ public class RadixTree {
 	 * Special constructor of the root node. The empty string 
 	 * does not affect the positioning of other nodes. 
 	 */
-	RadixTree() {
+	public RadixTree() {
 		this.key = "";
 		this.freq = 0;
 	}
@@ -78,9 +77,14 @@ public class RadixTree {
 	 * @param lastWord - the word to add to the Bigram list.
 	 */
 	private void addBigramNeighbor(String lastWord) {
+		if (lastWord.length() == 0) {
+			return;
+		} 
+		else {
 		if (bigramNeighbors == null)
 			bigramNeighbors = HashMultiset.create();
 		bigramNeighbors.add(lastWord);
+		}
 	}
 	
 	/**
@@ -310,7 +314,7 @@ public class RadixTree {
 		/** This method allows users to specify a maxDistance
 		 *  at which they want the search to end. Initialized
 		 *  with the empty string as an accumulator.*/
-		return this.getPrefixSuggestions("", word, Constants.maxRTD);
+		return this.getPrefixSuggestions("", word, AutoCorrectConstants.maxRTD);
 	}
 	public List<Suggestion> getPrefixSuggestions(String word, int maxDistance) {
 		/** This method allows users to specify a maxDistance
@@ -432,7 +436,7 @@ public class RadixTree {
 		int led = currentRow[rootWord.length()]; //These levenshtein matrices hold the final
 		if (led <= maxLED)			 		 //LED value in their bottom right corner.
 			if (this.isWord())				 //Ours is 1D,so  it's just the rightmost slot.
-				results.add(new Suggestion(wordFragment + this.key, this.getFreq(), Constants.max, led, this.bigramNeighbors));
+				results.add(new Suggestion(wordFragment + this.key, this.getFreq(), AutoCorrectConstants.max, led, this.bigramNeighbors));
 		if (_children != null && !_children.isEmpty()) //We don't have the info here to set the rtDistance now. ^
 			for(RadixTree rt : _children.values()) //recur on children.
 				if (rt != null)

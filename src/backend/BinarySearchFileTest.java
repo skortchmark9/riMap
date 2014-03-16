@@ -20,7 +20,7 @@ public class BinarySearchFileTest {
 	@Test
 	public void testReadChunks() throws IOException {
 		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
-		System.out.println(b.readChunks("name", "id"));
+//		System.out.println(b.readChunks("name", "id"));
 		b.close();
 		assertTrue(true);
 	}

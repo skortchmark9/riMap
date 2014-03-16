@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import autocorrect.RadixTree;
 import backend.Constants;
 import backend.Resources;
 import edu.brown.cs032.emc3.kdtree.KDTree;
@@ -118,6 +119,23 @@ public class MapFactory {
 		}
 		System.out.println("Done: " + (System.currentTimeMillis() - start) + "s");
 		return new KDTree<Node>(nodeList);
+	}
+	
+	public static RadixTree createRadixTree() {
+		System.out.println("Reading index");
+		List<List<String>> names = Resources.indexFile.readChunks("name");
+		RadixTree rt = new RadixTree();
+		for(List<String> nameList : names) {
+			String lastWord = "";
+			String nameField = nameList.get(0);
+			for (String word : Constants.spaces.split(nameField)) {
+				if (word.length() > 0) {
+					rt.insert(word, lastWord);
+					lastWord = word;
+				}
+			}
+		}
+		return rt;
 	}
 	
 	public static List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
