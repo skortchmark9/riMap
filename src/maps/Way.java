@@ -42,8 +42,8 @@ public class Way implements Edge<PathNodeWrapper> {
 
 	@Override
 	public String getName() {
-		return name;
-	}
+		return uniqueID;
+	}	
 
 	@Override
 	public double getWeight() {

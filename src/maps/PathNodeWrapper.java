@@ -91,6 +91,18 @@ public class PathNodeWrapper implements PathNode<Node> {
 	}
 	
 	@Override
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
+		if (!(o instanceof PathNodeWrapper)) {
+			return false;
+		}
+		PathNodeWrapper p = (PathNodeWrapper) o;
+		return getValue().equals(p.getValue());
+	}
+	
+	@Override
 	public String toString() {
 		return "PW: " + getValue().toString();
 	}

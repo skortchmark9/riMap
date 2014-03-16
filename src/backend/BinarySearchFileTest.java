@@ -18,6 +18,27 @@ public class BinarySearchFileTest {
 	// Figure this out with TAs
 	
 	@Test
+	public void testReadChunks() throws IOException {
+		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
+		System.out.println(b.readChunks("name", "id"));
+		b.close();
+		assertTrue(true);
+	}
+
+	/*
+	//Applied for single row
+	@Test
+	public void testSearchSingleMultiple() {
+		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
+			System.out.println(b.searchMultiples("Olive St", "name", "nodes"));
+		} catch (IOException e) {
+			e.printStackTrace();
+			assertTrue(false);
+		}
+	}
+
+	//Applied for multiple rows
+	@Test
 	public void testSearchMultiples() {
 		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
 			System.out.println(b.searchMultiples("10th Avenue", "name", "nodes"));
@@ -26,9 +47,9 @@ public class BinarySearchFileTest {
 			assertTrue(false);
 		}
 	}
+
 	
 	
-	/*
 	@Test
 	public void testStringParse() {
 		List<String> matchList = new LinkedList<>();
@@ -52,15 +73,7 @@ public class BinarySearchFileTest {
 		assertTrue(matchList.contains("string"));
 	}
 	
-	
-	@Test
-	public void testReadChunks() throws IOException {
-		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
-		//System.out.println(b.readChunks("name", "id"));
-		b.close();
-		assertTrue(true);
-	}
-	
+		
 
 	@Test
 	public void FindUTF8() throws IOException {
