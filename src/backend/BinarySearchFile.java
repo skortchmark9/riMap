@@ -162,7 +162,7 @@ public class BinarySearchFile implements AutoCloseable {
 					break;
 				}
 			}
-			
+
 			//Searches following lines.
 			while(rangeEnd < length) {
 				long nextLine = nextNewLine(rangeEnd, length) + 1;
@@ -180,9 +180,9 @@ public class BinarySearchFile implements AutoCloseable {
 				}
 			}
 			return readChunk(rangeStart + 1, rangeEnd + 1, xs);
-	} catch (IOException e) {
-		return null;
-	}
+		} catch (IOException e) {
+			return null;
+		}
 	}
 
 	/**
@@ -289,8 +289,8 @@ public class BinarySearchFile implements AutoCloseable {
 	public static String string(byte[] bytes) {
 		return new String(bytes, UTF8);
 	}
-	
-	
+
+
 	/**
 	 * Wrapper for System.out print stream
 	 * @param s  - string to print to standard out
@@ -351,8 +351,8 @@ public class BinarySearchFile implements AutoCloseable {
 			long secondLine = nextNewLine(0, length);
 			long chunkSize = (length - secondLine) / numThreads + 1;
 			for(int i = 1; i <= Constants.numThreads; i++) {
-				long chunkEnd = (i == Constants.numThreads) ? length : nextNewLine(secondLine + (chunkSize * i), length) + 1;
-				long chunkStart = nextNewLine((secondLine + (chunkSize * (i - 1))), chunkEnd) + 1;
+				long chunkEnd = (i == Constants.numThreads) ? length : nextNewLine(secondLine + (chunkSize * i), length);
+				long chunkStart = nextNewLine((secondLine + (chunkSize * (i - 1))), chunkEnd);
 				chunks.addAll(readChunk(chunkStart, chunkEnd, xs));
 				System.out.println("Finished chunk: " + (i - 1) + " of: " + Constants.numThreads);
 			}
@@ -366,161 +366,159 @@ public class BinarySearchFile implements AutoCloseable {
 
 	private List<List<String>> readChunk(long start, long end, String...xs) {
 		List<List<String>> lines = new LinkedList<>();
-		long lineStart = start;
-		long lineEnd = 0;
-		//FIXME now that I'm looking at this it's actually so slow....many read
-		//calls is stupid, we already have the size of the range we want to
-		//search - read it in memory and then look.
-		while (lineStart < end) {
-			try {
-				lineEnd = nextNewLine(lineStart, end);
-				byte[] line = new byte[(int) (lineEnd - lineStart)];
-				raf.seek(lineStart);
-				raf.read(line);
-				lines.add(Arrays.asList(getXs(string(line), xs)));
-				lineStart = lineEnd + 1;
-			} catch (IOException e) {
-				//TODO we should discuss the behavior here - 
-				//how do we want to handle it if we can't read a chunk
-				return lines;
+		try {
+			start++;
+			byte[] chunk = new byte[(int) (end - start)];
+			raf.seek(start);
+			raf.read(chunk);
+			int lastNewLine = -1;
+			for(int i = 0; i < chunk.length; i++) {
+				if (chunk[i] == '\n') {
+					lines.add(Arrays.asList(getXs(string(Arrays.copyOfRange(chunk, lastNewLine + 1, i)), xs)));
+					lastNewLine = i;
+				}
 			}
+		} catch (IOException e) {
+			//TODO we should discuss the behavior here - 
+			//how do we want to handle it if we can't read a chunk
+			return lines;
 		}
 		return lines;
 	}
 
-	/**
-	 * Finds the immediate next newline character in the file.
-	 * @param start - the starting location of the search.
-	 * @param end - the ending location of the search. 
-	 * @return - the position of the newline char. 
-	 * @throws IOException - in case of problems with raf. 
-	 */
-	public long nextNewLine(long start, long end) throws IOException {
-		if (start > end) {
-			return end;
-		}
-		Long cachedNewLine = nextNewLines.get(start);
-		if (cachedNewLine != null) {
-			return cachedNewLine;
-		}
-		raf.seek(start);
-		byte[] arrayToSearch;
-		int arraySize;
-		if ((end - start) < Constants.BufferLength) {
-			arraySize = (int) (end - start);
-		}
-		else {
-			arraySize = Constants.BufferLength;
-		}
-		arrayToSearch = new byte[arraySize];
-		raf.read(arrayToSearch);
-		for(int i = 0; i < arraySize; i++) {
-			int ch = arrayToSearch[i];
-			if (ch  == '\n') {
-				nextNewLines.put(start, start + i);
-				return start + i;
-			}
-		}
-		if (start + arraySize < end) {
-			return nextNewLine(start + arraySize, end);
-		}
-		else {
-			return end;
+/**
+ * Finds the immediate next newline character in the file.
+ * @param start - the starting location of the search.
+ * @param end - the ending location of the search. 
+ * @return - the position of the newline char. 
+ * @throws IOException - in case of problems with raf. 
+ */
+public long nextNewLine(long start, long end) throws IOException {
+	if (start > end) {
+		return end;
+	}
+	Long cachedNewLine = nextNewLines.get(start);
+	if (cachedNewLine != null) {
+		return cachedNewLine;
+	}
+	raf.seek(start);
+	byte[] arrayToSearch;
+	int arraySize;
+	if ((end - start) < Constants.BufferLength) {
+		arraySize = (int) (end - start);
+	}
+	else {
+		arraySize = Constants.BufferLength;
+	}
+	arrayToSearch = new byte[arraySize];
+	raf.read(arrayToSearch);
+	for(int i = 0; i < arraySize; i++) {
+		int ch = arrayToSearch[i];
+		if (ch  == '\n') {
+			nextNewLines.put(start, start + i);
+			return start + i;
 		}
 	}
+	if (start + arraySize < end) {
+		return nextNewLine(start + arraySize, end);
+	}
+	else {
+		return end;
+	}
+}
 
-	/** 
-	 * Same thing really.
-	 * @param start - starting location of search. 
-	 * @param beginning - position above start in file, the upper bound. 
-	 * @return - the position of the newline. 
-	 * @throws IOException
-	 */
-	public long prevNewLine(long start, long beginning) throws IOException {
-		Long cachedPrevLine = prevNewLines.get(start);
-		if (cachedPrevLine != null) {
-			return cachedPrevLine;
-		}
-		byte[] arrayToSearch;
-		int arraySize;
-		if ((start - beginning) < Constants.BufferLength) {
-			arraySize = (int) (start - beginning);
-		}
-		else {
-			arraySize = Constants.BufferLength;
-		}
-		arrayToSearch = new byte[arraySize];
-		raf.seek(start - arraySize);
-		raf.read(arrayToSearch);
-		for(int i = arraySize - 1; i >= 0; i--) {
-			int ch = arrayToSearch[i];
-			if (ch  == '\n') {
-				prevNewLines.put(start, start - arraySize + i);
-				return start - arraySize + i;
-			}
-		}
-		if (start - arraySize > beginning) {
-			return prevNewLine(start - arraySize, beginning);
-		}
-		else {
-			return beginning;
+/** 
+ * Same thing really.
+ * @param start - starting location of search. 
+ * @param beginning - position above start in file, the upper bound. 
+ * @return - the position of the newline. 
+ * @throws IOException
+ */
+public long prevNewLine(long start, long beginning) throws IOException {
+	Long cachedPrevLine = prevNewLines.get(start);
+	if (cachedPrevLine != null) {
+		return cachedPrevLine;
+	}
+	byte[] arrayToSearch;
+	int arraySize;
+	if ((start - beginning) < Constants.BufferLength) {
+		arraySize = (int) (start - beginning);
+	}
+	else {
+		arraySize = Constants.BufferLength;
+	}
+	arrayToSearch = new byte[arraySize];
+	raf.seek(start - arraySize);
+	raf.read(arrayToSearch);
+	for(int i = arraySize - 1; i >= 0; i--) {
+		int ch = arrayToSearch[i];
+		if (ch  == '\n') {
+			prevNewLines.put(start, start - arraySize + i);
+			return start - arraySize + i;
 		}
 	}
+	if (start - arraySize > beginning) {
+		return prevNewLine(start - arraySize, beginning);
+	}
+	else {
+		return beginning;
+	}
+}
 
-	/** 
-	 * from class, lexicographically compares two byte[]s.
-	 * The index file is weirdly sorted so that words with
-	 * special characters are pushed to the end. Not lexicographical
-	 * which was advertised, so that's confusing. Therefore, we've
-	 * implemented a comparator that has the same deficiency.
-	 * In UTF8 special characters are represented by negative bytes.
-	 * If both the byte[] have special characters, the one with the
-	 * more negative bytes is less. However, if only one byte[] has
-	 * a special character, the positive number will represent the
-	 * standard character and should be less.
-	 * @param a 
-	 * @param b
-	 * @return
-	 */
-	static int jCompare(byte[] a, byte[] b) {
-		for(int i = 0; i < a.length; i++) {
-			if (b.length <= i) {
-				return 1;
+/** 
+ * from class, lexicographically compares two byte[]s.
+ * The index file is weirdly sorted so that words with
+ * special characters are pushed to the end. Not lexicographical
+ * which was advertised, so that's confusing. Therefore, we've
+ * implemented a comparator that has the same deficiency.
+ * In UTF8 special characters are represented by negative bytes.
+ * If both the byte[] have special characters, the one with the
+ * more negative bytes is less. However, if only one byte[] has
+ * a special character, the positive number will represent the
+ * standard character and should be less.
+ * @param a 
+ * @param b
+ * @return
+ */
+static int jCompare(byte[] a, byte[] b) {
+	for(int i = 0; i < a.length; i++) {
+		if (b.length <= i) {
+			return 1;
+		}
+		if (a[i] != b[i]) {
+			//If both bytes are special or standard, we can just subtract them.
+			if ((a[i] < 0 && b[i] < 0) || (a[i] > 0 && b[i] > 0)) {
+				return a[i] - b[i];
 			}
-			if (a[i] != b[i]) {
-				//If both bytes are special or standard, we can just subtract them.
-				if ((a[i] < 0 && b[i] < 0) || (a[i] > 0 && b[i] > 0)) {
-					return a[i] - b[i];
-				}
-				else {
-					//If only one byte is special, we want to HIGHER number to be first.
-					return b[i] - a[i];
-				}
+			else {
+				//If only one byte is special, we want to HIGHER number to be first.
+				return b[i] - a[i];
 			}
 		}
-		//strings are equal up to a's length
-		if (a.length < b.length) {
-			return -1;
-		}
-		//strings are equal
-		return 0;
 	}
+	//strings are equal up to a's length
+	if (a.length < b.length) {
+		return -1;
+	}
+	//strings are equal
+	return 0;
+}
 
-	int compare(byte[] a, byte[] b) {
-		return jCompare(a, b);
-	}
+int compare(byte[] a, byte[] b) {
+	return jCompare(a, b);
+}
 
-	@Override
-	//Attempts to close the file. If it can't, closes the file. 
-	public void close() {
-		try {
-			if (raf != null) {
-				raf.close();
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			System.out.println("Closing...");
-			System.exit(1);
+@Override
+//Attempts to close the file. If it can't, closes the file. 
+public void close() {
+	try {
+		if (raf != null) {
+			raf.close();
 		}
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		System.out.println("Closing...");
+		System.exit(1);
 	}
+}
 }
