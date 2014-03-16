@@ -34,7 +34,6 @@ public class PathTester {
 	private void streetnames(String street1, String xStreet1, String street2, String xStreet2) {
 		source = MapFactory.createIntersection(street1, xStreet1);
 		dest = MapFactory.createIntersection(street2, xStreet2);
-
 	}
 	
 	private void latlng(double lat1, double lon1, double lat2, double lon2) {

@@ -17,6 +17,18 @@ public class BinarySearchFileTest {
 	String films = "./data/baconfiles/films.tsv";
 	// Figure this out with TAs
 	
+	//Applied for single row
+	@Test
+	public void testSearchSingleMultiple() {
+		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
+			System.out.println(b.searchMultiples("Olive St", "name", "nodes"));
+		} catch (IOException e) {
+			e.printStackTrace();
+			assertTrue(false);
+		}
+	}
+/*
+	//Applied for multiple rows
 	@Test
 	public void testSearchMultiples() {
 		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
@@ -26,7 +38,7 @@ public class BinarySearchFileTest {
 			assertTrue(false);
 		}
 	}
-	
+
 	
 	/*
 	@Test

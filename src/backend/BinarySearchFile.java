@@ -153,7 +153,6 @@ public class BinarySearchFile implements AutoCloseable {
 				raf.seek(tab + 1);
 				byte[] tempField = new byte[searchCodeBytes.length + 1]; //get one extra byte for use in the else clause below
 				raf.read(tempField);
-				out(string(tempField));
 				byte[] testField = Arrays.copyOfRange(tempField, 0, searchCodeBytes.length); //returns the test field without the extra byte (second index is exclusive)
 				int follow = tempField[tempField.length-1]; //returns the extra byte
 				int cmp = compare(searchCodeBytes, testField);
@@ -171,7 +170,6 @@ public class BinarySearchFile implements AutoCloseable {
 				raf.seek(tab);
 				byte[] tempField = new byte[searchCodeBytes.length + 1]; //get one extra byte for use in the else clause below
 				raf.read(tempField);
-				out(string(tempField));
 				byte[] testField = Arrays.copyOfRange(tempField, 0, searchCodeBytes.length); //returns the test field without the extra byte (second index is exclusive)
 				int follow = tempField[tempField.length-1]; //returns the extra byte
 				int cmp = compare(searchCodeBytes, testField);
@@ -180,7 +178,7 @@ public class BinarySearchFile implements AutoCloseable {
 				} else {
 					break;
 				}
-			}			
+			}
 			return readChunk(rangeStart + 1, rangeEnd + 1, xs);
 	} catch (IOException e) {
 		return null;
@@ -193,6 +191,9 @@ public class BinarySearchFile implements AutoCloseable {
 	 * @return - the line the key is on, or null if it's not found. 
 	 */
 	String search(String searchCode) {
+		if (searchCode == null){
+			return null;
+		}
 		try {
 			long length = raf.length();
 			long secondLine = nextNewLine(0, length);
@@ -265,7 +266,7 @@ public class BinarySearchFile implements AutoCloseable {
 				if (follow == '\t' || follow == '\n') { //Could we save time by eliminating this read?
 					return lastTab + 1;
 				} else {
-					return (lastSearch) ? -1 : search(word, followingNewLine, bottom);
+					return (lastSearch) ? -1 : search(word, top, followingNewLine);
 				}
 			}
 		} catch (IOException e) {

@@ -58,31 +58,28 @@ public class MapFactory {
 	}
 	
 	public static Node createIntersection(String streetName1, String streetName2) {
-		String intersection = null;
-		List<List<String>> street1nodeLists = Resources.indexFile.searchMultiples(streetName1, "node");
+		List<List<String>> street1nodeLists = Resources.indexFile.searchMultiples(streetName1, "nodes");
 		Set<String> street1nodeIDs = new HashSet<>();
 		for(List<String> nodeList : street1nodeLists) {
 			for(String nodes : nodeList) {
 				street1nodeIDs.addAll(Arrays.asList(Constants.comma.split(nodes)));				
 			}
 		}
-		List<List<String>> street2nodeLists = Resources.indexFile.searchMultiples(streetName2, "node");
+		List<List<String>> street2nodeLists = Resources.indexFile.searchMultiples(streetName2, "nodes");
+		if (street2nodeLists == null) {
+			System.out.println("ERROR: StreetName2 has no node lists");
+		}
 		for(List<String> nodeList : street2nodeLists) {
 			for(String nodes : nodeList) {
 				for(String node : Constants.comma.split(nodes)) {
 					if (street1nodeIDs.contains(node)) {
 						//TODO: What if multiples?
-						intersection = node;
-						break;
+						return createNode(node);
 					}
 				}
 			}
 		}
-		if (intersection == null) {
-			return null;
-		} else {
-			return createNode(intersection);
-		}
+		return null;
 	}
 	
 	public static KDTree<Node> createKDTree() {

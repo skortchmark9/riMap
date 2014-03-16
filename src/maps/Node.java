@@ -26,7 +26,6 @@ public class Node implements KDimensionable {
 		Double lat = checkLatitude(latitude);
 		Double lon = checkLongitude(longitude);
 		coords = new double[]{lat, lon};
-		//TODO make me work!
 		this.id = id;
 		this.wayIDs = ways;
 	}
