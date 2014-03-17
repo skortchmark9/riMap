@@ -17,8 +17,14 @@ public class Constants {
 			new Generator(2, Generator.SuggestType.PREFIX, Generator.SuggestType.WHITESPACE);
 	
 	public static final Ranker defaultRanker = new Ranker(Ranker.CompareMode.SMART);
+	
+	//Info for rendering lines on map:
+	public static final double INITIAL_LAT = 41.842678; //Home Depot
+	public static final double INITIAL_LON = -71.417541;
+	public static final float GEO_DIMENSION_FACTOR = 0.02f;
 	public static final float MIN_ZOOM = 0.1f;
 	public static final float MAX_ZOOM = 2.0f;
+	
 
 	public static final int BufferLength = 1024;
 

@@ -1,9 +1,12 @@
 package frontend;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -32,10 +35,14 @@ public class MapDemo {
                 JFrame frame = new JFrame();
                 frame = new JFrame();
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.setSize(800, 400);
+                frame.setSize(800, 800);
                 frame.setLocationRelativeTo(null);
                 frame.setLayout(new BorderLayout());
-                final MapPane pane = new MapPane("./data/balls.txt");
+                final MapPane pane = new MapPane();
+                pane.setBorder(BorderFactory.createLineBorder(Color.blue));
+                JPanel p2 = new JPanel();
+                p2.setBackground(Color.WHITE);
+                frame.add(p2);
                 frame.add(new JScrollPane(pane));
                 frame.setVisible(true);
 
