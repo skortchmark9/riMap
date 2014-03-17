@@ -81,12 +81,20 @@ public class Node implements KDimensionable {
 		return 2;
 	}
 	
-	public double manhattanDistanceTo(KDimensionable kd) {
+	private double manhattanDistanceTo(KDimensionable kd) {
 		double[] otherCoords = kd.getCoordinates();
 		double latDiff = Math.abs(coords[0] - otherCoords[0]);
 		double lonDiff = Math.abs(coords[1] - otherCoords[1]);
 		
 		return latDiff + lonDiff;
+	}
+	
+	private double squareDistanceTo(KDimensionable kd) {
+		double[] otherCoords = kd.getCoordinates();
+		double dist = 0;
+		dist += Math.pow(coords[0] - otherCoords[0], 2);
+		dist +=  Math.pow(coords[1] - otherCoords[1], 2);
+		return dist;
 	}
 
 
@@ -97,7 +105,7 @@ public class Node implements KDimensionable {
 	public double distanceTo(KDimensionable kd) {
 		// TODO: perhaps this should calculate the haversine Distance?
 		//right now we are just returning Manhattan distance:
-		return this.manhattanDistanceTo(kd);
+		return this.squareDistanceTo(kd);
 		}
 	
 	

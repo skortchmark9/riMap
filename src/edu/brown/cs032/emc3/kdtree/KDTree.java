@@ -298,23 +298,23 @@ public class KDTree<KDType extends KDimensionable> {
 	 * Returns all KDimensionable objects in this tree in a sorted list.
 	 * The list is sorted in ascending order by distance from the testPoint.
 	 * 
-	 * @param radius - the length of the radius to search.
+	 * @param radiusSquared - the length of the radius to search.
 	 * @param testPoint - the point from which to define the radius.
 	 * @return
 	 * a list of KDimensionable objects in ascending order by distance to the testpoint.
 	 */
-	public List<KDType> getObjectsWithinRadius(double radius, KDimensionable testPoint) {
+	public List<KDType> getObjectsWithinRadius(double radiusSquared, KDimensionable testPoint) {
 		if (_root == null) {
 			System.err.println("ERROR: KDTree.getObjectsWithinRadius(): Tree has not been constructed.");
 			return null;
 		}
-		if (radius <= 0) {
+		if (radiusSquared <= 0) {
 			System.err.println("ERROR: KDTree.getObjectsWithinRadius(): Cannot search a non-positive radius.");
 			return null;
 		}
 		
 		ArrayList<KDType> points = new ArrayList<>();
-		points.addAll(this.recursiveRadiusSearch(_root, 0, radius, testPoint));
+		points.addAll(this.recursiveRadiusSearch(_root, 0, radiusSquared, testPoint));
 		Collections.sort(points, new DistanceToPointComparator(testPoint)); //sort according to distance to the test point
 		return points;
 	}
