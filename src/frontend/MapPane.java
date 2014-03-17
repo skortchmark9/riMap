@@ -12,6 +12,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private float scale = 1f;
+	private static float scale = 1f;
 	private static final int PIXEL_WIDTH = 700;
 	private static final int PIXEL_HEIGHT = 700;
 	//private List<Node> startLocs;
@@ -40,16 +41,18 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private List<Way> renderedWays;
 
 
-	MapPane(String fileName)   {
+	MapPane()   {
 		this.setBackground(Color.black);
 		this.setPreferredSize(new Dimension(PIXEL_WIDTH, PIXEL_HEIGHT));
+		this.setMaximumSize(getPreferredSize());
 		this.setFocusable(true);
 		
+		Corners.reposition(Constants.INITIAL_LAT, Constants.INITIAL_LON); //init to home depot (lol)
 		initInteraction(); //initializes all interactions for the map view.
 		
 		//new synchronous list for all ways in viewport (ways we need to render)
-		renderedWays = Collections.synchronizedList(MapFactory.getWaysInRange(0, 0, 0, 0));
-		
+		//renderedWays = Collections.synchronizedList(MapFactory.getWaysInRange(0, 0, 0, 0));
+		renderedWays = MapFactory.getWays_TEST();
 		this.repaint(); //paint the initial set of ways
 		this.requestFocusInWindow();
 	}
@@ -59,19 +62,24 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
 
-		g2d.drawLine(0, 0, PIXEL_WIDTH - 1, 0);
-		g2d.drawLine(0, 0, 0, PIXEL_HEIGHT - 1);
-		g2d.drawLine(PIXEL_WIDTH - 1, 0, PIXEL_WIDTH - 1, PIXEL_HEIGHT - 1);
-		g2d.drawLine(0, PIXEL_HEIGHT - 1, PIXEL_WIDTH - 1, PIXEL_HEIGHT - 1);
-
 		g2d.setColor(Color.WHITE);
 		for (Way way : renderedWays) {
 			int[] start = geo2pixel(way.getStart().getCoordinates());
 			int[] end = geo2pixel(way.getTarget().getValue().getCoordinates());
-			g.drawLine(start[0], start[1], end[0], end[1]);
+			out("Start point:", "("+start[0]+",", start[1]+")");
+			out("End point:", "("+end[0]+",", end[1]+")");
+			g2d.drawLine(start[0], start[1], end[0], end[1]);
 		}
+		g2d.drawLine(0, 0, 10, 10);
 	}
 	
+	void out(Object ...strs) {
+		String s = "";
+		for (Object o : strs) {
+			s = s + " " + o;
+		}
+		System.out.println(s);
+	}
 	
 	/**
 	 * Converts Latitude & Longitudes to screen coordinates
@@ -87,9 +95,16 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * the returned array will be in the form <strong>{x, y}</strong>
 	 */
 	private int[] geo2pixel(double[] coordinates) {
-		int[] result = new int[2];
-		//TODO: return converted coords
-		return null;
+		out("abs: " + this.getLocationOnScreen());
+		out("Coords:", Arrays.toString(coordinates));
+		float geoWidth = Constants.GEO_DIMENSION_FACTOR / scale;
+		out("geoWidth =", geoWidth);
+		double[] offset = Corners.offsetFromTopLeft(coordinates);
+		out("offset =", Arrays.toString(offset));
+		int x = (int) Math.round(offset[1]/geoWidth * PIXEL_WIDTH);
+		int y = (int) (int) Math.round((offset[0]/geoWidth) * PIXEL_HEIGHT);
+		out("Calculated screen coords:", x, y);
+		return new int[]{x, y};
 	}
 
 	/**
@@ -110,6 +125,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 
 		//key binding for zoom in
 		am.put("plus", new AbstractAction() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				zoomIn();
@@ -119,6 +136,11 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		
 		//key binding for zoom out
 		am.put("minus", new AbstractAction() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				zoomOut();
@@ -160,6 +182,48 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		String[] locs = Constants.tab.split(way);
 //		startLocs.add(new PathNode(Double.parseDouble(locs[0]), Double.parseDouble(locs[1])));
 //		endLocs.add(new PathNode(Double.parseDouble(locs[2]), Double.parseDouble(locs[3])));
+	}
+	
+	private static class Corners {
+		private static double[] topLeft		= new double[2], 
+								topRight	= new double[2], 
+								bottomLeft	= new double[2], 
+								bottomRight = new double[2];
+		
+		/**
+		 * Gives the top left corner a new location and
+		 * repositions all corners based on the zoom scale.
+		 * 
+		 * @param lat - the new latitude of the top left corner
+		 * @param lon - the new longitude of the top left corner.
+		 */
+		private static void reposition(double lat, double lon) {
+			topLeft[0] = lat;
+			topLeft[1] = lon;
+			
+			float width = Constants.GEO_DIMENSION_FACTOR/scale;
+			topRight[0] = topLeft[0]; //topRight has same latitude as topLeft
+			topRight[1] = topLeft[1] + width; //longitude is topLeft's longitude + width 
+			
+			bottomLeft[0] = topLeft[0] + width; //bottomLeft latitude is topLeft latitude + width
+			bottomLeft[1] = topLeft[1]; //longitude is same as topLeft
+			
+			bottomRight[0] = bottomLeft[0]; //bottomRight has same latitude as bottomLeft
+			bottomRight[1] = topRight[1]; //bottomRight has same longitude as topRight
+		}
+		
+		/**
+		 * Returns a double[] of size 2 containing the difference 
+		 * (difference in latitude, difference of longitude) of the 
+		 * parameter coordinates to the top left of the rendered view.
+		 * 
+		 * @param coords - the coordinates to calculate distance to the top left of the rendered view
+		 * @return
+		 * a double[] of size 2 containing the difference: {latDiff, lonDiff}
+		 */
+		private static double[] offsetFromTopLeft(double coords[]) {
+			return new double[]{topLeft[0] - coords[0], coords[1] - topLeft[1]};
+		}
 	}
 	
 	/**

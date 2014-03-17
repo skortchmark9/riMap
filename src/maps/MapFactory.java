@@ -1,5 +1,6 @@
 package maps;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +22,7 @@ import edu.brown.cs032.emc3.kdtree.KDTree;
 public class MapFactory {
 	
 	private static HashMap<String, Node> nodes = new HashMap<>();
-	private static HashMap<String, Way> ways= new HashMap<>();
+	private static HashMap<String, Way> ways = new HashMap<>();
 	
 	static Way createWay(String wayID) {
 		Way possibleWay= ways.get(wayID);
@@ -147,5 +148,13 @@ public class MapFactory {
 	
 	public static List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
 		return null;
+	}
+	
+	public static List<Way> getWays_TEST() {
+		List<Way> waysList = new ArrayList<>();
+		//TOPLEFT: 41.842678, -71.417541
+		waysList.add(new Way("one", "one", new Node("oneStart", 41.842678, -71.417541, null), new PathNodeWrapper(new Node("oneEnd", 41.822678, -71.397541, null))));
+		waysList.add(new Way("two", "two", new Node("twoStart", 41.832678, -71.407541, null), new PathNodeWrapper(new Node("twoEnd", 41.832678, -71.404541, null))));
+		return waysList;
 	}
 }
