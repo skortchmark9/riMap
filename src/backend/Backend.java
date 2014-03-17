@@ -21,10 +21,15 @@ public class Backend {
 	Engine autoCorrectEngine = null;
 	
 	public Backend(String[] args) throws IOException {
+		if (args.length != 3) {
+			Util.err("ERROR: Incorrect number of resources");
+			System.exit(1);
+		}
+			
 		try {
 			new Resources(args[0], args[1], args[2]);
 		} catch (IOException e) {
-			System.out.println("ERROR: Could not generate Resources");
+			Util.err("ERROR: Could not generate Resources");
 			throw e;
 		}
 		initKDTree();
@@ -32,16 +37,37 @@ public class Backend {
 	}
 	
 	private void initKDTree() {
+		if (Constants.DEBUG_MODE) {
+			Util.resetClock();
+			Util.out("Start KD Build");
+			Util.memLog();
+		}
 		kd = MapFactory.createKDTree();
+		if (Constants.DEBUG_MODE) {
+			Util.out("End KD Build (Elapsed:", Util.lap()+")");
+			Util.memLog();
+		}
 	}
 	
 	private void initAutoCorrect() {
+		if (Constants.DEBUG_MODE) {
+			Util.resetClock();
+			Util.out("Start Autoc build");
+			Util.memLog();
+		}
+		
 		RadixTree rt = MapFactory.createRadixTree();
 		if (rt.isEmpty()) {
-			System.out.println("ERROR: Could not instantiate AutoCorrectEngine");
+			Util.err("ERROR: Could not instantiate AutoCorrectEngine");
 			return;
 		} else {
+			if(Constants.DEBUG_MODE) System.out.print("Done with radix tree. building engine...");
 			autoCorrectEngine = new Engine(Constants.defaultGenerator, Constants.defaultRanker, rt);
+			if(Constants.DEBUG_MODE) System.out.println("Done.");
+		}
+		if (Constants.DEBUG_MODE) {
+			Util.out("End Autoc build (Elapsed:", Util.lap()+")");
+			Util.memLog();
 		}
 	}
 	
@@ -49,7 +75,7 @@ public class Backend {
 		if (autoCorrectEngine != null) {
 			return autoCorrectEngine.suggest(name);
 		} else {
-			System.err.println("ERROR: AutoCorrectEngine is not initialized");
+			Util.err("ERROR: AutoCorrectEngine is not initialized");
 			return null;
 		}
 	}
@@ -58,34 +84,30 @@ public class Backend {
 		if (kd != null) {
 			return kd.getNearestNeighbors(num, testPoint);
 		} else {
-			System.err.println("ERROR: KD TREE NOT INITIALIZED");
+			Util.err("ERROR: KD TREE NOT INITIALIZED");
 			return null;
 		}
 	}
 	
 	public List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+		if (Constants.DEBUG_MODE) {
+			Util.out("Looking for Ways in Range");
+			Util.resetClock();
+		}
 		double lat1 = minLat + maxLat / 2;
 		double lon1 = minLon + maxLon / 2;
 		//The midpoint of the map range. 
 		KDimensionable midpoint = new KDStub(lat1, lon1);
 		
 		double radiusSquared = Math.pow((maxLat - lat1), 2) + Math.pow(maxLon - lon1, 2);
-		List<Node> nodes = kd.getObjectsWithinRadius(radiusSquared, midpoint);
-		List<Way> ways = new LinkedList<>();
+		List<Node> nodes = kd.getObjectsWithinRadius(Math.sqrt(radiusSquared), midpoint); //changed to use square root
+		List<Way> ways = new ArrayList<>();
 		for(Node n : nodes) {
 			for(String wayID : n.getWayIDs()) {
 				ways.add(MapFactory.createWay(wayID));
 			}
 		}
 		return ways;
-	}
-	
-	public static List<Way> getWays_TEST() {
-		List<Way> waysList = new ArrayList<>();
-		//TOPLEFT: 41.842678, -71.417541
-//		waysList.add(new Way("one", "one", new Node("oneStart", 41.842678, -71.417541, null), new PathNodeWrapper(new Node("oneEnd", 41.822678, -71.397541, null))));
-//		waysList.add(new Way("two", "two", new Node("twoStart", 41.832678, -71.407541, null), new PathNodeWrapper(new Node("twoEnd", 41.832678, -71.404541, null))));
-		return waysList;
 	}
 
 }

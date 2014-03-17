@@ -24,6 +24,7 @@ import javax.swing.KeyStroke;
 
 import backend.Backend;
 import backend.Constants;
+import backend.Util;
 import maps.MapFactory;
 import maps.Node;
 import maps.Way;
@@ -56,8 +57,14 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		//renderedWays = Collections.synchronizedList(MapFactory.getWaysInRange(0, 0, 0, 0));
 		double[] topLeft = Corners.topLeft;
 		renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
+		if (Constants.DEBUG_MODE) {
+			Util.out("Finished - Got All Ways in range", "(Elapsed:", Util.lap() +")");
+		}
 		this.repaint(); //paint the initial set of ways
 		this.requestFocusInWindow();
+		if (Constants.DEBUG_MODE) {
+			Util.memLog();
+		}
 	}
 
 	@Override
@@ -67,21 +74,15 @@ public class MapPane extends JPanel implements MouseWheelListener {
 
 		g2d.setColor(Color.WHITE);
 		for (Way way : renderedWays) {
+			if (way != null) {
 			int[] start = geo2pixel(way.getStart().getCoordinates());
 			int[] end = geo2pixel(way.getTarget().getValue().getCoordinates());
-			out("Start point:", "("+start[0]+",", start[1]+")");
-			out("End point:", "("+end[0]+",", end[1]+")");
+			Util.out("Start point:", "("+start[0]+",", start[1]+")");
+			Util.out("End point:", "("+end[0]+",", end[1]+")");
 			g2d.drawLine(start[0], start[1], end[0], end[1]);
+			}
 		}
 		g2d.drawLine(0, 0, 10, 10);
-	}
-	
-	void out(Object ...strs) {
-		String s = "";
-		for (Object o : strs) {
-			s = s + " " + o;
-		}
-		System.out.println(s);
 	}
 	
 	/**

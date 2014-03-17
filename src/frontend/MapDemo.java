@@ -15,6 +15,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import backend.Backend;
+import backend.Constants;
+import backend.Util;
 
 public class MapDemo {
 	public static void main(String[] args) {
@@ -38,10 +40,21 @@ public class MapDemo {
                 
                 Backend b = null;
 				try {
-					String arg1 = "/Users/samkortchmar/Documents/Brown/Semester IV/CS032/Projects/CS032_Maps/data/mapsfiles/ways.tsv";
-					String arg2	= "/Users/samkortchmar/Documents/Brown/Semester IV/CS032/Projects/CS032_Maps/data/mapsfiles/nodes.tsv";
-					String arg3 = "/Users/samkortchmar/Documents/Brown/Semester IV/CS032/Projects/CS032_Maps/data/mapsfiles/index.tsv";
+					String arg1 = "./data/mapsfiles/ways.tsv";
+					String arg2	= "./data/mapsfiles/nodes.tsv";
+					String arg3 = "./data/mapsfiles/index.tsv";
+					if (Constants.DEBUG_MODE) {
+						Util.out("Constructing backend");
+						Util.memLog();
+					}
+					
 					b = new Backend(new String[] {arg1, arg2, arg3});
+					
+					if (Constants.DEBUG_MODE) {
+						Util.out("backend done.");
+						Util.memLog();
+					}
+						
 				} catch (IOException e) {
 				}
 
@@ -51,7 +64,20 @@ public class MapDemo {
                 frame.setSize(800, 800);
                 frame.setLocationRelativeTo(null);
                 frame.setLayout(new BorderLayout());
+                
+                if (Constants.DEBUG_MODE) {
+                	Util.resetClock();
+                	Util.out("Constructing MapPane...");
+                	Util.memLog();
+                }
+
                 final MapPane pane = new MapPane(b);
+                
+                if(Constants.DEBUG_MODE) {
+                	Util.out("Finished MapPane (Elapsed:", Util.lap()+")");
+        			Util.memLog();
+                }
+                
                 pane.setBorder(BorderFactory.createLineBorder(Color.blue));
                 JPanel p2 = new JPanel();
                 p2.setPreferredSize(new Dimension(100, 700));

@@ -6,6 +6,11 @@ import autocorrect.Generator;
 import autocorrect.Ranker;
 
 public class Constants {
+	
+	//XXX DEBUG MODE
+	public static final boolean DEBUG_MODE = true; //XXX TURN THIS OFF BEFORE HANDIN / SYSTEM TESTS
+	//XXX DEBUG MODE
+	
 	//Precompiled regex patterns to make split and replace faster. 
 	public static final Pattern tab = Pattern.compile("\t");
 	public static final Pattern comma = Pattern.compile(",");
@@ -32,5 +37,14 @@ public class Constants {
 	 * For threaded file reading into KD Tree
 	 */
 	public static final int numThreads = 10;
+	
+	
+	public void out(Object ...argv) {
+		String str = "";
+		for (Object o : argv) {
+			str.concat(" " + o);
+		}
+		System.out.println(str);
+	}
 
 }
