@@ -264,7 +264,6 @@ public class RadixTree {
 	}
 
 
-
 	/**
 	 * Searches the tree for every word of a given text. used for testing
 	 * 

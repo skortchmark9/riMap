@@ -136,6 +136,7 @@ public class MapFactory {
 			String nameField = nameList.get(0);
 			for (String word : Constants.spaces.split(nameField)) {
 				if (word.length() > 0) {
+					word = word.toLowerCase();
 					rt.insert(word, lastWord);
 					lastWord = word;
 				}

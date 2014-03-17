@@ -3,13 +3,13 @@ package autocorrect;
 import com.google.common.collect.HashMultiset;
 
 public class Suggestion {
-	
+
 	private String word; //The word
 	private int freq; //frequency of occurrence in corpus. //GOOD. More is better
 	private int led;	//Levenshtein distance			   //BAD. Less is better
 	private int rtDistance; //Distance from departure node //BAD. Usually, less is better.
 	private HashMultiset<String> neighbors;			   //for a given neighbor: GOOD. More is better.
-	
+
 	Suggestion(String word) {
 		//used only for testing (equality purposes)
 		this.word = word;
@@ -24,7 +24,7 @@ public class Suggestion {
 		this.led = AutoCorrectConstants.max;		//In our suggestions.
 		this.neighbors = neighbors;
 	}
-	
+
 	Suggestion(String word, int freq, int rtDistance, HashMultiset<String> neighbors) {
 		this.word = word;
 		this.freq = freq;
@@ -32,7 +32,7 @@ public class Suggestion {
 		this.led = AutoCorrectConstants.max;
 		this.neighbors = neighbors;
 	}
-	
+
 	Suggestion(String word, int freq, int rtDistance, int led, HashMultiset<String> neighbors) {
 		this.word = word;
 		this.freq = freq;
@@ -40,15 +40,15 @@ public class Suggestion {
 		this.led = led;
 		this.neighbors = neighbors;
 	}
-	
+
 	public int getLED() {
 		return this.led;
 	}
-	
+
 	public String getWord() {
 		return this.word;
 	}
-	
+
 	private int smartEvaluate(String previousWord) {
 		/** Evaluates suggestion as per README*/
 		int val = this.freq * AutoCorrectConstants.unigramWeight;
@@ -59,23 +59,25 @@ public class Suggestion {
 				return AutoCorrectConstants.max;
 			else
 				val = val - (this.led * AutoCorrectConstants.ledWeight);
-			val += this.bigramProbability(previousWord) * AutoCorrectConstants.bigramWeight;
+		val += this.bigramProbability(previousWord) * AutoCorrectConstants.bigramWeight;
 		return val;
 	}
-	
-	
+
+
 	public String secondWord() {
 		/** Used by rt.whitespace for filtering whitespace suggestions */
 		String[] parts = this.word.trim().split("\\s+");
 		return parts[parts.length - 1];
 	}
 
-	
+
 	public int bigramProbability(String previousWord) {
-		Integer val = this.neighbors.count(previousWord);
-		return (val == null) ? 0 : val;
+		if (neighbors != null) {
+			return neighbors.count(previousWord);
+		}
+		return 0;
 	}
-	
+
 	public int defaultCompareTo(Suggestion s, String previousWord,  String currentWord) {
 		/** Default comparator used in defaultRank. Selects first for exact matches, 
 		 * then checks for bigram probability, then for unigram probability, and
@@ -123,19 +125,19 @@ public class Suggestion {
 		return (this.word.compareTo(s.word));
 	}
 
-		
-	
+
+
 	@Override
 	public String toString() {
 		return this.word;
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		/** A pretty soft equals - just checks if suggestions have the same string.*/
 		if (o == this) return true;
 		if (!(o instanceof Suggestion)) return false;
-		
+
 		Suggestion s = (Suggestion) o;
 		return (this.word.trim().equals(s.word.trim()));
 	}

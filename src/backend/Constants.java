@@ -17,10 +17,12 @@ public class Constants {
 			new Generator(2, Generator.SuggestType.PREFIX, Generator.SuggestType.WHITESPACE);
 	
 	public static final Ranker defaultRanker = new Ranker(Ranker.CompareMode.SMART);
+
+	public static final int BufferLength = 1024;
+	
 	public static final float MIN_ZOOM = 0.1f;
 	public static final float MAX_ZOOM = 2.0f;
 
-	public static final int BufferLength = 1024;
 
 	/**
 	 * For threaded file reading into KD Tree

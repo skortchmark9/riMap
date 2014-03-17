@@ -12,6 +12,7 @@ import maps.MapFactory;
 import org.junit.Test;
 
 import backend.BinarySearchFile;
+import backend.Constants;
 import backend.Resources;
 
 public class RadixTreeTest {
@@ -28,7 +29,8 @@ public class RadixTreeTest {
 		try {
 			new Resources(ways, nodes, index);
 			RadixTree rt = MapFactory.createRadixTree();
-			
+			Engine e = new Engine(Constants.defaultGenerator, Constants.defaultRanker, rt);
+			System.out.println(e.suggest("Olive S"));
 		} catch (IOException e) {
 			assertTrue(false);
 			e.printStackTrace();

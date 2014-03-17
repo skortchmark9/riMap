@@ -2,13 +2,15 @@ package ac;
 
 import java.util.HashMap;
 
+import com.google.common.collect.HashMultiset;
+
 public class Suggestion {
 	
 	private String word; //The word
 	private int freq; //frequency of occurrence in corpus. //GOOD. More is better
 	private int led;	//Levenshtein distance			   //BAD. Less is better
 	private int rtDistance; //Distance from departure node //BAD. Usually, less is better.
-	private HashMap<String, Integer> neighbors;			   //for a given neighbor: GOOD. More is better.
+	private HashMultiset<String> neighbors;			   //for a given neighbor: GOOD. More is better.
 	
 	Suggestion(String word) {
 		//used only for testing (equality purposes)
@@ -17,7 +19,7 @@ public class Suggestion {
 
 	//We need all these constructors because they get called differently by each suggester.
 	// prefixes cant see levenshteins and vice versa. Its basically montagues and capulets.
-	Suggestion(String word, int freq, HashMap<String, Integer> neighbors) {
+	Suggestion(String word, int freq, HashMultiSet<String> neighbors) {
 		this.word = word;
 		this.freq = freq;
 		this.rtDistance = Constants.max; //We take these into account. 
@@ -25,7 +27,7 @@ public class Suggestion {
 		this.neighbors = neighbors;
 	}
 	
-	Suggestion(String word, int freq, int rtDistance, HashMap<String, Integer> neighbors) {
+	Suggestion(String word, int freq, int rtDistance, HashMultiSet<String> neighbors) {
 		this.word = word;
 		this.freq = freq;
 		this.rtDistance = rtDistance;
@@ -33,7 +35,7 @@ public class Suggestion {
 		this.neighbors = neighbors;
 	}
 	
-	Suggestion(String word, int freq, int rtDistance, int led, HashMap<String, Integer> neighbors) {
+	Suggestion(String word, int freq, int rtDistance, int led, HashMultiSet<String> neighbors) {
 		this.word = word;
 		this.freq = freq;
 		this.rtDistance = rtDistance;
@@ -72,8 +74,10 @@ public class Suggestion {
 
 	
 	public int bigramProbability(String previousWord) {
-		Integer val = this.neighbors.get(previousWord);
-		return (val == null) ? 0 : val;
+		if (this.neighbors != null) {
+			return neighbors.count(previousWord);
+		}
+		return 0;
 	}
 	
 	public int defaultCompareTo(Suggestion s, String previousWord,  String currentWord) {

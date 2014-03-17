@@ -418,7 +418,7 @@ public class RadixTree {
 		for(RadixTree child : _children.values())		 //To reach the empty string.
 			if(child != null)
 				results.addAll(child.nodeLD(rootWord, "", initRow, maxLED)); //Passes along the rest of the
-		return results; 											 //work to nodeLD.
+		return results; 												 //work to nodeLD.
 	}
 
 
@@ -478,7 +478,6 @@ public class RadixTree {
 			if (thisNode._children != null && !thisNode._children.isEmpty()) {
 				RadixTree currentNode = thisNode._children.get(charKey);
 				if (currentNode != null) {
-					System.out.println("Here is the current node: " + currentNode.toString() + " its freq: " + currentNode.getFreq());
 					if (currentNode.isWord()) {
 						int breakpoint = i + currentNode.key.length();
 						if (breakpoint < currentWord.length())
