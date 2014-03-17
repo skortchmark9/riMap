@@ -91,21 +91,26 @@ public class Node implements KDimensionable {
 	
 	private double squareDistanceTo(KDimensionable kd) {
 		double[] otherCoords = kd.getCoordinates();
-		double dist = 0;
-		dist += Math.pow(coords[0] - otherCoords[0], 2);
-		dist +=  Math.pow(coords[1] - otherCoords[1], 2);
+		double dist = Math.pow(coords[0] - otherCoords[0], 2) + Math.pow(coords[1] - otherCoords[1], 2);
 		return dist;
 	}
 
+	private double euclideanDistanceTo(KDimensionable kd) {
+		double[] otherCoords = kd.getCoordinates();
+		double d_squared = Math.pow(coords[0] - otherCoords[0], 2) + Math.pow(coords[1] - otherCoords[1], 2);
+		return Math.sqrt(d_squared);
+		
+	}
 
 	/**
-	 * @return the Haversine Distance between two Locations 
+	 * @return
+	 * The square of the distance between two  Distance between two Locations 
 	 */
 	@Override
 	public double distanceTo(KDimensionable kd) {
 		// TODO: perhaps this should calculate the haversine Distance?
 		//right now we are just returning Manhattan distance:
-		return this.squareDistanceTo(kd);
+		return this.euclideanDistanceTo(kd);
 		}
 	
 	
