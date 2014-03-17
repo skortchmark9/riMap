@@ -45,6 +45,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		this.setPreferredSize(new Dimension(PIXEL_WIDTH, PIXEL_HEIGHT));
 		this.setFocusable(true);
 		
+		Anchor.setCoords(41.842678, -71.417541); //Home Depot
 		initInteraction(); //initializes all interactions for the map view.
 		
 		//new synchronous list for all ways in viewport (ways we need to render)
@@ -160,6 +161,29 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		String[] locs = Constants.tab.split(way);
 //		startLocs.add(new PathNode(Double.parseDouble(locs[0]), Double.parseDouble(locs[1])));
 //		endLocs.add(new PathNode(Double.parseDouble(locs[2]), Double.parseDouble(locs[3])));
+	}
+	
+	
+	private static class Anchor {
+		private static double[] coords = new double[2];
+		
+		/**
+		 * Set the coordinates of this anchor
+		 * @param lat - the latitude to set
+		 * @param lon - the longitude to set
+		 */
+		private static void setCoords(double lat, double lon) {
+			coords[0] = lat;
+			coords[1] = lon;
+		}
+		
+		/**
+		 * @return
+		 * the current coordinates of the anchor
+		 */
+		public static double[] getCoords() {
+			return coords;
+		}
 	}
 	
 	/**
