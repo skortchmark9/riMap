@@ -2,6 +2,7 @@ package frontend;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 
 import javax.swing.BorderFactory;
@@ -41,9 +42,16 @@ public class MapDemo {
                 final MapPane pane = new MapPane();
                 pane.setBorder(BorderFactory.createLineBorder(Color.blue));
                 JPanel p2 = new JPanel();
+                p2.setPreferredSize(new Dimension(100, 700));
                 p2.setBackground(Color.WHITE);
-                frame.add(p2);
-                frame.add(new JScrollPane(pane));
+                frame.add(p2, BorderLayout.EAST);
+                JPanel p3 = new JPanel();
+                p3.setPreferredSize(new Dimension(700, 100));
+                p3.setBackground(Color.WHITE);
+                frame.add(p3, BorderLayout.SOUTH);
+                
+                //frame.add(new JScrollPane(pane), BorderLayout.CENTER);
+                frame.add(pane, BorderLayout.CENTER);
                 frame.setVisible(true);
 
                 SwingUtilities.invokeLater(new Runnable() {
