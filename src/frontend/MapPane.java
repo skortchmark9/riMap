@@ -22,6 +22,7 @@ import javax.swing.InputMap;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
+import backend.Backend;
 import backend.Constants;
 import maps.MapFactory;
 import maps.Node;
@@ -39,9 +40,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	//private List<Node> startLocs;
 	//private List<Node> endLocs;
 	private List<Way> renderedWays;
+	private Backend b;
 
 
-	MapPane()   {
+	MapPane(Backend b)   {
 		this.setBackground(Color.black);
 		this.setPreferredSize(new Dimension(PIXEL_WIDTH, PIXEL_HEIGHT));
 		this.setMaximumSize(getPreferredSize());
@@ -52,7 +54,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		
 		//new synchronous list for all ways in viewport (ways we need to render)
 		//renderedWays = Collections.synchronizedList(MapFactory.getWaysInRange(0, 0, 0, 0));
-		renderedWays = MapFactory.getWays_TEST();
+		double[] topLeft = Corners.topLeft;
+		renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
 		this.repaint(); //paint the initial set of ways
 		this.requestFocusInWindow();
 	}
@@ -95,15 +98,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * the returned array will be in the form <strong>{x, y}</strong>
 	 */
 	private int[] geo2pixel(double[] coordinates) {
-		out("abs: " + this.getLocationOnScreen());
-		out("Coords:", Arrays.toString(coordinates));
 		float geoWidth = Constants.GEO_DIMENSION_FACTOR / scale;
-		out("geoWidth =", geoWidth);
 		double[] offset = Corners.offsetFromTopLeft(coordinates);
-		out("offset =", Arrays.toString(offset));
 		int x = (int) Math.round(offset[1]/geoWidth * PIXEL_WIDTH);
 		int y = (int) (int) Math.round((offset[0]/geoWidth) * PIXEL_HEIGHT);
-		out("Calculated screen coords:", x, y);
 		return new int[]{x, y};
 	}
 
