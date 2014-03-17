@@ -16,16 +16,7 @@ import org.junit.Test;
 public class BinarySearchFileTest {
 	String films = "./data/baconfiles/films.tsv";
 	// Figure this out with TAs
-	
-	@Test
-	public void testReadChunks() throws IOException {
-		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
-//		System.out.println(b.readChunks("name", "id"));
-		b.close();
-		assertTrue(true);
-	}
 
-	/*
 	//Applied for single row
 	@Test
 	public void testSearchSingleMultiple() {
@@ -36,6 +27,17 @@ public class BinarySearchFileTest {
 			assertTrue(false);
 		}
 	}
+
+	
+	@Test
+	public void testReadChunks() throws IOException {
+		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
+//		System.out.println(b.readChunks("name", "id"));
+		b.close();
+		assertTrue(true);
+	}
+
+	/*
 
 	//Applied for multiple rows
 	@Test
