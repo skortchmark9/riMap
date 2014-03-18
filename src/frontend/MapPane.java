@@ -56,7 +56,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		//new synchronous list for all ways in viewport (ways we need to render)
 		//renderedWays = Collections.synchronizedList(MapFactory.getWaysInRange(0, 0, 0, 0));
 		double[] topLeft = Corners.topLeft;
-		renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
+		renderedWays = b.getWaysInRange(Corners.topLeft[0], Corners.bottomLeft[0], Corners.topLeft[1], Corners.topRight[1]);
 		if (Constants.DEBUG_MODE) {
 			Util.out("Finished - Got All Ways in range", "(Elapsed:", Util.lap() +")");
 		}

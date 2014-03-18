@@ -3,6 +3,8 @@
  */
 package backend;
 
+import java.text.DecimalFormat;
+
 /**
  * @author emc3
  *
@@ -51,12 +53,14 @@ public class Util {
 	}
 	
 	public static String getFirst4Digits(double x) {
-		String ans = (int) x + "";
-		if (x < 100) {
-			return ans + decimalDigits(x, 2); 
-		} else {
-			return ans + decimalDigits(x, 3);
+		x = Math.abs(x);
+		String num = String.valueOf(x);
+		num = num.replace(".", "");
+		while (num.length() < 4) {
+			num+= "0";
 		}
+		System.out.println(num);
+		return num.substring(0, 4);
 	}
 	
 	static int decimalDigits(double x, int n) {

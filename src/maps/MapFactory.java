@@ -77,9 +77,11 @@ public class MapFactory {
 			Util.resetClock();
 		}
 		List<Way> ways = new LinkedList<>();
-		for(double i = minLat; i < maxLat; i++) {
-			for(double j = minLon; j < maxLon; j++) {
-				List<List<String>> chunk = Resources.waysFile.searchMultiples("/w/" + Util.getFirst4Digits(i) + "." + Util.getFirst4Digits(j),
+		for(double i = minLat; i <= maxLat + .01; i+=0.01) {
+			for(double j = maxLon; j >= minLon; j-=0.01) {
+				String searchCode = "/w/" + Util.getFirst4Digits(i) + "." + Util.getFirst4Digits(j);
+				Util.out("SC:", searchCode);
+				List<List<String>> chunk = Resources.waysFile.searchMultiples(searchCode,
 				SearchType.WILDCARD, "id", "name", "start", "end");
 				for (List<String> wayInfo : chunk) {
 					if (wayInfo != null && !wayInfo.isEmpty()) {

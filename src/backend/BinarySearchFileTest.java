@@ -23,6 +23,8 @@ public class BinarySearchFileTest {
 	//Applied for multiple rows
 
 
+	
+	
 	@Test
 	public void testSearchSingleMultiple() {
 		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
@@ -81,6 +83,9 @@ public class BinarySearchFileTest {
 		assertTrue(-4 == Util.decimalDigits(testValue, 1));
 		assertTrue(0 == Util.decimalDigits(testValue, 0));
 		assertTrue(0 ==  Util.decimalDigits(testValue, -1));
+		testValue = -73.8000;
+		Util.out(Util.getFirst4Digits(testValue));
+		
 	}
 
 

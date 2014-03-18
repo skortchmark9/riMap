@@ -87,7 +87,6 @@ public class MapDemo {
                 p3.setBackground(Color.WHITE);
                 frame.add(p3, BorderLayout.SOUTH);
                 
-                //frame.add(new JScrollPane(pane), BorderLayout.CENTER);
                 frame.add(pane, BorderLayout.CENTER);
                 frame.setVisible(true);
 
