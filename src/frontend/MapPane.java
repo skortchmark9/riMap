@@ -74,9 +74,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		}
 		this.repaint(); //paint the initial set of ways
 		this.requestFocusInWindow();
-		if (Constants.DEBUG_MODE) {
+		
+		if (Constants.DEBUG_MODE)
 			Util.memLog();
-		}
 	}
 
 	@Override
@@ -215,6 +215,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * Zooms the map view out (unless we are at min zoom)
 	 */
 	private void zoomOut() {
+		if (scale > Constants.MIN_ZOOM - 0.1) {
+			scale -= 0.1;
+		}
 		//TODO: zoom out 0.1
 	}
 	
