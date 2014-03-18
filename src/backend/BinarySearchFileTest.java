@@ -63,8 +63,7 @@ public class BinarySearchFileTest {
 	@Test
 	public void wildCardTest() {
 		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
-			System.out.println(b.search("Olive Str", SearchType.WILDCARD));
-			assertTrue(true);
+			assertTrue(b.search("Olive Str", SearchType.WILDCARD).equals("Olive Street	/n/4192.7140.201402759,/n/4192.7140.201402766"));
 		} catch (IOException e) {
 			assertTrue(false);
 		}

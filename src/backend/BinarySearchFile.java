@@ -26,7 +26,7 @@ public class BinarySearchFile implements AutoCloseable {
 	int tabBufferLength;
 	int numCalls;
 	long length;
-	enum SearchType {WILDCARD, DEFAULT}
+	public enum SearchType {WILDCARD, DEFAULT}
 
 	/** 
 	 * Main constructor of the BinarySearchFile.

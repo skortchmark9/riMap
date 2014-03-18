@@ -13,10 +13,10 @@ import autocorrect.RadixTree;
 import backend.Constants;
 import backend.Resources;
 import backend.Util;
+import backend.BinarySearchFile.SearchType;
 import edu.brown.cs032.emc3.kdtree.KDStub;
 import edu.brown.cs032.emc3.kdtree.KDTree;
 import edu.brown.cs032.emc3.kdtree.KDimensionable;
-
 /**
  * 
  * @author emc3 / skortchm
@@ -46,19 +46,53 @@ public class MapFactory {
 	}
 	
 	private static Way createWay(String wayID, String name, Node start, PathNodeWrapper end) {
-		Way resultWay = new Way(wayID, name, start, end);
-		ways.put(wayID, resultWay);
+		Way resultWay = ways.get(wayID);
+		if (resultWay == null) {
+			resultWay = new Way(wayID, name, start, end);
+			ways.put(wayID, resultWay);
+		}
 		return resultWay;
 	}
-	/*
-	public List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+	
+	private static Way createWay(String wayID, String name, String start, String end) {
+		Way resultWay = ways.get(wayID);
+		if (resultWay == null) {
+			Node startNode = createNode(start);
+			Node endNode = createNode(end);
+			if (endNode != null && startNode != null) {
+				resultWay = createWay(wayID, name, startNode, new PathNodeWrapper(endNode));
+			}
+			if (resultWay != null) {
+			ways.put(wayID, resultWay);
+			} else {
+				return null;
+			}
+		}
+		return resultWay;
+	}
+
+	public static List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
 		if (Constants.DEBUG_MODE) {
 			Util.out("Looking for Ways in Range");
 			Util.resetClock();
 		}
-		Util.getFirst4Digits(minLat);
-	}*/
-
+		List<Way> ways = new LinkedList<>();
+		for(double i = minLat; i < maxLat; i++) {
+			for(double j = minLon; j < maxLon; j++) {
+				List<List<String>> chunk = Resources.waysFile.searchMultiples("/w/" + Util.getFirst4Digits(i) + "." + Util.getFirst4Digits(j),
+				SearchType.WILDCARD, "id", "name", "start", "end");
+				for (List<String> wayInfo : chunk) {
+					if (wayInfo != null && !wayInfo.isEmpty()) {
+						Way possibleWay = createWay(wayInfo.get(0), wayInfo.get(1), wayInfo.get(2), wayInfo.get(3));
+						if (possibleWay != null) {
+							ways.add(possibleWay);
+						}
+					}
+				}
+			}
+		}
+		return ways;
+	}
 	
 	
 
