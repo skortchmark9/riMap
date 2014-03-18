@@ -215,8 +215,21 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * Zooms the map view out (unless we are at min zoom)
 	 */
 	private void zoomOut() {
-		if (scale > Constants.MIN_ZOOM - 0.1) {
+		if (scale > Constants.MIN_ZOOM + 0.1) {
+			double geoWidth = Constants.GEO_DIMENSION_FACTOR / scale;
 			scale -= 0.1;
+			double newGeoWidth = Constants.GEO_DIMENSION_FACTOR / scale;
+			double pageDiff = (newGeoWidth-geoWidth)/2;
+			double newLat = Corners.topLeft[0] + pageDiff;
+			double newLon = Corners.topLeft[1] - pageDiff;
+			Corners.reposition(newLat, newLon);
+			
+			if (source != null)
+				//TODO: reposition the source thingy
+			if (target != null) {
+				//TODO: reposition the target thingy
+			}
+			
 		}
 		//TODO: zoom out 0.1
 	}
