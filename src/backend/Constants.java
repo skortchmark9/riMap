@@ -17,6 +17,8 @@ public class Constants {
 	public static final Pattern digits = Pattern.compile("\\D");
 	public static final Pattern quotes = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
 	public static final Pattern spaces = Pattern.compile("\\s+");
+	public static final Pattern period = Pattern.compile(".");
+	
 	
 	public static final Generator defaultGenerator = 
 			new Generator(2, Generator.SuggestType.PREFIX, Generator.SuggestType.WHITESPACE);

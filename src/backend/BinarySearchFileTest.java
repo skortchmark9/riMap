@@ -20,28 +20,37 @@ import org.junit.Test;
 public class BinarySearchFileTest {
 	String films = "./data/baconfiles/films.tsv";
 	// Figure this out with TAs
+	//Applied for multiple rows
+
+
+	
+	
 	@Test
 	public void testSearchSingleMultiple() {
 		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
-			System.out.println(b.searchMultiples("Olive St", "name", "nodes"));
+			List<List<String>> results = b.searchMultiples("Olive St", "name", "nodes");
+			assertTrue(results.get(0).get(0).equals("Olive St"));
+			assertTrue(results.size() == 1);
 		} catch (IOException e) {
 			e.printStackTrace();
 			assertTrue(false);
 		}
 	}
 
-
-	//Applied for multiple rows
+	
 	@Test
 	public void testSearchMultiples() {
 		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
-	//		System.out.println(b.searchMultiples("10th Avenue", "name", "nodes"));
+			List<List<String>> results = b.searchMultiples("10th Avenue", "name", "nodes");
+			assertTrue(results.size() == 3);
+			for(List<String> list : results) {
+				assertTrue(list.get(0).equals("10th Avenue"));
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			assertTrue(false);
 		}
 	}
-
 	
 	@Test
 	public void wildCardMultipleTest() {
@@ -56,8 +65,7 @@ public class BinarySearchFileTest {
 	@Test
 	public void wildCardTest() {
 		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
-			System.out.println(b.search("Olive Str", SearchType.WILDCARD));
-			assertTrue(true);
+			assertTrue(b.search("Olive Str", SearchType.WILDCARD).equals("Olive Street	/n/4192.7140.201402759,/n/4192.7140.201402766"));
 		} catch (IOException e) {
 			assertTrue(false);
 		}
@@ -75,6 +83,9 @@ public class BinarySearchFileTest {
 		assertTrue(-4 == Util.decimalDigits(testValue, 1));
 		assertTrue(0 == Util.decimalDigits(testValue, 0));
 		assertTrue(0 ==  Util.decimalDigits(testValue, -1));
+		testValue = -73.8000;
+		Util.out(Util.getFirst4Digits(testValue));
+		
 	}
 
 
@@ -142,14 +153,17 @@ public class BinarySearchFileTest {
 			String name1 = line.split("\t")[0];
 			line2 = r.readLine();
 			if (line2 == null) continue;
-			String name2 = line2.split("\t")[0];
+			String name2 = line2;
 			//System.out.println(name1 + " : " + name2);
-			int cmp = BinarySearchFile.jCompare(name1.getBytes(), name2.getBytes());
+			int cmp = BinarySearchFile.jCompare(name1.getBytes(), name2.getBytes(), 0);
 			if (!(cmp < 0)) {
+				int follow = line.charAt(name1.length());
+				if (!(follow == '\t' || follow == '\n')) {
 				System.err.println("jCompare Failed! Compare returned: " + cmp);
 				System.err.println("\tfirst: " + name1);
 				System.err.println("\tsecond: " + name2);
 				assertTrue(false);
+				}
 			}
 		}
 		r.close();
@@ -208,10 +222,10 @@ public class BinarySearchFileTest {
 		byte[] a = "Sylvester Stallone".getBytes();
 		byte[] b = "Sándor Almási".getBytes();
 		byte[] c = "Sébastian udss".getBytes();
-		assertTrue(BinarySearchFile.jCompare(a, b) < 0);
-		assertTrue(BinarySearchFile.jCompare(b, a) > 0);
-		assertTrue(BinarySearchFile.jCompare(b, c) < 0);
-		assertTrue(BinarySearchFile.jCompare(a, c) < 0);
+		assertTrue(BinarySearchFile.jCompare(a, b, 0) < 0);
+		assertTrue(BinarySearchFile.jCompare(b, a, 0) > 0);
+		assertTrue(BinarySearchFile.jCompare(b, c, 0) < 0);
+		assertTrue(BinarySearchFile.jCompare(a, c, 0) < 0);
 	}
 
 	@Test

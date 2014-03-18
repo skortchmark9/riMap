@@ -26,7 +26,7 @@ public class BinarySearchFile implements AutoCloseable {
 	int tabBufferLength;
 	int numCalls;
 	long length;
-	enum SearchType {WILDCARD, DEFAULT}
+	public enum SearchType {WILDCARD, DEFAULT}
 
 	/** 
 	 * Main constructor of the BinarySearchFile.
@@ -81,7 +81,6 @@ public class BinarySearchFile implements AutoCloseable {
 			return null;
 		}
 	}
-
 
 	/**
 	 * Cool function designed to minimize the number of binary searches. 
@@ -163,12 +162,27 @@ public class BinarySearchFile implements AutoCloseable {
 		}
 	}
 
+	/** 
+	 * This function does a small but difficult job. It finds the first
+	 * occurrence of the given word (searchCodeBytes) in the file.
+	 * The name is a little misleading - it jumps backwards but then scans
+	 * forward. The effect is the same as scanning backwards, but faster.
+	 * @param searchCodeBytes - the word in question
+	 * @param start - an instance of the word in the file.
+	 * @param s - the type of search: DEFAULT looks for exact matches, and
+	 * WILDCARD finds all words which start with the given word.
+	 * @return - the newline holding the first occurrence of the word.
+	 * @throws IOException - if there are issues with seek or read.
+	 */
 	long scanBackward(byte[] searchCodeBytes, long start, SearchType s) throws IOException {
-		boolean foundAnyMatches = false;
+		//The initial newLine is the start.
+		long lastNewLine = start;
+		//We don't want to accidentally try to read past the top of the file.
 		while (start > 0) {
 			byte[] arrayToSearch;
 			int arraySize;
 			if (start < bufferLength) {
+				//If there isn't enough space at the top of the file.
 				arraySize = (int) (start);
 			}
 			else {
@@ -177,16 +191,20 @@ public class BinarySearchFile implements AutoCloseable {
 			arrayToSearch = new byte[arraySize];
 			long startIndex = start - arraySize;
 			raf.seek(startIndex);
+			//Jumps backwards into the file 
 			raf.read(arrayToSearch);
-			boolean foundInThisRun = false;
-			boolean foundAWord = false;
-			long lastNewLine = start;
+			//Reads from the startIndex to the starting newLine.
+			//Indicates whether we've found a MATCHING word in this run.
+			boolean foundMatch = false;
+			//Indicates whether we've even found a word to compare with.
+			boolean foundWord = false;
+			//Iterate through the array hunting for newLines.
 			for(int i = 0; i < arraySize; i++) {
 				int ch = arrayToSearch[i];
-				startIndex++;
 				if (ch  == '\n') {
-					//					newLines.putPrev(endIndex, endIndex - i);
-					lastNewLine = startIndex;
+					//TODO make sure this is right for all cases.
+					newLines.putNext(startIndex, startIndex + i);
+					//Depending on the file, we may need to skip some tabs.
 					int tabsToSkip = parsePattern.get(sortingCol);
 					int tabsFound = 0;
 					int tabLocation = 0;
@@ -199,27 +217,26 @@ public class BinarySearchFile implements AutoCloseable {
 							break;
 						}
 					}
-					int wordStart = i + tabLocation + 1; //Perhaps we need to add 1?
-					byte[] testArray = Arrays.copyOfRange(arrayToSearch, wordStart, wordStart +  searchCodeBytes.length);
-					foundAWord = true;
-					Util.out(string(testArray));
-					int cmp = compare(searchCodeBytes, testArray);
+					//The convention is to return the exact index of the last tab,
+					//so we need to add 1
+					int wordStart = i + tabLocation + 1;
+					foundWord = true;
+					int cmp = compare(searchCodeBytes, arrayToSearch, wordStart);
 					if (cmp == 0) {
+						lastNewLine = startIndex + i;
 						if (s == SearchType.WILDCARD) {
-							foundInThisRun = true;
-							foundAnyMatches = true;
+							foundMatch = true;
 							break;
 						} else if (arrayToSearch[wordStart + searchCodeBytes.length] == '\t' ||
 								arrayToSearch[wordStart + searchCodeBytes.length] == '\n') {
-							foundInThisRun = true;
-							foundAnyMatches = true;
+							foundMatch = true;
 							break;
 						}
 					}
 				}
 			}
-			if (foundAWord && !foundInThisRun) {
-				return lastNewLine - 1;
+			if (foundWord && !foundMatch) {
+				return lastNewLine;
 			} else {
 				start = startIndex;
 			}
@@ -227,7 +244,20 @@ public class BinarySearchFile implements AutoCloseable {
 		return start;
 	}
 
+	/** 
+	 * This function does a small but difficult job. It finds the last
+	 * occurrence of the given word (searchCodeBytes) in the file.
+	 * The name is a little misleading - it jumps forwards but then scans
+	 * backward. The effect is the same as scanning forward, but faster.
+	 * @param searchCodeBytes - the word in question
+	 * @param start - an instance of the word in the file.
+	 * @param s - the type of search: DEFAULT looks for exact matches, and
+	 * WILDCARD finds all words which start with the given word.
+	 * @return - the newline holding the last occurrence of the word.
+	 * @throws IOException - if there are issues with seek or read.
+	 */
 	long scanForward(byte[] searchCodeBytes, long start, SearchType s) throws IOException {
+		long lastNewLine = start;
 		byte[] arrayToSearch;
 		int arraySize;
 		if ((length - start) < bufferLength) {
@@ -242,13 +272,11 @@ public class BinarySearchFile implements AutoCloseable {
 		raf.read(arrayToSearch);
 		boolean foundInThisRun = false;
 		boolean foundAWord = false;
-		long lastNewLine = endIndex;
 		for(int i = arraySize - 1; i > 0; i--) {
 			int ch = arrayToSearch[i];
 			endIndex--;
 			if (ch  == '\n') {
 				//					newLines.putPrev(endIndex, endIndex - i);
-				lastNewLine = endIndex;
 				int tabsToSkip = parsePattern.get(sortingCol);
 				int tabsFound = 0;
 				int tabLocation = 0;
@@ -262,10 +290,8 @@ public class BinarySearchFile implements AutoCloseable {
 					}
 				}
 				int wordStart = i + tabLocation + 1; //Perhaps we need to add 1?
-				byte[] testArray = Arrays.copyOfRange(arrayToSearch, wordStart, wordStart +  searchCodeBytes.length);
 				foundAWord = true;
-				Util.out(string(testArray));
-				int cmp = compare(searchCodeBytes, testArray);
+				int cmp = compare(searchCodeBytes, arrayToSearch, wordStart);
 				if (cmp == 0) {
 					if (s == SearchType.WILDCARD) {
 						foundInThisRun = true;
@@ -275,11 +301,13 @@ public class BinarySearchFile implements AutoCloseable {
 						foundInThisRun = true;
 						break;
 					}
+				} else {
+					lastNewLine = endIndex;
 				}
 			}
 		}
 		if (foundAWord && !foundInThisRun) {
-			return lastNewLine;
+			return endIndex == start ? start : lastNewLine;
 		} else {
 			return scanForward(searchCodeBytes, endIndex, s);
 		}
@@ -356,9 +384,8 @@ public class BinarySearchFile implements AutoCloseable {
 			//XXX: changing to only do one read, with an extra byte
 			byte[] tempField = new byte[word.length + 1]; //get one extra byte for use in the else clause below
 			raf.read(tempField);
-			byte[] testField = Arrays.copyOfRange(tempField, 0, word.length); //returns the test field without the extra byte (second index is exclusive)
 			int follow = tempField[tempField.length-1]; //returns the extra byte
-			int cmp = compare(word, testField);
+			int cmp = compare(word, tempField);
 			if (cmp < 0 && !lastSearch) {
 				return search(word, top, followingNewLine, s);
 			}
@@ -596,32 +623,32 @@ public class BinarySearchFile implements AutoCloseable {
 	 * @param b
 	 * @return
 	 */
-	static int jCompare(byte[] a, byte[] b) {
+	static int jCompare(byte[] a, byte[] b, int bIndex) {
 		for(int i = 0; i < a.length; i++) {
+			int relativeIndex = i + bIndex;
 			if (b.length <= i) {
 				return 1;
 			}
-			if (a[i] != b[i]) {
+			if (a[i] != b[relativeIndex]) {
 				//If both bytes are special or standard, we can just subtract them.
-				if ((a[i] < 0 && b[i] < 0) || (a[i] > 0 && b[i] > 0)) {
-					return a[i] - b[i];
+				if ((a[i] < 0 && b[relativeIndex] < 0) || (a[i] > 0 && b[relativeIndex] > 0)) {
+					return a[i] - b[relativeIndex];
 				}
 				else {
 					//If only one byte is special, we want to HIGHER number to be first.
-					return b[i] - a[i];
+					return b[i] - a[relativeIndex];
 				}
 			}
 		}
-		//strings are equal up to a's length
-		if (a.length < b.length) {
-			return -1;
-		}
-		//strings are equal
 		return 0;
+	}
+	
+	int compare(byte[] a, byte[] b, int bIndex) {
+		return jCompare(a, b, bIndex);
 	}
 
 	int compare(byte[] a, byte[] b) {
-		return jCompare(a, b);
+		return jCompare(a, b, 0);
 	}
 
 	@Override

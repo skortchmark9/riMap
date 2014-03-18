@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import backend.BinarySearchFile.SearchType;
 import autocorrect.Engine;
 import autocorrect.RadixTree;
 import maps.MapFactory;
@@ -85,6 +86,10 @@ public class Backend {
 		}
 	}
 	
+	public List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+		return MapFactory.getWaysInRange(minLat, maxLat, minLon, maxLon);
+	}
+	
 	public List<Node> getNearestNeighbors(int num, KDimensionable testPoint) {
 		if (kd != null) {
 			return kd.getNearestNeighbors(num, testPoint);
@@ -92,26 +97,5 @@ public class Backend {
 			Util.err("ERROR: KD TREE NOT INITIALIZED");
 			return null;
 		}
-	}
-	
-	public List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
-		if (Constants.DEBUG_MODE) {
-			Util.out("Looking for Ways in Range");
-			Util.resetClock();
-		}
-		double lat1 = minLat + maxLat / 2;
-		double lon1 = minLon + maxLon / 2;
-		//The midpoint of the map range. 
-		KDimensionable midpoint = new KDStub(lat1, lon1);
-		
-		double radiusSquared = Math.pow((maxLat - lat1), 2) + Math.pow(maxLon - lon1, 2);
-		List<Node> nodes = kd.getObjectsWithinRadius(Math.sqrt(radiusSquared), midpoint); //changed to use square root
-		List<Way> ways = new ArrayList<>();
-		for(Node n : nodes) {
-			for(String wayID : n.getWayIDs()) {
-				ways.add(MapFactory.createWay(wayID));
-			}
-		}
-		return ways;
-	}
+	}	
 }
