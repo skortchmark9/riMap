@@ -62,4 +62,8 @@ public class Util {
 		return (System.currentTimeMillis() - START);
 	}
 	
+	public static long timeSince(long start) {
+		return (System.currentTimeMillis() - start);
+	}
+	
 }

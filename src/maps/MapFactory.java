@@ -12,6 +12,7 @@ import java.util.Set;
 import autocorrect.RadixTree;
 import backend.Constants;
 import backend.Resources;
+import backend.Util;
 import edu.brown.cs032.emc3.kdtree.KDStub;
 import edu.brown.cs032.emc3.kdtree.KDTree;
 import edu.brown.cs032.emc3.kdtree.KDimensionable;
@@ -109,13 +110,24 @@ public class MapFactory {
 	}
 	
 	public static KDTree<Node> createKDTree() {
-		System.out.println("Reading nodes");
+		long start = 0; //XXX: FOR DEBUGGING
+		if (Constants.DEBUG_MODE) {
+			Util.out("Reading node data from file to List (System Calls):");
+			start = Util.resetClock();
+		}
+		
 		List<List<String>> nodes = Resources.nodesFile.readChunks("id", "latitude", "longitude", "ways");
-		long start = System.currentTimeMillis();
-		System.out.println("Initializing KDTree");
+		
+		if (Constants.DEBUG_MODE) {
+			Util.out("Populated List with node data.", "(Elapsed:", Util.timeSince(start) + ")");
+			Util.memLog();
+			Util.out("Creating Node objects from node data:");
+			start = Util.resetClock();
+		}
+		
 		List<Node> nodeList = new LinkedList<>();
 		//Iterators here because we are parsing a lot of data and we want to make the best use of our
-		//underlying datastructure. The wrapper list is a LinkedList and the underlying one is an arrayList.
+		//underlying data structure. The wrapper list is a LinkedList and the underlying one is an arrayList.
 		Iterator<List<String>> outerListIterator = nodes.iterator();
 		while (outerListIterator.hasNext()) {
 			List<String> nodeInfo = outerListIterator.next();
@@ -126,13 +138,33 @@ public class MapFactory {
 				}
 			}
 		}
-		System.out.println("Done: " + (System.currentTimeMillis() - start) + "s");
+		
+		if (Constants.DEBUG_MODE) {
+			Util.out("Finished Nodes creation", "(Elapsed:", Util.timeSince(start) + ")");
+			Util.memLog();
+			Util.out("Creating KDTree from Nodes List:");
+			Util.resetClock();
+		}
+		
 		return new KDTree<Node>(nodeList);
 	}
 	
 	public static RadixTree createRadixTree() {
-		System.out.println("Reading index");
+		long start = 0; //XXX: FOR DEBUGGING
+		if (Constants.DEBUG_MODE) {
+			Util.out("Reading index file for names:");
+			Util.memLog();
+			start = Util.resetClock();
+		}
+		
 		List<List<String>> names = Resources.indexFile.readChunks("name");
+		
+		if (Constants.DEBUG_MODE) {
+			Util.out("Done reading names to list.", "(Elapsed:", Util.timeSince(start) + ")");
+			Util.out("Creating Tree from List:");
+			start = Util.resetClock();
+		}
+		
 		RadixTree rt = new RadixTree();
 		for(List<String> nameList : names) {
 			String lastWord = "";
@@ -145,6 +177,11 @@ public class MapFactory {
 				}
 			}
 		}
+		
+		if (Constants.DEBUG_MODE) {
+			Util.out("Done inserting names from list to Radix Tree.", "(Elapsed:", Util.timeSince(start) + ")");
+		}
+		
 		return rt;
 	}
 	
