@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -85,6 +86,20 @@ public class LineMap {
 		} else {
 			return possiblePrevLine;
 		}
+	}
+	
+	int suggestLineLength(long rafLength) {
+		int lineLength = 0;
+		int successfulTries = 0;
+		for(int i = 0; i < 20; i++) {
+			Random r = new Random(rafLength);
+			Range<Long> range = lineMap.rangeContaining(r.nextLong());
+			if (range != null) {
+				lineLength += (range.upperEndpoint() - range.lowerEndpoint());
+				successfulTries++;
+			}
+		}
+		return lineLength / successfulTries;
 	}
 }
 

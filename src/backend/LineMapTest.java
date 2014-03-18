@@ -23,5 +23,4 @@ public class LineMapTest {
 		assertTrue(l.getNextNewLine(20) == null);
 		assertTrue(l.getPrevNewLine(47) == 40);
 	}
-	
 }

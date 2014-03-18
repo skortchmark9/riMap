@@ -30,8 +30,10 @@ public class Constants {
 	public static final float MIN_ZOOM = 0.1f;
 	public static final float MAX_ZOOM = 2.0f;
 	
-
-	public static final int BufferLength = 1024;
+	//A prime number!
+	public static final int ADJUST_LINE_BUFFER = 4037;
+	public static final int BufferLength = 512;
+	public static final int TabBufferLength = 256;
 
 	/**
 	 * For threaded file reading into KD Tree

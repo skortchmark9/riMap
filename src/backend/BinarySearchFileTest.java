@@ -12,6 +12,7 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 
+import backend.BinarySearchFile.SearchType;
 import backend.Util;
 
 import org.junit.Test;
@@ -19,27 +20,6 @@ import org.junit.Test;
 public class BinarySearchFileTest {
 	String films = "./data/baconfiles/films.tsv";
 	// Figure this out with TAs
-	
-
-	@Test
-	public void testDecimalDigitTest() {
-		double testValue = Constants.INITIAL_LAT;
-		Util.out(testValue);
-		Util.out("2: ", Util.decimalDigits(testValue, 2));
-		Util.out("1: ", Util.decimalDigits(testValue, 1));
-		Util.out("0: ", Util.decimalDigits(testValue, 0));
-		Util.out("-1: ", Util.decimalDigits(testValue, -1));
-		testValue = Constants.INITIAL_LON;
-		Util.out(testValue);
-		Util.out("2: ", Util.decimalDigits(testValue, 2));
-		Util.out("1: ", Util.decimalDigits(testValue, 1));
-		Util.out("0: ", Util.decimalDigits(testValue, 0));
-		Util.out("-1: ", Util.decimalDigits(testValue, -1));
-	}
-	
-	
-	
-	//Applied for single row
 	@Test
 	public void testSearchSingleMultiple() {
 		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
@@ -50,22 +30,12 @@ public class BinarySearchFileTest {
 		}
 	}
 
-	
-	@Test
-	public void testReadChunks() throws IOException {
-		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
-//		System.out.println(b.readChunks("name", "id"));
-		b.close();
-		assertTrue(true);
-	}
-
-	
 
 	//Applied for multiple rows
 	@Test
 	public void testSearchMultiples() {
 		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
-			System.out.println(b.searchMultiples("10th Avenue", "name", "nodes"));
+	//		System.out.println(b.searchMultiples("10th Avenue", "name", "nodes"));
 		} catch (IOException e) {
 			e.printStackTrace();
 			assertTrue(false);
@@ -73,46 +43,90 @@ public class BinarySearchFileTest {
 	}
 
 	
+	@Test
+	public void wildCardMultipleTest() {
+		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
+			assertTrue(b.searchMultiples("2nd ", SearchType.WILDCARD, "name", "nodes").size() == 26);
+		} catch (IOException e) {
+			e.printStackTrace();
+			assertTrue(false);
+		}
+	}
 	
+	@Test
+	public void wildCardTest() {
+		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
+			System.out.println(b.search("Olive Str", SearchType.WILDCARD));
+			assertTrue(true);
+		} catch (IOException e) {
+			assertTrue(false);
+		}
+	}
+
+	@Test
+	public void testDecimalDigitTest() {
+		double testValue = Constants.INITIAL_LAT;
+		assertTrue(84 == Util.decimalDigits(testValue, 2));
+		assertTrue(8 == Util.decimalDigits(testValue, 1));
+		assertTrue(0 == Util.decimalDigits(testValue, 0));
+		assertTrue(0 == Util.decimalDigits(testValue, -1));
+		testValue = Constants.INITIAL_LON;
+		assertTrue (-41 == Util.decimalDigits(testValue, 2));
+		assertTrue(-4 == Util.decimalDigits(testValue, 1));
+		assertTrue(0 == Util.decimalDigits(testValue, 0));
+		assertTrue(0 ==  Util.decimalDigits(testValue, -1));
+	}
+
+
+
+	@Test
+	public void testReadChunks() throws IOException {
+		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
+		//		System.out.println(b.readChunks("name", "id"));
+		b.close();
+		assertTrue(true);
+	}
+	//Applied for single row - fix readchunks
+
 	@Test
 	public void testStringParse() {
 		List<String> matchList = new LinkedList<>();
 		String test = "hey \"this is\" a string";
 		Matcher regexMatcher = Constants.quotes.matcher(test);
 		while (regexMatcher.find()) {
-			  if (regexMatcher.group(1) != null) {
-			        // Add double-quoted string without the quotes
-			        matchList.add(regexMatcher.group(1));
-			    } else if (regexMatcher.group(2) != null) {
-			        // Add single-quoted string without the quotes
-			        matchList.add(regexMatcher.group(2));
-			    } else {
-			        // Add unquoted word
-			        matchList.add(regexMatcher.group());
-			    }
+			if (regexMatcher.group(1) != null) {
+				// Add double-quoted string without the quotes
+				matchList.add(regexMatcher.group(1));
+			} else if (regexMatcher.group(2) != null) {
+				// Add single-quoted string without the quotes
+				matchList.add(regexMatcher.group(2));
+			} else {
+				// Add unquoted word
+				matchList.add(regexMatcher.group());
+			}
 		}
 		assertTrue(matchList.contains("hey"));
 		assertTrue(matchList.contains("this is"));
 		assertTrue(matchList.contains("a"));
 		assertTrue(matchList.contains("string"));
 	}
-	
-		
+
+
 
 	@Test
 	public void FindUTF8() throws IOException {
 		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/index.tsv", "name", "name", "id");
-		System.out.println(b.search("雅-miyavi-"));
+		//		System.out.println(b.search("雅-miyavi-"));
 		assertTrue(b.getXsByY("雅-miyavi-", "id")[0].equals("/m/01qkwf8"));
 		b.close();
 	}
-	
+
 	//Why does the below work but not the above ?
 
 	@Test
 	public void FindUTF8Again() throws IOException {
 		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/index.tsv", "name", "name", "id");
-		System.out.println(b.search("안소희"));
+		//		System.out.println(b.search("안소희"));
 		assertTrue(b.getXsByY("Íñigo Garcés", "id")[0].equals("/m/0c09t3g"));
 		b.close();
 	}
@@ -140,15 +154,15 @@ public class BinarySearchFileTest {
 		}
 		r.close();
 	}
-	
-	
+
+
 	@Test
 	public void FindFifty() throws IOException {
 		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
 		assertTrue(b.getXsByY("50 Cent", "id")[0].equals("/m/01vvyc_"));
 		b.close();
 	}
-	
+
 	@Test
 	public void TestXsByY() throws Exception {
 		BinarySearchFile b = new BinarySearchFile(films, "id", "id", "name", "starring");
@@ -171,7 +185,7 @@ public class BinarySearchFileTest {
 		assertTrue(b.getXsByY("/m/0hzcwhy", "name")[0].equals("Watch Juice"));
 		b.close();
 	}
-	
+
 	@Test
 	public void BinarySearchNotThere() throws Exception {
 		//I don't think we want this behavior.
@@ -187,7 +201,7 @@ public class BinarySearchFileTest {
 		assertTrue(Resources.indexFile.search("Taylor Swift").equals("Taylor Swift\t/m/0dl567"));
 		r.closeResources();
 	}
-	
+
 
 	@Test
 	public void testModdedComparator() {
@@ -213,8 +227,8 @@ public class BinarySearchFileTest {
 		assertTrue(r.indexFile.search("Fabio Stallone").equals("Fabio Stallone\t/m/07z32y_"));
 		r.closeResources();
 	}
-	
-	
+
+
 	@Test
 	public void testMatcher() {
 		String line = "OHMYG0ODNUMB3RS";
@@ -222,23 +236,23 @@ public class BinarySearchFileTest {
 		line = m.replaceAll("!!!");
 		assertTrue(!line.equals("OHMYG0ODNUMB3RS"));
 	}
-	
+
 	@Test
 	public void BinarySearch2() throws IOException {
 		BinarySearchFile b = new BinarySearchFile(films, "id", "id", "name", "starring");
-//		System.out.println(b.search("/m/0ds29fr"));
+		//		System.out.println(b.search("/m/0ds29fr"));
 		assertTrue(b.getXsByY("/m/0ds29fr", "name")[0].equals("Singularity"));
 		b.close();
 	}
-	
-	
+
+
 	@Test
 	public void BinarySearch() throws IOException {
 		BinarySearchFile b = new BinarySearchFile(films, "id", "id", "name", "starring");	
 		assertTrue(b.getXsByY("/m/0fvp0c", "name") != null);
 		b.close();
 	}
-	
+
 	@Test
 	public void testNewLine() throws Exception {
 		Resources r = new Resources(1);
@@ -252,14 +266,14 @@ public class BinarySearchFileTest {
 		assertTrue(r.indexFile.search("Samuel L. Jackson").equals("Samuel L. Jackson\t/m/0f5xn"));
 		r.closeResources();
 	}
-	
-	
+
+
 	@Test
 	public void SearchByID() throws Exception {
-//		BinarySearchFile b = new BinarySearchFile(Resources.actorsFile, ParseType.ACTOR);
-	//	String result = "Steve Coogan\t\t\t\t/m/01nfys\t/m/08k40m,/m/0crzbrv";
+		//		BinarySearchFile b = new BinarySearchFile(Resources.actorsFile, ParseType.ACTOR);
+		//	String result = "Steve Coogan\t\t\t\t/m/01nfys\t/m/08k40m,/m/0crzbrv";
 
-//		assertTrue(b.search("/m/01nfys").equals(result));
+		//		assertTrue(b.search("/m/01nfys").equals(result));
 	}
 	@Test
 	public void SearchByName() throws Exception {
@@ -267,14 +281,14 @@ public class BinarySearchFileTest {
 		assertTrue(Resources.indexFile.search("Samuel L. Jackson").equals("Samuel L. Jackson\t/m/0f5xn"));
 		r.closeResources();
 	}
-	
+
 	@Test
 	public void SearchMoviesByID() throws Exception {
 		Resources r = new Resources(1);
 		assertTrue(Resources.waysFile.getXsByY("/m/02x3lt7", "name")[0].equals("Hannah Montana: The Movie"));
 		r.closeResources();
 	}
-/*
+	/*
 	@Test //Ant didn't like this test for some reason. It works though.
 	public void fileNotFound() {
 		boolean failed = true;
@@ -282,5 +296,5 @@ public class BinarySearchFileTest {
 			failed = false;
 		}
 	}
-*/
+	 */
 }
