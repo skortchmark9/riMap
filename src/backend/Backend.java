@@ -114,5 +114,4 @@ public class Backend {
 		}
 		return ways;
 	}
-
 }

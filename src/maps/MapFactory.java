@@ -41,11 +41,26 @@ public class MapFactory {
 		if (startLoc == null || endLoc == null) {
 			return null;
 		} else {
-			Way resultWay = new Way(wayID, wayInfo[0], startLoc, new PathNodeWrapper(endLoc));
-			ways.put(wayID, resultWay);
-			return resultWay;
+			return createWay(wayID, wayInfo[0], startLoc, new PathNodeWrapper(endLoc));
 		}
 	}
+	
+	private static Way createWay(String wayID, String name, Node start, PathNodeWrapper end) {
+		Way resultWay = new Way(wayID, name, start, end);
+		ways.put(wayID, resultWay);
+		return resultWay;
+	}
+	/*
+	public List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+		if (Constants.DEBUG_MODE) {
+			Util.out("Looking for Ways in Range");
+			Util.resetClock();
+		}
+		Util.getFirst4Digits(minLat);
+	}*/
+
+	
+	
 
 	
 	//TODO : Potentially we could store the nodes created somewhere so that if

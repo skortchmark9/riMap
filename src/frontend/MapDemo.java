@@ -36,7 +36,6 @@ public class MapDemo {
                 } catch (IllegalAccessException illegalAccessException) {
                 } catch (UnsupportedLookAndFeelException unsupportedLookAndFeelException) {
                 }
-               
                 
                 Backend b = null;
 				try {
@@ -47,7 +46,6 @@ public class MapDemo {
 						Util.out("Constructing backend");
 						Util.memLog();
 					}
-					
 					b = new Backend(new String[] {arg1, arg2, arg3});
 					
 					if (Constants.DEBUG_MODE) {
