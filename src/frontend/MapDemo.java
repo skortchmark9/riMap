@@ -50,7 +50,6 @@ public class MapDemo {
 					
 					if (Constants.DEBUG_MODE) {
 						Util.out("backend done.");
-						Util.memLog();
 					}
 						
 				} catch (IOException e) {
@@ -63,8 +62,10 @@ public class MapDemo {
                 frame.setLocationRelativeTo(null);
                 frame.setLayout(new BorderLayout());
                 
+                long start = 0; //XXX: FOR DEBUGGING
+                
                 if (Constants.DEBUG_MODE) {
-                	Util.resetClock();
+                	start = Util.resetClock();
                 	Util.out("Constructing MapPane...");
                 	Util.memLog();
                 }
@@ -72,7 +73,7 @@ public class MapDemo {
                 final MapPane pane = new MapPane(b);
                 
                 if(Constants.DEBUG_MODE) {
-                	Util.out("Finished MapPane (Elapsed:", Util.lap()+")");
+                	Util.out("Finished MapPane (Elapsed:", Util.timeSince(start)+")");
         			Util.memLog();
                 }
                 
