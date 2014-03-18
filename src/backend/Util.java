@@ -50,6 +50,21 @@ public class Util {
 		out("\tALLOC'd:", (((double)r.totalMemory())/1048576.0)+"MB", "|", "FREE:", ((double)(r.freeMemory())/1048576.0)+"MB", "|", "MAX:", (((double) r.maxMemory())/1048576.0)+"MB");
 	}
 	
+	public static String getFirst4Digits(double x) {
+		String ans = (int) x + "";
+		if (x < 100) {
+			return ans + decimalDigits(x, 2); 
+		} else {
+			return ans + decimalDigits(x, 3);
+		}
+	}
+	
+	static int decimalDigits(double x, int n) {
+	    double ans;
+	    ans = (x - (int) x) * Math.pow(10, n);
+	    return (int) ans;
+	}
+	
 	/**
 	 * Starts the stopwatch
 	 * @return the time of clock start

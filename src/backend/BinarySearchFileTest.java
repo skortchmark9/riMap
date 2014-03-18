@@ -8,15 +8,37 @@ import java.io.RandomAccessFile;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 
-import org.junit.Test;
+import backend.Util;
 
+import org.junit.Test;
 
 public class BinarySearchFileTest {
 	String films = "./data/baconfiles/films.tsv";
 	// Figure this out with TAs
+	
 
+	@Test
+	public void testDecimalDigitTest() {
+		double testValue = Constants.INITIAL_LAT;
+		Util.out(testValue);
+		Util.out("2: ", Util.decimalDigits(testValue, 2));
+		Util.out("1: ", Util.decimalDigits(testValue, 1));
+		Util.out("0: ", Util.decimalDigits(testValue, 0));
+		Util.out("-1: ", Util.decimalDigits(testValue, -1));
+		testValue = Constants.INITIAL_LON;
+		Util.out(testValue);
+		Util.out("2: ", Util.decimalDigits(testValue, 2));
+		Util.out("1: ", Util.decimalDigits(testValue, 1));
+		Util.out("0: ", Util.decimalDigits(testValue, 0));
+		Util.out("-1: ", Util.decimalDigits(testValue, -1));
+	}
+	
+	
+	
 	//Applied for single row
 	@Test
 	public void testSearchSingleMultiple() {
@@ -37,7 +59,7 @@ public class BinarySearchFileTest {
 		assertTrue(true);
 	}
 
-	/*
+	
 
 	//Applied for multiple rows
 	@Test

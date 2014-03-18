@@ -37,14 +37,4 @@ public class Constants {
 	 * For threaded file reading into KD Tree
 	 */
 	public static final int numThreads = 10;
-	
-	
-	public void out(Object ...argv) {
-		String str = "";
-		for (Object o : argv) {
-			str.concat(" " + o);
-		}
-		System.out.println(str);
-	}
-
 }

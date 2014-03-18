@@ -20,8 +20,7 @@ public class BinarySearchFile implements AutoCloseable {
 	RandomAccessFile raf; // the random access file to be searched
 	private static Charset UTF8 = Charset.forName("UTF-8"); // the type of encoding.
 	HashMap<String, Integer> parsePattern;
-	HashMap<Long, Long> nextNewLines;
-	HashMap<Long, Long> prevNewLines;
+	LineMap newLines;
 	String sortingCol;
 
 	/** 
@@ -40,8 +39,7 @@ public class BinarySearchFile implements AutoCloseable {
 			System.out.println("ERROR: Unable to open file '" + filePath + "'");
 			System.exit(1);
 		}
-		nextNewLines = new HashMap<>();
-		prevNewLines = new HashMap<>();
+		newLines = new LineMap();
 		parsePattern = readHeader(nextNewLine(0, raf.length()));
 		for(String colID : importantCols) {
 			if (!parsePattern.containsKey(colID)) {
@@ -395,7 +393,7 @@ public long nextNewLine(long start, long end) throws IOException {
 	if (start > end) {
 		return end;
 	}
-	Long cachedNewLine = nextNewLines.get(start);
+	Long cachedNewLine = newLines.getNextNewLine(start);
 	if (cachedNewLine != null) {
 		return cachedNewLine;
 	}
@@ -413,7 +411,7 @@ public long nextNewLine(long start, long end) throws IOException {
 	for(int i = 0; i < arraySize; i++) {
 		int ch = arrayToSearch[i];
 		if (ch  == '\n') {
-			nextNewLines.put(start, start + i);
+			newLines.putNext(start, start + i);
 			return start + i;
 		}
 	}
@@ -433,7 +431,7 @@ public long nextNewLine(long start, long end) throws IOException {
  * @throws IOException
  */
 public long prevNewLine(long start, long beginning) throws IOException {
-	Long cachedPrevLine = prevNewLines.get(start);
+	Long cachedPrevLine = newLines.getPrevNewLine(start);
 	if (cachedPrevLine != null) {
 		return cachedPrevLine;
 	}
@@ -451,7 +449,7 @@ public long prevNewLine(long start, long beginning) throws IOException {
 	for(int i = arraySize - 1; i >= 0; i--) {
 		int ch = arrayToSearch[i];
 		if (ch  == '\n') {
-			prevNewLines.put(start, start - arraySize + i);
+			newLines.putPrev(start, start - arraySize + i);
 			return start - arraySize + i;
 		}
 	}
