@@ -165,7 +165,11 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * @return
 	 */
 	public double pixelOffset2geoOffset(int pixelOffset) {
-			return (((double)pixelOffset)/((double)PIXEL_WIDTH)) * (Constants.GEO_DIMENSION_FACTOR / scale);
+			double pixelRatio = ((double) pixelOffset) / ((double) PIXEL_WIDTH);
+			double geoWidth = Constants.GEO_DIMENSION_FACTOR / scale;
+			double geoLen  = pixelRatio * geoWidth;
+			return geoLen;
+			//return (((double)pixelOffset)/((double)PIXEL_WIDTH)) * (Constants.GEO_DIMENSION_FACTOR / scale);
 	}
 
 	/**
@@ -283,8 +287,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			//no new ways to get
 			this.repaint(); 
 		}
-		//TODO: zoom in  0.1
-		
 	}
 
 	@Override
@@ -311,8 +313,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			Point p = e.getPoint();
 			double[] geoOffset = new double[]{pixelOffset2geoOffset(p.y - startP.y), pixelOffset2geoOffset(p.x - startP.x)};
 			//calculate new anchor point (top left lat/lon)
-			double newLat = Corners.topLeft[0] + geoOffset[0]; 
-			double newLon = Corners.topLeft[1] - geoOffset[1]; 
+			double newLat = Corners.topLeft[0] + pixelOffset2geoOffset(p.y - startP.y); 
+			double newLon = Corners.topLeft[1] - pixelOffset2geoOffset(p.x - startP.x); 
 			Corners.reposition(newLat, newLon); //reposition all corners with new coords
 			
 			//re-calibrate click points
@@ -320,6 +322,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				source.recalibrate();
 			if (target != null)
 				target.recalibrate();
+			
+			repaint(); //repaint for responsiveness
 			
 			//get all new ways n' add 'em to the renderList
 			/*
@@ -330,7 +334,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			*/
 			
 			renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
-			//repaint the map
+			//repaint the map again with new ways
 			repaint();
 			
 			
