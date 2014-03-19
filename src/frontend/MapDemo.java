@@ -78,7 +78,6 @@ public class MapDemo {
         			Util.memLog();
                 }
                 
-                pane.setBorder(BorderFactory.createLineBorder(Color.blue));
                 JPanel p2 = new JPanel();
                 p2.setPreferredSize(new Dimension(100, 700));
                 p2.setBackground(Color.WHITE);

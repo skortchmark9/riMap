@@ -52,11 +52,15 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		this.setFocusable(true);
 		
 		Corners.reposition(Constants.INITIAL_LAT, Constants.INITIAL_LON); //init to home depot (lol)
-		Util.out("Corners:");
-		Util.out("\tTop Left:", "("+Corners.topLeft[0]+",", Corners.topLeft[1]+")");
-		Util.out("\tTop Right:", "("+Corners.topRight[0]+",", Corners.topRight[1]+")");
-		Util.out("\tBottom Right:", "("+Corners.bottomRight[0]+",", Corners.bottomRight[1]+")");
-		Util.out("\tBottom Left:", "("+Corners.bottomLeft[0]+",", Corners.bottomLeft[1]+")");
+		
+		if (Constants.DEBUG_MODE) {
+			Util.out("Corners:");
+			Util.out("\tTop Left:", "("+Corners.topLeft[0]+",", Corners.topLeft[1]+")");
+			Util.out("\tTop Right:", "("+Corners.topRight[0]+",", Corners.topRight[1]+")");
+			Util.out("\tBottom Right:", "("+Corners.bottomRight[0]+",", Corners.bottomRight[1]+")");
+			Util.out("\tBottom Left:", "("+Corners.bottomLeft[0]+",", Corners.bottomLeft[1]+")");
+		}
+		
 		initInteraction(); //initializes all interactions for the map view.
 		
 		//new synchronous list for all ways in viewport (ways we need to render)
@@ -523,6 +527,27 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		 */
 		private void recalibrate() {
 			screenCoords = geo2pixel(node.getCoordinates()); 
+		}
+		
+	}
+	
+	private class WayDrawer extends Thread {
+		private Graphics2D brush;
+		private List<Way> renderList;
+		
+		private WayDrawer(Graphics2D brush, List<Way> list) {
+			this.brush = brush;
+			this.renderList = list;
+		}
+		
+		@Override
+		public void run() {
+			for (Way way : renderList) {
+				int[] start = geo2pixel(way.getStart().getCoordinates());
+				int[] end = geo2pixel(way.getTarget().getValue().getCoordinates());
+				brush.setColor(Color.WHITE);
+				brush.drawLine(start[0], start[1], end[0], end[1]);
+			}
 		}
 		
 	}

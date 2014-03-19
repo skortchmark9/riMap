@@ -513,13 +513,20 @@ public class BinarySearchFile implements AutoCloseable {
 				long chunkEnd = (i == Constants.numThreads) ? length : nextNewLine(secondLine + (chunkSize * i), length);
 				long chunkStart = nextNewLine((secondLine + (chunkSize * (i - 1))), chunkEnd);
 				chunks.addAll(readChunk(chunkStart, chunkEnd, xs));
-				System.out.println("Finished chunk: " + (i - 1) + " of: " + Constants.numThreads);
+				
+				if (Constants.DEBUG_MODE) {
+					Util.out("Finished chunk: " + (i - 1) + " of: " + Constants.numThreads);
+				}
+				
 			}
 		}
 		catch (IOException e) {
-			System.err.println("ERROR: readChunks could not read the file.");
+			Util.err("ERROR: readChunks could not read the file.");
 		}
-		System.out.println("Finished Reading");
+		
+		if (Constants.DEBUG_MODE)
+			Util.out("Finished Reading");
+		
 		return chunks;
 	}
 

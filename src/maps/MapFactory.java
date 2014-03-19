@@ -72,18 +72,23 @@ public class MapFactory {
 	}
 
 	public static List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+		
 		if (Constants.DEBUG_MODE) {
 			Util.out("Looking for Ways in Range");
 			Util.resetClock();
 		}
+		
 		List<Way> ways = new LinkedList<>();
 		for(double i = minLat; i <= maxLat + .01; i+=0.01) {
 			for(double j = maxLon; j >= minLon - .01; j-=0.01) {
 				String searchCode = "/w/" + Util.getFirst4Digits(i) + "." + Util.getFirst4Digits(j);
-				Util.out("SC:", searchCode);
-				if (searchCode.equals("/w/4165.7209.189121272.3.1")) {
-					Util.out("HERE");
+				
+				if (Constants.DEBUG_MODE) {
+					Util.out("SC:", searchCode);
+					if (searchCode.equals("/w/4165.7209.189121272.3.1"))
+						Util.out("HERE");
 				}
+				
 				List<List<String>> chunk = Resources.waysFile.searchMultiples(searchCode,
 				SearchType.WILDCARD, "id", "name", "start", "end");
 				for (List<String> wayInfo : chunk) {
@@ -148,7 +153,7 @@ public class MapFactory {
 		}
 		List<List<String>> street2nodeLists = Resources.indexFile.searchMultiples(streetName2, "nodes");
 		if (street2nodeLists == null) {
-			System.out.println("ERROR: StreetName2 has no node lists");
+			Util.err("ERROR: StreetName2 has no node lists");
 		}
 		for(List<String> nodeList : street2nodeLists) {
 			for(String nodes : nodeList) {
