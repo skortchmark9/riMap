@@ -28,9 +28,9 @@ public class Constants {
 	//Info for rendering lines on map:
 	public static final double INITIAL_LAT = 41.842678; //Home Depot
 	public static final double INITIAL_LON = -71.417541;
-	public static final double GEO_DIMENSION_FACTOR = 0.02f;
-	public static final double MIN_ZOOM = 0.1f;
-	public static final double MAX_ZOOM = 2.0f;
+	public static final double GEO_DIMENSION_FACTOR = 0.02;
+	public static final double MIN_ZOOM = 0.2;
+	public static final double MAX_ZOOM = 12.0;
 	
 	//A prime number!
 	public static final int ADJUST_LINE_BUFFER = 4037;

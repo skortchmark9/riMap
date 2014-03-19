@@ -11,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -99,16 +100,20 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		//Render Click Points
 		if (source != null) {
 			
-			if (Constants.DEBUG_MODE)
+			if (Constants.DEBUG_MODE) {
 				Util.out("Point A:", "("+source.screenCoords[0]+",", source.screenCoords[1]+")");
+				Util.out("Node ways:", source.node.getWayIDs());
+			}
 			
 			g2d.setColor(Color.GREEN);
 			g2d.drawOval(source.screenCoords[0] - 5, source.screenCoords[1] - 5, 10, 10);
 		}
 		if (target != null) {
 			
-			if (Constants.DEBUG_MODE)
+			if (Constants.DEBUG_MODE) {
 				Util.out("Point B:", "("+target.screenCoords[0]+",", target.screenCoords[1]+")");
+				Util.out("Node ways:", target.node.getWayIDs());
+			}
 			
 			g2d.setColor(Color.RED);
 			g2d.drawOval(target.screenCoords[0] - 5, target.screenCoords[1] - 5, 10, 10);
@@ -169,6 +174,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			double geoWidth = Constants.GEO_DIMENSION_FACTOR / scale;
 			double geoLen  = pixelRatio * geoWidth;
 			return geoLen;
+					
 			//return (((double)pixelOffset)/((double)PIXEL_WIDTH)) * (Constants.GEO_DIMENSION_FACTOR / scale);
 	}
 
@@ -230,9 +236,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private void zoomOut() {
 		if (Constants.DEBUG_MODE)
 		//only zoom out if we are before theshold
-		if (scale > Constants.MIN_ZOOM + 0.1) {
+		if (scale > Constants.MIN_ZOOM) {
 			double oldGeoWidth = Constants.GEO_DIMENSION_FACTOR / scale; //get the old width
-			scale -= 0.1; //decrement scale
+			scale *= 0.8; //decrement scale
 			if (Constants.DEBUG_MODE)
 				Util.out("New Scale:", scale);
 			double newGeoWidth = Constants.GEO_DIMENSION_FACTOR / scale; //get new width
@@ -249,12 +255,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			if (target != null)
 				target.recalibrate();
 			
-			//get all new ways n' add 'em to the renderList 
-			renderedWays.addAll(b.getWaysInRange(Corners.topLeft[0] - viewDiff, Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1])); // top side of new view
-			renderedWays.addAll(b.getWaysInRange(Corners.bottomRight[0], Corners.topRight[0] - viewDiff, Corners.topRight[1] - viewDiff, Corners.topRight[1])); //right side minus top right corner square (taken care of above)
-			renderedWays.addAll(b.getWaysInRange(Corners.bottomLeft[0], Corners.bottomLeft[0] + viewDiff, Corners.bottomLeft[1], Corners.bottomRight[1] - viewDiff)); //bottom side minus bottom right corner (taken care of above)
-			renderedWays.addAll(b.getWaysInRange(Corners.bottomLeft[0] + viewDiff, Corners.topLeft[0] - viewDiff, Corners.topLeft[1], Corners.topLeft[1] + viewDiff)); //left side minus top and bottom left corners (taken care of above)
+			this.repaint(); //repaint for responsiveness
 			
+			//get all new ways n' add 'em to the renderList 
+			renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
 			//repaint this component
 			this.repaint();
 		}
@@ -265,17 +269,17 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 */
 	private void zoomIn() {
 		//only zoom in if we are before threshold
-		if (scale < Constants.MAX_ZOOM - 0.1) {
+		if (scale < Constants.MAX_ZOOM) {
 			double oldGeoWidth = Constants.GEO_DIMENSION_FACTOR / scale; //get the old width
-			scale += 0.1; //decrement scale
+			scale *= 1.2; //decrement scale
 			if (Constants.DEBUG_MODE)
 				Util.out("New Scale:", scale);
 			double newGeoWidth = Constants.GEO_DIMENSION_FACTOR / scale; //get new width
-			double viewDiff = (newGeoWidth-oldGeoWidth)/2; //find difference of each side of view in new width
+			double viewDiff = (oldGeoWidth - newGeoWidth)/2; //find difference of each side of view in new width
 			
 			//calculate new anchor point (top left lat/lon)
-			double newLat = Corners.topLeft[0] + viewDiff; 
-			double newLon = Corners.topLeft[1] - viewDiff; 
+			double newLat = Corners.topLeft[0] - viewDiff; 
+			double newLon = Corners.topLeft[1] + viewDiff; 
 			Corners.reposition(newLat, newLon); //reposition all corners with new coords
 			
 			//re-calibrate clickPoints
@@ -317,6 +321,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			double newLon = Corners.topLeft[1] - pixelOffset2geoOffset(p.x - startP.x); 
 			Corners.reposition(newLat, newLon); //reposition all corners with new coords
 			
+			startP = e.getPoint(); //re-define start p
+			
 			//re-calibrate click points
 			if (source != null)
 				source.recalibrate();
@@ -325,20 +331,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			
 			repaint(); //repaint for responsiveness
 			
-			//get all new ways n' add 'em to the renderList
-			/*
-			renderedWays.addAll(b.getWaysInRange(Corners.topLeft[0] - geoOffset[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1])); // top side of new view
-			renderedWays.addAll(b.getWaysInRange(Corners.bottomRight[0], Corners.topRight[0] - geoOffset[0], Corners.topRight[1] - geoOffset[1], Corners.topRight[1] - geoOffset[1])); //right side minus top right corner square (taken care of above)
-			renderedWays.addAll(b.getWaysInRange(Corners.bottomLeft[0], Corners.bottomLeft[0] + geoOffset[0], Corners.bottomLeft[1], Corners.bottomRight[1] - geoOffset[1])); //bottom side minus bottom right corner (taken care of above)
-			renderedWays.addAll(b.getWaysInRange(Corners.bottomLeft[0] + geoOffset[0], Corners.topLeft[0] - geoOffset[0], Corners.topLeft[1], Corners.topLeft[1] + geoOffset[1])); //left side minus top and bottom left corners (taken care of above)
-			*/
-			
+			//get all new ways for the render list
 			renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
 			//repaint the map again with new ways
 			repaint();
-			
-			
-			
 		}
 		
 		@Override
