@@ -234,7 +234,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * Zooms the map view out (unless we are at min zoom)
 	 */
 	private void zoomOut() {
-		if (Constants.DEBUG_MODE)
 		//only zoom out if we are before theshold
 		if (scale > Constants.MIN_ZOOM) {
 			double oldGeoWidth = Constants.GEO_DIMENSION_FACTOR / scale; //get the old width
@@ -257,7 +256,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			
 			this.repaint(); //repaint for responsiveness
 			
-			//get all new ways n' add 'em to the renderList 
+			//get all new ways in new range 
 			renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
 			//repaint this component
 			this.repaint();
@@ -292,11 +291,75 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			this.repaint(); 
 		}
 	}
+	
+	/**
+	 * Zooms the mouse in according to the current mouse position
+	 * @param mousePos - the mouse point to zoom in towards
+	 */
+	private void zoomIn(Point mousePos) {
+		if (scale < Constants.MAX_ZOOM) {
+			scale *= 1.1;
+			
+			if (Constants.DEBUG_MODE)
+				Util.out("New Scale:", scale);
+			
+			int newX = (int)Math.ceil((mousePos.x*(1.1-1) - 1));
+			int newY = (int)Math.ceil((mousePos.y*(1.1-1) - 1));
+			
+			double[] newAnchor = pixel2geo(newX, newY);
+			Corners.reposition(newAnchor[0], newAnchor[1]); //reposition all corners with new coords
+
+			//re-calibrate clickPoints
+			if (source != null)
+				source.recalibrate();
+			if (target != null)
+				target.recalibrate();
+
+			//no new ways to get
+			this.repaint(); 
+		}
+	}
+	
+	/**
+	 * Zooms the map out according to the current mouse position 
+	 * @param mousePos - the mousePoint to zoom out from
+	 */
+	private void zoomOut(Point mousePos) {
+		if (scale > Constants.MIN_ZOOM) {
+			scale *= 0.9;
+			if (Constants.DEBUG_MODE)
+				Util.out("New Scale:", scale);
+			
+			int newX = (int)Math.ceil((mousePos.x*(0.9-1) - 1));
+			int newY = (int)Math.ceil((mousePos.y*(0.9-1) - 1));
+			double[] newAnchor = pixel2geo(newX, newY);
+			Corners.reposition(newAnchor[0], newAnchor[1]); //reposition all corners with new coords
+			
+			//re-calibrate clickPoints
+			if (source != null)
+				source.recalibrate();
+			if (target != null)
+				target.recalibrate();
+			
+			this.repaint(); // repaint for responsiveness
+			
+			//get all new ways in new range 
+			renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
+			//repaint this component
+			this.repaint();
+		}
+	}
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		// TODO Auto-generated method stub
-		
+		int scrollAmount = e.getWheelRotation();
+		if (Constants.DEBUG_MODE)
+			Util.out("MOUSEWHEEL AMOUNT:", scrollAmount);
+		if (scrollAmount < 0) {
+			zoomIn(e.getPoint());
+		} else {
+			zoomOut(e.getPoint());
+		}
 	}
 	
 	/**
