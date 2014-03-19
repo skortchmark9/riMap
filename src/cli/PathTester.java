@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 
+import kdtree.KDStub;
+import kdtree.KDimensionable;
 import maps.MapFactory;
 import maps.Node;
 import maps.PathNodeWrapper;
 import backend.Backend;
 import backend.Constants;
-import edu.brown.cs032.emc3.kdtree.KDStub;
-import edu.brown.cs032.emc3.kdtree.KDimensionable;
 import graph.PathFinder;
 
 public class PathTester {

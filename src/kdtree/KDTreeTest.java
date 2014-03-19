@@ -1,7 +1,7 @@
 /**
  * 
  */
-package edu.brown.cs032.emc3.kdtree;
+package kdtree;
 
 import static org.junit.Assert.*;
 

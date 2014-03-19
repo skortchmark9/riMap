@@ -1,5 +1,4 @@
 package frontend;
-import edu.brown.cs032.emc3.kdtree.KDStub;
 import graph.PathNode;
 
 import java.awt.Color;
@@ -23,6 +22,7 @@ import javax.swing.InputMap;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
+import kdtree.KDStub;
 import backend.Backend;
 import backend.Constants;
 import backend.Util;
@@ -224,8 +224,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			double newLon = Corners.topLeft[1] - pageDiff;
 			Corners.reposition(newLat, newLon);
 			
-			if (source != null)
-				//TODO: reposition the source thingy
+			if (source != null) {
+				
+			}
 			if (target != null) {
 				//TODO: reposition the target thingy
 			}
@@ -376,6 +377,14 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			KDStub p = new KDStub(geoCoords[0], geoCoords[1]);
 			node = b.getNearestNeighbors(1, p).get(0);
 			screenCoords = geo2pixel(node.getCoordinates());
+		}
+		
+		/**
+		 * This method re-calibrates the screen coordinates 
+		 * after any translation 
+		 */
+		private void recalibrate() {
+			screenCoords = geo2pixel(node.getCoordinates()); 
 		}
 		
 	}

@@ -1,4 +1,4 @@
-package edu.brown.cs032.emc3.kdtree;
+package kdtree;
 
 public interface KDimensionable {
 	

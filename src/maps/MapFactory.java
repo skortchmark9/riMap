@@ -9,14 +9,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import kdtree.KDStub;
+import kdtree.KDTree;
+import kdtree.KDimensionable;
 import autocorrect.RadixTree;
 import backend.Constants;
 import backend.Resources;
 import backend.Util;
 import backend.BinarySearchFile.SearchType;
-import edu.brown.cs032.emc3.kdtree.KDStub;
-import edu.brown.cs032.emc3.kdtree.KDTree;
-import edu.brown.cs032.emc3.kdtree.KDimensionable;
 /**
  * 
  * @author emc3 / skortchm
