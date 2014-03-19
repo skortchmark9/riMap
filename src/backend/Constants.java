@@ -8,7 +8,7 @@ import autocorrect.Ranker;
 public class Constants {
 	
 	//XXX DEBUG MODE
-	public static final boolean DEBUG_MODE = true; //XXX TURN THIS OFF BEFORE HANDIN / SYSTEM TESTS
+	public static final boolean DEBUG_MODE = false; //XXX TURN THIS OFF BEFORE HANDIN / SYSTEM TESTS
 	//XXX DEBUG MODE
 	
 	//Precompiled regex patterns to make split and replace faster. 
