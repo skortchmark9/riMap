@@ -59,7 +59,6 @@ public class Util {
 		while (num.length() < 4) {
 			num+= "0";
 		}
-		System.out.println(num);
 		return num.substring(0, 4);
 	}
 	
@@ -69,6 +68,19 @@ public class Util {
 	    return (int) ans;
 	}
 	
+	public static byte[] concatByteArrays(byte[] first, byte[] second) {
+		byte[] result = new byte[first.length + second.length];
+		int lastIndex = 0;
+		for(int i = 0; i < first.length; i++) {
+			result[i] = first[i];
+			lastIndex = i;
+		}
+		lastIndex++;
+		for(int i = 0; i < second.length; i++) {
+			result[i + lastIndex] = second[i];
+		}
+		return result;
+	}
 	/**
 	 * Starts the stopwatch
 	 * @return the time of clock start

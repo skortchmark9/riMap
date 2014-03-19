@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.google.common.collect.ObjectArrays;
+
 /**
  * Searchable file which reads from the disk, without reading the file into memory.
  * It also reads the headers of tsv style documents and parses them appropriately.
@@ -291,6 +293,14 @@ public class BinarySearchFile implements AutoCloseable {
 				}
 				int wordStart = i + tabLocation + 1; //Perhaps we need to add 1?
 				foundAWord = true;
+				long wordEnd = wordStart + searchCodeBytes.length;
+				long diff = wordEnd - arrayToSearch.length;
+				if (diff > 0) {
+					byte[] extraArray = new byte[(int) diff];
+					raf.seek(wordStart);
+					raf.read(extraArray);
+					arrayToSearch = Util.concatByteArrays(arrayToSearch, extraArray);
+				}
 				int cmp = compare(searchCodeBytes, arrayToSearch, wordStart);
 				if (cmp == 0) {
 					if (s == SearchType.WILDCARD) {

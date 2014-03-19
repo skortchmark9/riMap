@@ -22,7 +22,15 @@ public class BinarySearchFileTest {
 	// Figure this out with TAs
 	//Applied for multiple rows
 
-
+	
+	@Test
+	public void testConcatByte() {
+		byte[] first = new byte[] {1, 2, 3,4, 5};
+		byte[] second = new byte[] {6, 7, 8, 9, 10};
+		byte[] result = Util.concatByteArrays(first, second);
+		byte[] expected = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+		assertTrue(Arrays.equals(result, expected));
+		}
 	
 	
 	@Test
