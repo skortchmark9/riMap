@@ -78,7 +78,7 @@ public class MapFactory {
 		}
 		List<Way> ways = new LinkedList<>();
 		for(double i = minLat; i <= maxLat + .01; i+=0.01) {
-			for(double j = maxLon; j >= minLon; j-=0.01) {
+			for(double j = maxLon; j >= minLon - .01; j-=0.01) {
 				String searchCode = "/w/" + Util.getFirst4Digits(i) + "." + Util.getFirst4Digits(j);
 				Util.out("SC:", searchCode);
 				List<List<String>> chunk = Resources.waysFile.searchMultiples(searchCode,
