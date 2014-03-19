@@ -35,6 +35,7 @@ public class SearchAutoFillPane extends JPanel {
 	private JTextField searchField = null;
 	private JPopupMenu popup = null;
 	Backend b;
+	boolean confirmed = false;
 
 	private JTable searchTable = null;
 	private TableRowSorter<DefaultTableModel> rowSorter = null;
@@ -57,6 +58,7 @@ public class SearchAutoFillPane extends JPanel {
 		searchField = new JTextField(50);
 		searchField.getInputMap().put(KeyStroke.getKeyStroke("pressed UP"), "nothing");
 		searchField.getInputMap().put(KeyStroke.getKeyStroke("pressed DOWN"), "nothing");
+
 		FocusListener defaultFocusListener = searchField.getFocusListeners()[0];
 		searchField.removeFocusListener(defaultFocusListener);
 		searchField.addFocusListener(new FocusListener() {
@@ -138,13 +140,18 @@ public class SearchAutoFillPane extends JPanel {
 				case KeyEvent.VK_ENTER:
 				{
 					if (popup.isVisible()) {
-						String suggestion = (String) searchTable.getValueAt(searchTable.getSelectedRow(), 0);
+						int selectedRow = searchTable.getSelectedRow();
+						if (selectedRow >= 0) {
+						String suggestion = (String) searchTable.getValueAt(selectedRow, 0);
 						System.out.println(suggestion);
-//						searchField.setCaret(new HighlightCaret());
 						searchField.setText(suggestion);
 						int end = searchField.getSelectionEnd();
 						searchField.setSelectionStart(end);
 						searchField.setSelectionEnd(end);
+						} else {
+							hidePopup();
+							confirmed = true;
+						}
 					}
 					break;
 				}

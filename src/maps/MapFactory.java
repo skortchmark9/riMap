@@ -81,6 +81,9 @@ public class MapFactory {
 			for(double j = maxLon; j >= minLon - .01; j-=0.01) {
 				String searchCode = "/w/" + Util.getFirst4Digits(i) + "." + Util.getFirst4Digits(j);
 				Util.out("SC:", searchCode);
+				if (searchCode.equals("/w/4165.7209.189121272.3.1")) {
+					Util.out("HERE");
+				}
 				List<List<String>> chunk = Resources.waysFile.searchMultiples(searchCode,
 				SearchType.WILDCARD, "id", "name", "start", "end");
 				for (List<String> wayInfo : chunk) {

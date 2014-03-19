@@ -390,6 +390,9 @@ public class BinarySearchFile implements AutoCloseable {
 			long mid = (top + bottom) / 2;
 			long followingNewLine = nextNewLine(mid, bottom);
 			boolean lastSearch = false;
+			if (followingNewLine > bottom) {
+				Util.out("HERE");
+			}
 			if (followingNewLine == bottom) {
 				followingNewLine = prevNewLine(mid, top);
 				if (followingNewLine == top) { //We've reached the top of the file, so we've got one more shot to check.
@@ -471,6 +474,9 @@ public class BinarySearchFile implements AutoCloseable {
 		}
 		if (arraySize < 0) {
 			System.out.println("HER");
+			byte[] test = new byte[Constants.BufferLength];
+			raf.read(test);
+			Util.out(string(test));
 		}
 		arrayToSearch = new byte[arraySize];
 		raf.seek(start);
@@ -555,7 +561,7 @@ public class BinarySearchFile implements AutoCloseable {
 		}
 		Long cachedNewLine = newLines.getNextNewLine(start);
 		if (cachedNewLine != null) {
-			return cachedNewLine;
+			return cachedNewLine < end ? cachedNewLine : end;
 		}
 		raf.seek(start);
 		byte[] arrayToSearch;
@@ -599,7 +605,7 @@ public class BinarySearchFile implements AutoCloseable {
 		}*/
 		Long cachedPrevLine = newLines.getPrevNewLine(start);
 		if (cachedPrevLine != null) {
-			return cachedPrevLine;
+			return cachedPrevLine > beginning ? cachedPrevLine : beginning;
 		}
 		byte[] arrayToSearch;
 		int arraySize;
