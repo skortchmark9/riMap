@@ -43,8 +43,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private ClickNeighbor target;
 	private Backend b;
 	private boolean clickSwitch = true;
-	 
-
 
 	MapPane(Backend b)   {
 		this.b = b;

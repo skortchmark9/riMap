@@ -2,6 +2,9 @@ package autocorrect;
 
 import java.util.LinkedList;
 
+import backend.Constants;
+import backend.Util;
+
 public class Generator {
 	/** Responsible for generating Suggestions for Ranker to Rank. Only to be used by engine.*/
 	private Boolean prefix = false;
@@ -31,6 +34,9 @@ public class Generator {
 			allSuggestions.addAll(rt.whitespace(currentWord));
 		
 		allSuggestions.addAll(rt.levenshtein(currentWord, this.led));
+		if (Constants.DEBUG_MODE) {
+			Util.out(allSuggestions.size());
+		}
 		return allSuggestions;
 	}
 }
