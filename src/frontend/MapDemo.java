@@ -63,7 +63,6 @@ public class MapDemo {
                 frame.setSize(800, 800);
                 frame.setLocationRelativeTo(null);
                 frame.setLayout(new BorderLayout());
-                
                 long start = 0; //XXX: FOR DEBUGGING
                 
                 if (Constants.DEBUG_MODE) {
