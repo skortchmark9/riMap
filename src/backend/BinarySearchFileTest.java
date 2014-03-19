@@ -21,8 +21,18 @@ public class BinarySearchFileTest {
 	String films = "./data/baconfiles/films.tsv";
 	// Figure this out with TAs
 	//Applied for multiple rows
+	String ways = "./data/mapsfiles/ways.tsv";
 
-	
+	@Test
+	public void searchForWeirdWay() {
+		try (BinarySearchFile b = new BinarySearchFile(ways, "id", "id", "name", "start", "end")) {
+			List<List<String>> results = b.searchMultiples("/w/4188.7131", SearchType.WILDCARD, "id", "name", "start", "end");
+			Util.out(results);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	/*
 	@Test
 	public void capitalizeTest() {
 		String orig = "what up";

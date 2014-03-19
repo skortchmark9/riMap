@@ -54,9 +54,7 @@ public class BinarySearchFile implements AutoCloseable {
 		parsePattern = readHeader(nextNewLine(0, length));
 		for(String colID : importantCols) {
 			if (!parsePattern.containsKey(colID)) {
-				System.out.println("ERROR: file header not formatted correctly");
-				System.exit(0);
-				break;
+				throw new IOException("ERROR: file header not formatted correctly");
 			}
 		}
 	}
@@ -470,6 +468,9 @@ public class BinarySearchFile implements AutoCloseable {
 		}
 		else {
 			arraySize = tabBufferLength;
+		}
+		if (arraySize < 0) {
+			System.out.println("HER");
 		}
 		arrayToSearch = new byte[arraySize];
 		raf.seek(start);
