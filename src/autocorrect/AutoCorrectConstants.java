@@ -15,5 +15,8 @@ public class AutoCorrectConstants {
 	public final static int unigramWeight = 1; //Weighting assigned to unigram freq in SmartRank
 	public final static int bigramWeight = 2000; //Weighting assigned to bigram freqin SmartRank
 	
+	
+	public final static int UNIGRAM_DIFFERENCE_THRESHOLD = 10;
+	
 	public final static int numResults = 5; //Number of results we want to display
 }
