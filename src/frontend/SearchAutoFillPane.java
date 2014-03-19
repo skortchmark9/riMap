@@ -4,16 +4,16 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
-import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
@@ -25,11 +25,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
-import javax.swing.text.DefaultCaret;
-import javax.swing.text.DefaultHighlighter;
-import javax.swing.text.Highlighter;
 
-import autocorrect.AutoCorrectConstants;
 import backend.Backend;
 import backend.Util;
 
@@ -50,17 +46,35 @@ public class SearchAutoFillPane extends JPanel {
 
 		rowSorter = new TableRowSorter<DefaultTableModel>(searchTableModel);
 		searchTable = new JTable(searchTableModel);
+		searchTable.setPreferredSize(new Dimension(605, 80));
 		searchTable.setFillsViewportHeight(true);
 		searchTable.getColumnModel().setColumnSelectionAllowed(false);
 		searchTable.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		searchTable.getTableHeader().setReorderingAllowed(false);
-		searchTable.setPreferredSize(new Dimension(775, 100));
 		searchTable.setGridColor(Color.WHITE);
 		searchTable.setEnabled(false);
 
 		searchField = new JTextField(50);
-		searchField.setCaret(new HighlightCaret());
+		searchField.getInputMap().put(KeyStroke.getKeyStroke("pressed UP"), "nothing");
+		searchField.getInputMap().put(KeyStroke.getKeyStroke("pressed DOWN"), "nothing");
+		FocusListener defaultFocusListener = searchField.getFocusListeners()[0];
+		searchField.removeFocusListener(defaultFocusListener);
+		searchField.addFocusListener(new FocusListener() {
+		    @Override
+		    public void focusGained(FocusEvent e) {
+		    	int end = searchField.getDocument().getLength();
+		    	searchField.setCaretPosition(end);
+		    }
+
+		    @Override
+		    public void focusLost(FocusEvent e) {
+		        searchField.getHighlighter().removeAllHighlights();
+		    }
+			
+		});
+		System.out.println(Arrays.toString(searchField.getFocusListeners()));
 		
+
 		searchField.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void changedUpdate(DocumentEvent e) {
@@ -91,13 +105,21 @@ public class SearchAutoFillPane extends JPanel {
 				{
 				case KeyEvent.VK_UP:
 				{
+					if (popup.isVisible()) {
 					cycleTableSelectionUp();
+					} else {
+						searchField.setCaretPosition(0);
+					}
 					break;
 				}
 
 				case KeyEvent.VK_DOWN:
 				{
+					if (popup.isVisible()) {
 					cycleTableSelectionDown();
+					} else {
+						searchField.setCaretPosition(searchField.getDocument().getLength());
+					}
 					break;
 				}
 
@@ -112,35 +134,28 @@ public class SearchAutoFillPane extends JPanel {
 					//Do whatever you want here
 					break;
 				}
-				
+
 				case KeyEvent.VK_ENTER:
 				{
-					String suggestion = (String) searchTable.getValueAt(searchTable.getSelectedRow(), 0);
-					System.out.println(suggestion);
-					searchField.setCaret(new HighlightCaret());
-					searchField.setText(suggestion);
-					int end = searchField.getSelectionEnd();
-					searchField.setSelectionStart(end);
-					searchField.setSelectionEnd(end);
+					if (popup.isVisible()) {
+						String suggestion = (String) searchTable.getValueAt(searchTable.getSelectedRow(), 0);
+						System.out.println(suggestion);
+//						searchField.setCaret(new HighlightCaret());
+						searchField.setText(suggestion);
+						int end = searchField.getSelectionEnd();
+						searchField.setSelectionStart(end);
+						searchField.setSelectionEnd(end);
+					}
 					break;
 				}
+				case KeyEvent.VK_ESCAPE:
+					hidePopup();
 				}
 			}
 
 			@Override
 			public void keyPressed(KeyEvent e) {
 
-			}
-		});
-
-		
-		KeyStroke keyStroke = KeyStroke.getKeyStroke("ESCAPE");
-		searchField.getInputMap().put(keyStroke, "ESCAPE");
-		searchField.getActionMap().put("ESCAPE", new AbstractAction() {
-			private static final long serialVersionUID = 1L;
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				//Do what you wish here with the escape key.
 			}
 		});
 
@@ -152,6 +167,7 @@ public class SearchAutoFillPane extends JPanel {
 		this.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 		this.add(searchField, BorderLayout.CENTER);
 		this.setPreferredSize(new Dimension(775, 100));
+
 	}
 
 	private final void newFilter() {
@@ -172,19 +188,24 @@ public class SearchAutoFillPane extends JPanel {
 		return "("+orig.toLowerCase()+")|("+orig.toUpperCase()+")";
 	}
 
+	private void hidePopup() {
+		if (popup.isVisible()) {
+			popup.setVisible(false);
+		}
+	}
+
 	private void showPopup(DocumentEvent e) {
 		if(e.getDocument().getLength() > 0) {
 			initTableModel();
 			if(!popup.isVisible()) { 
 				Rectangle r = searchField.getBounds();
 				Util.out(r);
-				popup.show(searchField, (r.x-130), (r.y+16));
+				popup.show(searchField, (r.x-75), (r.y+16));
 				popup.setVisible(true);
 			}
 
 			newFilter();
-			searchField.grabFocus();
-
+			searchField.requestFocusInWindow();
 		}
 		else {
 			popup.setVisible(false);
@@ -219,7 +240,7 @@ public class SearchAutoFillPane extends JPanel {
 		for(String s : suggestions) {
 			cappedSuggestions.add(Util.capitalizeAll(s));
 		}
-		
+
 		String[][] data = new String[length][];
 		for(int i = 0; i < length; i++) {
 			data[i] = new String[] {cappedSuggestions.remove(0)};
@@ -227,26 +248,3 @@ public class SearchAutoFillPane extends JPanel {
 		searchTableModel.setDataVector(data, columns);
 	}
 }
-
-class HighlightCaret extends DefaultCaret {
-
-    private static final Highlighter.HighlightPainter unfocusedPainter =
-            new DefaultHighlighter.DefaultHighlightPainter(new Color(230, 230, 210));
-    private static final long serialVersionUID = 1L;
-    private boolean isFocused;
-
-    @Override
-    protected Highlighter.HighlightPainter getSelectionPainter() {
-        return isFocused ? super.getSelectionPainter() : unfocusedPainter;
-    }
-
-    @Override
-    public void setSelectionVisible(boolean hasFocus) {
-        if (hasFocus != isFocused) {
-            isFocused = hasFocus;
-            super.setSelectionVisible(false);
-            super.setSelectionVisible(true);
-        }
-    }
-}
-

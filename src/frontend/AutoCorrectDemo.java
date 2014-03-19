@@ -12,6 +12,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import backend.Backend;
+import backend.Backend.BackendType;
 
 public class AutoCorrectDemo {
 	public static void main(String[] args) {
@@ -41,7 +42,7 @@ public class AutoCorrectDemo {
 					String arg1 = "/Users/samkortchmar/Documents/Brown/Semester IV/CS032/Projects/CS032_Maps/data/mapsfiles/ways.tsv";
 					String arg2	= "/Users/samkortchmar/Documents/Brown/Semester IV/CS032/Projects/CS032_Maps/data/mapsfiles/nodes.tsv";
 					String arg3 = "/Users/samkortchmar/Documents/Brown/Semester IV/CS032/Projects/CS032_Maps/data/mapsfiles/index.tsv";
-					b = new Backend(new String[] {arg1, arg2, arg3});
+					b = new Backend(new String[] {arg1, arg2, arg3}, BackendType.AC);
 	           } catch (IOException e) {
 					e.printStackTrace();
 				}
