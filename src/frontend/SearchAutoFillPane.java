@@ -8,12 +8,12 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
@@ -34,15 +34,19 @@ public class SearchAutoFillPane extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JTextField searchField = null;
 	private JPopupMenu popup = null;
-	Backend b;
-	boolean confirmed = false;
+	private Backend b;
+	private JLabel name;
 
 	private JTable searchTable = null;
 	private TableRowSorter<DefaultTableModel> rowSorter = null;
 	private DefaultTableModel searchTableModel = null;
 
-	public SearchAutoFillPane(Backend b) {
+	public SearchAutoFillPane(Backend b, String paneName) {
+		
+		name = new JLabel(paneName);
+		this.add(name, BorderLayout.NORTH);
 		this.b = b;
+		setBackground(Color.PINK);
 		searchTableModel = new DefaultTableModel();
 
 		rowSorter = new TableRowSorter<DefaultTableModel>(searchTableModel);
@@ -59,8 +63,6 @@ public class SearchAutoFillPane extends JPanel {
 		searchField.getInputMap().put(KeyStroke.getKeyStroke("pressed UP"), "nothing");
 		searchField.getInputMap().put(KeyStroke.getKeyStroke("pressed DOWN"), "nothing");
 
-		FocusListener defaultFocusListener = searchField.getFocusListeners()[0];
-		searchField.removeFocusListener(defaultFocusListener);
 		searchField.addFocusListener(new FocusListener() {
 		    @Override
 		    public void focusGained(FocusEvent e) {
@@ -74,7 +76,6 @@ public class SearchAutoFillPane extends JPanel {
 		    }
 			
 		});
-		System.out.println(Arrays.toString(searchField.getFocusListeners()));
 		
 
 		searchField.getDocument().addDocumentListener(new DocumentListener() {
@@ -150,7 +151,6 @@ public class SearchAutoFillPane extends JPanel {
 						searchField.setSelectionEnd(end);
 						} else {
 							hidePopup();
-							confirmed = true;
 						}
 					}
 					break;
@@ -173,7 +173,7 @@ public class SearchAutoFillPane extends JPanel {
 
 		this.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 		this.add(searchField, BorderLayout.CENTER);
-		this.setPreferredSize(new Dimension(775, 100));
+		this.setPreferredSize(new Dimension(775, 40));
 
 	}
 
@@ -186,7 +186,6 @@ public class SearchAutoFillPane extends JPanel {
 		catch(PatternSyntaxException e) {
 			return;
 		}
-
 		rowSorter.setRowFilter(rf);
 	}
 
@@ -206,7 +205,6 @@ public class SearchAutoFillPane extends JPanel {
 			initTableModel();
 			if(!popup.isVisible()) { 
 				Rectangle r = searchField.getBounds();
-				Util.out(r);
 				popup.show(searchField, (r.x-75), (r.y+16));
 				popup.setVisible(true);
 			}

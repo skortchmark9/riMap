@@ -9,7 +9,7 @@ public class Ranker implements Comparator<Suggestion> {
 	private String currentWord; //We need these to pass to suggestion comparator
 	private String previousWord; //for computing bigram probabilities and exact matches.
 	
-	public enum CompareMode {DEFAULT, SMART};
+	public enum CompareMode {DEFAULT, SMART, MAPS};
 	
 	public Ranker(CompareMode mode) {
 		/**The ranker gets currentWord and previousWord changed in the engine
@@ -48,6 +48,8 @@ public class Ranker implements Comparator<Suggestion> {
 		switch (this.mode) {
 		case SMART:
 			return s1.smartCompareTo(s2, this.previousWord, this.currentWord);
+		case MAPS:
+			return s1.mapsCompareTo(s2, this.previousWord, this.currentWord);
 		default:
 			return s1.defaultCompareTo(s2, this.previousWord, this.currentWord);	
 		}

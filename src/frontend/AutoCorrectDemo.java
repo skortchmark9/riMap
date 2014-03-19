@@ -46,7 +46,7 @@ public class AutoCorrectDemo {
 	           } catch (IOException e) {
 					e.printStackTrace();
 				}
-				frame.add(new SearchAutoFillPane(b), BorderLayout.NORTH);
+				frame.add(new SearchAutoFillPane(b, "!!!!"), BorderLayout.NORTH);
 				frame.pack();
 				frame.setVisible(true);
 				SwingUtilities.invokeLater(new Runnable() {

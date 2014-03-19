@@ -23,7 +23,7 @@ public class Constants {
 	public static final Generator defaultGenerator = 
 			new Generator(2, Generator.SuggestType.PREFIX, Generator.SuggestType.WHITESPACE);
 	
-	public static final Ranker defaultRanker = new Ranker(Ranker.CompareMode.SMART);
+	public static final Ranker defaultRanker = new Ranker(Ranker.CompareMode.MAPS);
 	
 	//Info for rendering lines on map:
 	public static final double INITIAL_LAT = 41.842678; //Home Depot

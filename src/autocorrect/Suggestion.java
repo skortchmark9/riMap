@@ -124,9 +124,60 @@ public class Suggestion {
 			return 1;
 		return (this.word.compareTo(s.word));
 	}
-
-
-
+	
+	/**
+	 * A special comparator for maps.
+	 * @param s
+	 * @param previousWord
+	 * @param currentWord
+	 * @return
+	 */
+	public int mapsCompareTo(Suggestion s, String previousWord, String currentWord) {
+		if (this.word.equals(s.word)) {
+			return 0;
+		}		
+		//If the previous word is the empty string, it's the first word in the street name - so check
+		//unigram frequency first, THEN levenshtein distance
+		if (previousWord.length() == 0) {
+			int freqDiff = s.freq - this.freq;
+			if (freqDiff != 0) {
+				return freqDiff;
+			}
+			if (this.led != AutoCorrectConstants.max && s.led != AutoCorrectConstants.max) {
+				int levDiff = this.led - s.led;
+				if (levDiff != 0) {
+					return levDiff;
+				}
+			}
+		} else { //The second word in the street name, so we care most about bigramProbability.
+			int bp1 = this.bigramProbability(previousWord);
+			int bp2 = s.bigramProbability(previousWord);
+			if (bp1 > bp2) {
+				return -1;
+			} else if (bp1 < bp2) {
+				return 1;
+			}
+			//then we care about levenshtein (more than unigram).
+			if (this.led != AutoCorrectConstants.max && s.led != AutoCorrectConstants.max) {
+				int levDiff = this.led - s.led;
+				if (levDiff != 0) {
+					return levDiff;
+				}
+			}
+			int freqDiff = s.freq - this.freq;
+			if (freqDiff != 0) {
+				return freqDiff;
+			}
+		}		
+		if (this.rtDistance != 0 && s.rtDistance != 0) {
+			int rtDiff = this.rtDistance - s.rtDistance;
+			if (rtDiff != 0) {
+				return rtDiff;
+			}
+		}
+		return this.word.compareTo(s.word);
+	}
+	
 	@Override
 	public String toString() {
 		return this.word;

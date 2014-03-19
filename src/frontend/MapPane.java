@@ -11,9 +11,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -44,9 +43,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private ClickNeighbor target;
 	private Backend b;
 	private boolean clickSwitch = true;
-	private ExecutorService drawExecutor;
-	 
-
 
 	MapPane(Backend b)   {
 		this.b = b;
@@ -89,12 +85,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		
 		//Render Ways
 		g2d.setColor(Color.WHITE);
-		
-		/*
-		WayDrawer wayDrawer = new WayDrawer(g2d, renderedWays); 
-		wayDrawer.start();
-		*/
-		
 		for (Way way : renderedWays) {
 			if (way != null) {
 				int[] start = geo2pixel(way.getStart().getCoordinates());
@@ -108,7 +98,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				g2d.drawLine(start[0], start[1], end[0], end[1]);
 			}
 		}
-		
 		
 		//Render Click Points
 		if (source != null) {
