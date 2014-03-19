@@ -1,10 +1,9 @@
 package frontend;
-import graph.PathNode;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -12,8 +11,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -23,12 +20,11 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import kdtree.KDStub;
+import maps.Node;
+import maps.Way;
 import backend.Backend;
 import backend.Constants;
 import backend.Util;
-import maps.MapFactory;
-import maps.Node;
-import maps.Way;
 
 public class MapPane extends JPanel implements MouseWheelListener {
 
@@ -161,6 +157,16 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		double lon = Corners.topLeft[1] + lonOffset;
 		return new double[]{lat,lon};
 	}
+	
+	
+	/**
+	 * Converts a pixel length to a geo length
+	 * @param pixelOffset
+	 * @return
+	 */
+	public double pixelOffset2geoOffset(int pixelOffset) {
+			return (((double)pixelOffset)/((double)PIXEL_WIDTH)) * (Constants.GEO_DIMENSION_FACTOR / scale);
+	}
 
 	/**
 	 * Initializes the interactions for the map:
@@ -176,7 +182,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 
 		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, 0), "plus");
 		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.SHIFT_DOWN_MASK), "plus");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), "plus");
 		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "minus");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.SHIFT_DOWN_MASK), "minus");
 
 		//key binding for zoom in
 		am.put("plus", new AbstractAction() {
@@ -184,6 +192,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if (Constants.DEBUG_MODE)
+					Util.out("Plus handler executing");
 				zoomIn();
 			}
 
@@ -191,13 +201,12 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		
 		//key binding for zoom out
 		am.put("minus", new AbstractAction() {
-			/**
-			 * 
-			 */
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if (Constants.DEBUG_MODE)
+					Util.out("Minus handler executing");
 				zoomOut();
 			}
 		});
@@ -215,30 +224,65 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * Zooms the map view out (unless we are at min zoom)
 	 */
 	private void zoomOut() {
+		if (Constants.DEBUG_MODE)
+		//only zoom out if we are before theshold
 		if (scale > Constants.MIN_ZOOM + 0.1) {
-			double geoWidth = Constants.GEO_DIMENSION_FACTOR / scale;
-			scale -= 0.1;
-			double newGeoWidth = Constants.GEO_DIMENSION_FACTOR / scale;
-			double pageDiff = (newGeoWidth-geoWidth)/2;
-			double newLat = Corners.topLeft[0] + pageDiff;
-			double newLon = Corners.topLeft[1] - pageDiff;
-			Corners.reposition(newLat, newLon);
+			double oldGeoWidth = Constants.GEO_DIMENSION_FACTOR / scale; //get the old width
+			scale -= 0.1; //decrement scale
+			if (Constants.DEBUG_MODE)
+				Util.out("New Scale:", scale);
+			double newGeoWidth = Constants.GEO_DIMENSION_FACTOR / scale; //get new width
+			double viewDiff = (newGeoWidth-oldGeoWidth)/2; //find difference of each side of view in new width
 			
-			if (source != null) {
-				
-			}
-			if (target != null) {
-				//TODO: reposition the target thingy
-			}
+			//calculate new anchor point (top left lat/lon)
+			double newLat = Corners.topLeft[0] + viewDiff; 
+			double newLon = Corners.topLeft[1] - viewDiff; 
+			Corners.reposition(newLat, newLon); //reposition all corners with new coords
 			
+			//re-calibrate click points
+			if (source != null)
+				source.recalibrate();
+			if (target != null)
+				target.recalibrate();
+			
+			//get all new ways n' add 'em to the renderList 
+			renderedWays.addAll(b.getWaysInRange(Corners.topLeft[0] - viewDiff, Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1])); // top side of new view
+			renderedWays.addAll(b.getWaysInRange(Corners.bottomRight[0], Corners.topRight[0] - viewDiff, Corners.topRight[1] - viewDiff, Corners.topRight[1])); //right side minus top right corner square (taken care of above)
+			renderedWays.addAll(b.getWaysInRange(Corners.bottomLeft[0], Corners.bottomLeft[0] + viewDiff, Corners.bottomLeft[1], Corners.bottomRight[1] - viewDiff)); //bottom side minus bottom right corner (taken care of above)
+			renderedWays.addAll(b.getWaysInRange(Corners.bottomLeft[0] + viewDiff, Corners.topLeft[0] - viewDiff, Corners.topLeft[1], Corners.topLeft[1] + viewDiff)); //left side minus top and bottom left corners (taken care of above)
+			
+			//repaint this component
+			this.repaint();
 		}
-		//TODO: zoom out 0.1
 	}
 	
 	/**
 	 * Zooms the map view in
 	 */
 	private void zoomIn() {
+		//only zoom in if we are before threshold
+		if (scale < Constants.MAX_ZOOM - 0.1) {
+			double oldGeoWidth = Constants.GEO_DIMENSION_FACTOR / scale; //get the old width
+			scale += 0.1; //decrement scale
+			if (Constants.DEBUG_MODE)
+				Util.out("New Scale:", scale);
+			double newGeoWidth = Constants.GEO_DIMENSION_FACTOR / scale; //get new width
+			double viewDiff = (newGeoWidth-oldGeoWidth)/2; //find difference of each side of view in new width
+			
+			//calculate new anchor point (top left lat/lon)
+			double newLat = Corners.topLeft[0] + viewDiff; 
+			double newLon = Corners.topLeft[1] - viewDiff; 
+			Corners.reposition(newLat, newLon); //reposition all corners with new coords
+			
+			//re-calibrate clickPoints
+			if (source != null)
+				source.recalibrate();
+			if (target != null)
+				target.recalibrate();
+			
+			//no new ways to get
+			this.repaint(); 
+		}
 		//TODO: zoom in  0.1
 		
 	}
@@ -255,9 +299,42 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 */
 	private class MouseHandler extends MouseAdapter {
 		
+		private Point startP;
+		
+		@Override
+		public void mousePressed(MouseEvent e) {
+			startP = e.getPoint();
+		}
+		
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			//TODO: pan map
+			Point p = e.getPoint();
+			double[] geoOffset = new double[]{pixelOffset2geoOffset(p.y - startP.y), pixelOffset2geoOffset(p.x - startP.x)};
+			//calculate new anchor point (top left lat/lon)
+			double newLat = Corners.topLeft[0] + geoOffset[0]; 
+			double newLon = Corners.topLeft[1] - geoOffset[1]; 
+			Corners.reposition(newLat, newLon); //reposition all corners with new coords
+			
+			//re-calibrate click points
+			if (source != null)
+				source.recalibrate();
+			if (target != null)
+				target.recalibrate();
+			
+			//get all new ways n' add 'em to the renderList
+			/*
+			renderedWays.addAll(b.getWaysInRange(Corners.topLeft[0] - geoOffset[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1])); // top side of new view
+			renderedWays.addAll(b.getWaysInRange(Corners.bottomRight[0], Corners.topRight[0] - geoOffset[0], Corners.topRight[1] - geoOffset[1], Corners.topRight[1] - geoOffset[1])); //right side minus top right corner square (taken care of above)
+			renderedWays.addAll(b.getWaysInRange(Corners.bottomLeft[0], Corners.bottomLeft[0] + geoOffset[0], Corners.bottomLeft[1], Corners.bottomRight[1] - geoOffset[1])); //bottom side minus bottom right corner (taken care of above)
+			renderedWays.addAll(b.getWaysInRange(Corners.bottomLeft[0] + geoOffset[0], Corners.topLeft[0] - geoOffset[0], Corners.topLeft[1], Corners.topLeft[1] + geoOffset[1])); //left side minus top and bottom left corners (taken care of above)
+			*/
+			
+			renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
+			//repaint the map
+			repaint();
+			
+			
+			
 		}
 		
 		@Override

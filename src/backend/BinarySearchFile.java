@@ -223,6 +223,15 @@ public class BinarySearchFile implements AutoCloseable {
 					//so we need to add 1
 					int wordStart = i + tabLocation + 1;
 					foundWord = true;
+					//XXX added
+					long wordEnd = wordStart + searchCodeBytes.length;
+					long diff = wordEnd - arrayToSearch.length;
+					if (diff > 0) {
+						byte[] extraArray = new byte[(int) diff];
+						raf.seek(wordStart);
+						raf.read(extraArray);
+						arrayToSearch = Util.concatByteArrays(arrayToSearch, extraArray);
+					}
 					int cmp = compare(searchCodeBytes, arrayToSearch, wordStart);
 					if (cmp == 0) {
 						lastNewLine = startIndex + i;
