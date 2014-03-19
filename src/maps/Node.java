@@ -6,7 +6,7 @@ package maps;
 import java.util.Arrays;
 import java.util.List;
 
-import edu.brown.cs032.emc3.kdtree.KDimensionable;
+import kdtree.KDimensionable;
 
 /**
  * @author emc3 / skortchm

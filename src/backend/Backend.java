@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import kdtree.KDStub;
+import kdtree.KDTree;
+import kdtree.KDimensionable;
 import backend.BinarySearchFile.SearchType;
 import autocorrect.Engine;
 import autocorrect.RadixTree;
@@ -12,9 +15,6 @@ import maps.MapFactory;
 import maps.Node;
 import maps.PathNodeWrapper;
 import maps.Way;
-import edu.brown.cs032.emc3.kdtree.KDStub;
-import edu.brown.cs032.emc3.kdtree.KDTree;
-import edu.brown.cs032.emc3.kdtree.KDimensionable;
 
 public class Backend {
 	
