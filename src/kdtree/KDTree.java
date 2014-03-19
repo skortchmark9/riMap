@@ -209,6 +209,8 @@ public class KDTree<KDType extends KDimensionable> {
 			node.putLeft(this.recursiveBuildFaster(less, depth+1));
 		if (!more.get(0).isEmpty())
 			node.putRight(this.recursiveBuildFaster(more, depth+1));
+		//XXX to save memory.
+		branches = null;
 		
 		_size++;
 		return node;
