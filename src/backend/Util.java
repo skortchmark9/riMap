@@ -68,6 +68,25 @@ public class Util {
 	    return (int) ans;
 	}
 	
+	public static String capitalizeAll(String original) {
+		String[] broken = Constants.spaces.split(original);
+		String result = "";
+		int i = 0;
+		int length = broken.length;
+		while (i < length) {
+			result += capitalize(broken[i]);
+			if (i != length - 1) {
+				result+=" ";
+			}
+			i++;
+		}
+		return result;
+	}
+	
+	public static String capitalize(String original) {
+		return original.length() == 0 ? original : original.substring(0, 1).toUpperCase() + original.substring(1);	
+	}
+	
 	public static byte[] concatByteArrays(byte[] first, byte[] second) {
 		byte[] result = new byte[first.length + second.length];
 		int lastIndex = 0;

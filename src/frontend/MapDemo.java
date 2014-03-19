@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.io.IOException;
 
 import javax.swing.BorderFactory;
@@ -88,6 +90,7 @@ public class MapDemo {
                 frame.add(p3, BorderLayout.SOUTH);
                 
                 frame.add(pane, BorderLayout.CENTER);
+                center(frame);
                 frame.setVisible(true);
 
                 SwingUtilities.invokeLater(new Runnable() {
@@ -101,5 +104,27 @@ public class MapDemo {
             }
         });
     }
+    
+    private void center(Window w) {
+        int screenWidth  = Toolkit.getDefaultToolkit().getScreenSize().width;
+        int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
+
+        int windowWidth = w.getWidth();
+        int windowHeight = w.getHeight();
+
+        if (windowHeight > screenHeight) {
+            return;
+        }
+
+        if (windowWidth > screenWidth) {
+            return;
+        }
+
+        int x = (screenWidth - windowWidth) / 2;
+        int y = (screenHeight - windowHeight) / 2;
+
+        w.setLocation(x, y);
+    }
+
 
 }

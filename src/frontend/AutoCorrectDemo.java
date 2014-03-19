@@ -2,6 +2,7 @@ package frontend;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.io.IOException;
 
 import javax.swing.JFrame;
@@ -16,50 +17,47 @@ public class AutoCorrectDemo {
 	public static void main(String[] args) {
 		new AutoCorrectDemo();
 	}
-	
 
-    public AutoCorrectDemo() {
+	public AutoCorrectDemo() {
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
 
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
+				try {
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				} catch (ClassNotFoundException classNotFoundException) {
+				} catch (InstantiationException instantiationException) {
+				} catch (IllegalAccessException illegalAccessException) {
+				} catch (UnsupportedLookAndFeelException unsupportedLookAndFeelException) {
+				}
 
-                try {
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                } catch (ClassNotFoundException classNotFoundException) {
-                } catch (InstantiationException instantiationException) {
-                } catch (IllegalAccessException illegalAccessException) {
-                } catch (UnsupportedLookAndFeelException unsupportedLookAndFeelException) {
-                }
-
-                JFrame frame = new JFrame();
-                frame = new JFrame();
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.setSize(800, 400);
-                frame.setLocationRelativeTo(null);
-                frame.setLayout(new BorderLayout());
-                Backend b;
+				JFrame frame = new JFrame();
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				frame.setSize(800, 500);
+				frame.setLocationRelativeTo(null);
+				frame.setLayout(new FlowLayout());
+				Backend b = null;
 				try {
 					String arg1 = "/Users/samkortchmar/Documents/Brown/Semester IV/CS032/Projects/CS032_Maps/data/mapsfiles/ways.tsv";
 					String arg2	= "/Users/samkortchmar/Documents/Brown/Semester IV/CS032/Projects/CS032_Maps/data/mapsfiles/nodes.tsv";
 					String arg3 = "/Users/samkortchmar/Documents/Brown/Semester IV/CS032/Projects/CS032_Maps/data/mapsfiles/index.tsv";
 					b = new Backend(new String[] {arg1, arg2, arg3});
-	                frame.add(new InputPane(b));
-				} catch (IOException e) {
+	           } catch (IOException e) {
 					e.printStackTrace();
 				}
-                frame.setVisible(true);
+				frame.add(new SearchAutoFillPane(b), BorderLayout.NORTH);
+				frame.pack();
+				frame.setVisible(true);
+				SwingUtilities.invokeLater(new Runnable() {
 
-                SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+					}
 
-                    @Override
-                    public void run() {
-                    }
+				});
 
-                });
-
-            }
-        });
-    }
+			}
+		});
+	}
 
 }

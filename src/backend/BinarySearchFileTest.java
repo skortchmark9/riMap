@@ -24,6 +24,12 @@ public class BinarySearchFileTest {
 
 	
 	@Test
+	public void capitalizeTest() {
+		String orig = "what up";
+		assertTrue(Util.capitalizeAll(orig).equals("What Up"));
+	}
+	
+	@Test
 	public void testConcatByte() {
 		byte[] first = new byte[] {1, 2, 3,4, 5};
 		byte[] second = new byte[] {6, 7, 8, 9, 10};
