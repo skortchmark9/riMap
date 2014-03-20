@@ -27,11 +27,8 @@ public class Constants {
 	public static final Ranker defaultRanker = new Ranker(Ranker.CompareMode.MAPS);
 	
 	//Info for rendering lines on map:
-	
-	//NYC:		 	40.771022, -73.970021
-	//Home Depot:	41.842678, -71.417541
-	public static final double INITIAL_LAT = 40.38; //NYC
-	public static final double INITIAL_LON = -73.71;
+	public static final double INITIAL_LAT = 41.842678; //Home Depot
+	public static final double INITIAL_LON = -71.417541;
 	public static final double GEO_DIMENSION_FACTOR = 0.02;
 	public static final double MIN_ZOOM = 0.2;
 	public static final double MAX_ZOOM = 12.0;
