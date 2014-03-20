@@ -4,6 +4,7 @@ package graph;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -21,8 +22,39 @@ public class PathFinder<K extends PathNode<T>, T> {
 		this.dest = dest;
 		consideredNodes = new HashMap<String, K>();
 	}
+	
+	public List<Edge<? extends PathNode<T>>> getPath() {
+		List<Edge<? extends PathNode<T>>> pathWays = new LinkedList<>();
+		constructGraphToDest(source);
+		K sourceNode = consideredNodes.get(source.getName());
+		K destNode = consideredNodes.get(dest.getName());
+		if (sourceNode == null || destNode == null) {
+			return pathWays;
+		}
+		List<K> path = new ArrayList<>();
+		for (K node = destNode; node != null; node = (K) node.getPrevious()) {
+			path.add(node);
+		}
+		Collections.reverse(path);
 
-	public void getPath() {
+		for(int i = 0; i < path.size() - 1; i++) {
+			K currentActor = path.get(i);
+			K nextActor =  path.get(i + 1);
+			String movieTitle = null;
+			Edge<? extends PathNode<T>> e = currentActor.getNeighbor(nextActor.getName());
+			if (e.getTarget().equals(nextActor)) {
+				movieTitle = e.getName();
+			}
+			if (movieTitle == null) {
+				return new LinkedList<Edge<? extends PathNode<T>>>();
+			} else {
+				pathWays.add(e);
+			}
+		}
+		return pathWays;
+	}
+
+	public void printPath() {
 		//Populates 'nodes' and performs djikstra's algorithm, assigning distances
 		//and previous nodes to each one.
 		constructGraphToDest(source);

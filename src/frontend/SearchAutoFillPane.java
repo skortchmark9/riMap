@@ -51,7 +51,7 @@ public class SearchAutoFillPane extends JPanel {
 
 		rowSorter = new TableRowSorter<DefaultTableModel>(searchTableModel);
 		searchTable = new JTable(searchTableModel);
-		searchTable.setPreferredSize(new Dimension(605, 80));
+		searchTable.setPreferredSize(new Dimension(605-300, 80));
 		searchTable.setFillsViewportHeight(true);
 		searchTable.getColumnModel().setColumnSelectionAllowed(false);
 		searchTable.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
@@ -59,7 +59,7 @@ public class SearchAutoFillPane extends JPanel {
 		searchTable.setGridColor(Color.WHITE);
 		searchTable.setEnabled(false);
 
-		searchField = new JTextField(50);
+		searchField = new JTextField(25);
 		searchField.getInputMap().put(KeyStroke.getKeyStroke("pressed UP"), "nothing");
 		searchField.getInputMap().put(KeyStroke.getKeyStroke("pressed DOWN"), "nothing");
 
@@ -173,7 +173,7 @@ public class SearchAutoFillPane extends JPanel {
 
 		this.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 		this.add(searchField, BorderLayout.CENTER);
-		this.setPreferredSize(new Dimension(775, 40));
+		this.setPreferredSize(new Dimension(500, 40));
 
 	}
 
@@ -205,7 +205,7 @@ public class SearchAutoFillPane extends JPanel {
 			initTableModel();
 			if(!popup.isVisible()) { 
 				Rectangle r = searchField.getBounds();
-				popup.show(searchField, (r.x-75), (r.y+16));
+				popup.show(searchField, (r.x-98), (r.y+16));
 				popup.setVisible(true);
 			}
 

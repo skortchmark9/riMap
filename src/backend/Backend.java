@@ -1,5 +1,9 @@
 package backend;
 
+import graph.Edge;
+import graph.PathFinder;
+import graph.PathNode;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -96,6 +100,15 @@ public class Backend {
 			Util.err("ERROR: AutoCorrectEngine is not initialized");
 			return null;
 		}
+	}
+	
+	public List<Way> getPath(Node source, Node dest) {
+		PathFinder<PathNodeWrapper, Node> p = new PathFinder<PathNodeWrapper, Node>(new PathNodeWrapper(source), new PathNodeWrapper(dest));
+		List<Way> ways = new LinkedList<>();
+		for(Edge<? extends PathNode<Node>> edge : p.getPath()) {
+			ways.add((Way) edge);
+		}
+		return ways;
 	}
 
 	public List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
