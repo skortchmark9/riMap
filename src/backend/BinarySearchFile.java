@@ -187,13 +187,10 @@ public class BinarySearchFile implements AutoCloseable {
 		while (start > 0) {
 			byte[] arrayToSearch;
 			int arraySize;
-			if (start < bufferLength) {
-				//If there isn't enough space at the top of the file.
-				arraySize = (int) (start);
-			}
-			else {
+			if (start < bufferLength)
+				arraySize = (int) (start); //If there isn't enough space at the top of the file.
+			else
 				arraySize = bufferLength;
-			}
 			arrayToSearch = new byte[arraySize];
 			long startIndex = start - arraySize;
 			raf.seek(startIndex);
@@ -250,12 +247,13 @@ public class BinarySearchFile implements AutoCloseable {
 					}
 				}
 			}
+			arrayToSearch = null;
 			if (foundWord && !foundMatch) {
 				return lastNewLine;
 			} else {
 				start = startIndex;
 			}
-		}
+		} //end while
 		return start;
 	}
 
@@ -329,6 +327,7 @@ public class BinarySearchFile implements AutoCloseable {
 				}
 			}
 		}
+		arrayToSearch = null;
 		if (foundAWord && !foundInThisRun) {
 			return endIndex == start ? start : lastNewLine;
 		} else {
