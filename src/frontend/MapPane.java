@@ -587,7 +587,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * @author emc3
 	 *
 	 */
-	private class ClickNeighbor {
+	class ClickNeighbor {
 		private Node node = null;
 		private int[] screenCoords = null;
 		
