@@ -23,7 +23,7 @@ public class BoundaryFinder {
 		minLat = Double.MAX_VALUE;
 		maxLat = Double.MIN_VALUE;
 		minLon = Double.MAX_VALUE;
-		maxLon = Double.MIN_VALUE;
+		maxLon = -70.5590942;
 		
 		BufferedReader reader = new BufferedReader(new FileReader("./data/mapsfiles/nodes.tsv"));
 		
@@ -32,7 +32,7 @@ public class BoundaryFinder {
 		while(line != null) {
 			String[] fields = line.split("\t");
 			Double testLat = Double.parseDouble(fields[1]);
-			Double testLon = Double.parseDouble(fields[2]);
+			Double lon = Double.parseDouble(fields[2]);
 			
 			if (testLat < minLat) {
 				minLat = testLat;
@@ -42,12 +42,12 @@ public class BoundaryFinder {
 				maxLat = testLat;
 			}
 			
-			if (testLon < minLon) {
-				minLon = testLon;
+			if (lon < minLon) {
+				minLon = lon;
 			}
 			
-			if (testLon > minLon) {
-				maxLon = testLon;
+			if (lon > maxLon) {
+				this.maxLon = lon;
 			}
 			
 			line = reader.readLine();

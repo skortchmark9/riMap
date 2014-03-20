@@ -32,7 +32,7 @@ public class Constants {
 	public static final double MINIMUM_LATITUDE = 40.1581762;
 	public static final double MAXIMUM_LATITUDE = 42.0952906;
 	public static final double MINIMUM_LONGITUDE = -73.7485663;
-	public static final double MAXIMUM_LONGITUDE =  -71.6965049;
+	public static final double MAXIMUM_LONGITUDE =  -70.5590942;
 	public static final double GEO_DIMENSION_FACTOR = 0.02;
 	public static final double MIN_ZOOM = 0.2;
 	public static final double MAX_ZOOM = 12.0;

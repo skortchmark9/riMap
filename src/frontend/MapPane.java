@@ -14,6 +14,9 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.AbstractAction;
@@ -45,6 +48,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private Backend b;
 	private boolean clickSwitch = true;
 	private AtomicInteger threadCount;
+	private ExecutorService executor;
 
 	MapPane(Backend b)   {
 		this.b = b;
@@ -72,7 +76,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		renderedWays = new LinkedList<>();
 		threadCount = new AtomicInteger(0);
 		//new thread!
-		new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]).start();
+		executor = Executors.newSingleThreadExecutor();
+		executor.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
+		//new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]).start();
 		//renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
 		calculatedRoute = new LinkedList<>();
 		if (Constants.DEBUG_MODE) {
@@ -109,6 +115,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			}
 		}
 		
+		//render calculated route
 		g2d.setColor(Color.BLUE);
 		g2d.setStroke(new BasicStroke(3));		
 		for (Way way : calculatedRoute) {
@@ -144,6 +151,20 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			g2d.setStroke(new BasicStroke(1));		
 			g2d.setColor(Color.RED);
 			g2d.drawOval(target.screenCoords[0] - 5, target.screenCoords[1] - 5, 10, 10);
+		}
+		
+		//render boundaries if in range
+		if (Util.boundariesInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1])) {
+			Util.out("Painting Boundaires");
+			int topLeft[] = geo2pixel(new double[]{Constants.MAXIMUM_LATITUDE, Constants.MINIMUM_LONGITUDE}); //top left boundary corner
+			int topRight[] = geo2pixel(new double[]{Constants.MAXIMUM_LATITUDE, Constants.MAXIMUM_LONGITUDE}); //top right boundary corner
+			int bottomRight[] = geo2pixel(new double[]{Constants.MINIMUM_LATITUDE, Constants.MAXIMUM_LONGITUDE});
+			int bottomLeft[] = geo2pixel(new double[]{Constants.MINIMUM_LATITUDE, Constants.MINIMUM_LONGITUDE});
+			g2d.setColor(Color.ORANGE);
+			g2d.drawLine(topLeft[0], topRight[1], topLeft[0], topRight[1]); //top boundary
+			g2d.drawLine(topRight[0], bottomRight[1], topRight[0], bottomRight[1]); //right boundary
+			g2d.drawLine(bottomLeft[0], bottomRight[1], bottomLeft[0], bottomRight[1]); //bottom boundary
+			g2d.drawLine(topLeft[0], bottomLeft[1], topLeft[0], bottomLeft[1]); //leftboundary
 		}
 	}
 	
@@ -383,7 +404,16 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			this.repaint(); // repaint for responsiveness
 			
 			//get all new ways in new range
-			new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]).start();
+			executor.shutdownNow();
+//			try {
+//				executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+			executor = Executors.newSingleThreadExecutor();
+			executor.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
+			//new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]).start();
 			//repaint this component
 			this.repaint();
 		}
@@ -421,11 +451,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			//calculate new anchor point (top left lat/lon)
 			double newLat = Corners.topLeft[0] + pixelOffset2geoOffset(p.y - startP.y); 
 			double newLon = Corners.topLeft[1] - pixelOffset2geoOffset(p.x - startP.x);
-			double oldLat = Corners.topLeft[0];
-			double oldLon = Corners.topLeft[1];
 			
 			Corners.reposition(newLat, newLon); //reposition all corners with new coords
-		
 			
 			startP = e.getPoint(); //re-define start p
 			
@@ -436,7 +463,11 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				target.recalibrate();
 			//get all new ways for the render list
 			
-			new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]).start();
+			
+			executor.shutdownNow();
+			executor = Executors.newSingleThreadExecutor();
+			executor.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
+			//new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]).start();
 			repaint();
 		}
 		
@@ -505,10 +536,17 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		 * @param lon - the new longitude of the top left corner.
 		 */
 		private static void reposition(double lat, double lon) {
+			double width = Constants.GEO_DIMENSION_FACTOR/scale;
+			
+			//Check to make sure move is in bounds
+			if (lat > Constants.MAXIMUM_LATITUDE + 0.002 || lat+width < Constants.MINIMUM_LATITUDE - 0.002 ||
+					lon < Constants.MINIMUM_LONGITUDE - 0.002 || lon+width > Constants.MAXIMUM_LONGITUDE + 0.002) {
+				return;
+			}
+			
 			topLeft[0] = lat;
 			topLeft[1] = lon;
 			
-			double width = Constants.GEO_DIMENSION_FACTOR/scale;
 			topRight[0] = topLeft[0]; //topRight has same latitude as topLeft
 			topRight[1] = topLeft[1] + width; //longitude is topLeft's longitude + width 
 			
@@ -605,6 +643,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			numberID = threadCount.incrementAndGet();
 			MapFactory.getNumWays();
 			List<Way> temp = b.getWaysInRange(this.minLat, this.maxLat, this.minLon, this.maxLon);
+			
 			if (threadCount.get() == numberID) {
 				renderedWays = temp;
 				repaint();

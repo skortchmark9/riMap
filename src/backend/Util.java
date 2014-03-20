@@ -115,5 +115,12 @@ public class Util {
 	public static long timeSince(long start) {
 		return (System.currentTimeMillis() - start);
 	}
+
+	public static boolean boundariesInRange(double minLat, double maxLat, double minLon, double maxLon) {
+		if (Constants.MINIMUM_LATITUDE >= minLat || Constants.MAXIMUM_LATITUDE <= maxLat 
+				|| Constants.MINIMUM_LONGITUDE >= minLon || Constants.MAXIMUM_LONGITUDE <= maxLon)
+			return true;
+		return false;
+	}
 	
 }
