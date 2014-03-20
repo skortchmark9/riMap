@@ -89,7 +89,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		Graphics2D g2d = (Graphics2D) g;
 		
 		//Render Ways
-		g2d.setColor(Color.WHITE);
+		g2d.setColor(Constants.GLOW_IN_THE_DARK);
 		g2d.setStroke(new BasicStroke(1));
 		for (Way way : renderedWays) {
 			if (way != null) {
