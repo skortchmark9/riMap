@@ -296,8 +296,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			this.repaint(); //repaint for responsiveness
 			
 			//get all new ways in new range 
-			renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
-			//repaint this component
+			new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]).start();
 			this.repaint();
 		}
 	}
@@ -384,7 +383,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			
 			//get all new ways in new range
 			new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]).start();
-			//renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
 			//repaint this component
 			this.repaint();
 		}
@@ -431,9 +429,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				source.recalibrate();
 			if (target != null)
 				target.recalibrate();
-			
-//			renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
-//			repaint();
 			//get all new ways for the render list
 			
 			new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]).start();
