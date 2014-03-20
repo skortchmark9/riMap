@@ -32,6 +32,7 @@ import maps.Node;
 import maps.Way;
 import backend.Backend;
 import backend.Constants;
+import backend.PathWayRequester;
 import backend.Util;
 
 public class Frontend implements ActionListener {
@@ -44,8 +45,7 @@ public class Frontend implements ActionListener {
 	private AtomicInteger threadCount;
 	final Cursor defaultCursor = Cursor.getDefaultCursor();
 	final Cursor busyCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
-	List<Future<List<Way>>> futurePathWays = new LinkedList<>();
-	ExecutorService executor;
+	PathWayRequester pwRequester;
 	
 	Frontend(Backend b) {
 		this.b = b;
@@ -54,8 +54,7 @@ public class Frontend implements ActionListener {
 		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		frame.setLayout(new FlowLayout());
 		frame.getContentPane().setBackground(Color.BLACK);
-		executor = Executors.newFixedThreadPool(5);
-		
+		pwRequester = new PathWayRequester(b);		
 		
 		calcStreetNames = new JButton("Calculate from cross-streets");
 		calcStreetNames.addActionListener(this);
@@ -129,82 +128,23 @@ public class Frontend implements ActionListener {
 		if (e.getSource() == getDirections) {
 			Node start = map.getStart();
 			Node end = map.getEnd();
+			List<Way> wayList;
 			if (start != null && end != null) {
-//				new PathFindingThread(start, end).start();
-				Future<List<Way>> ways = executor.submit(new CallableWays(start, end));
-				futurePathWays.add(ways);
-			}
-			List<Way> wayList = new LinkedList<>();
-			for(Future<List<Way>> ways : futurePathWays) {
 				try {
-					wayList = ways.get(5, TimeUnit.SECONDS);
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (ExecutionException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					wayList = pwRequester.getWays(start, end, 5);
+					map.clearRoute();
+					if (Constants.DEBUG_MODE) {
+						Util.out("WAYS FOUND:", wayList);
+					}
+					map.setCalculatedRoute(wayList);
+					map.repaint();
 				} catch (TimeoutException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					Util.out("ERROR: the search timed out - try again with more time?");
 				}
 			}
-			map.clearRoute();
-			if (Constants.DEBUG_MODE) {
-				Util.out("WAYS FOUND:", wayList);
-			}
-			map.setCalculatedRoute(wayList);
-			map.repaint();
 		}
 	}
-		
-	private class PathFindingThread extends Thread {
-		private int numberID;
-		private Node start, end;
-		
-		private PathFindingThread(Node start, Node end) {
-			this.start = start;
-			this.end = end;
-		}
 
-		@Override
-		public void run() {
-			
-			if (Constants.DEBUG_MODE) {
-				Util.out("Starting new PathFindingThread:");
-				Util.out("Source:", start.toString());
-				Util.out("Dest:", end.toString());
-			}
-			
-			numberID = threadCount.incrementAndGet();
-			List<Way> ways = b.getPath(start, end);
-			if (threadCount.get() == numberID && !ways.isEmpty()) {
-				map.clearRoute();
-				
-				if (Constants.DEBUG_MODE)
-					Util.out("WAYS FOUND:", ways);
-				map.setCalculatedRoute(ways);
-				map.repaint();
-			}
-		}
-	}
-	
-	
-
-	class CallableWays implements Callable<List<Way>> {
-	
-		Node start, end;
-	
-		public CallableWays(Node start, Node end) {
-			this.start = start;
-			this.end = end;
-		}
-	
-		@Override
-		public List<Way> call() {
-			return b.getPath(start, end);
-		}
-	}
 
 
 	public static void main(String[] args) {
