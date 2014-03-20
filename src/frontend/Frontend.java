@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -24,6 +25,7 @@ public class Frontend implements ActionListener {
 	JButton getDirections;
 	MapPane map;
 	Backend b;
+	private AtomicInteger threadCount;
 	
 	Frontend(Backend b) {
 		this.b = b;
@@ -45,6 +47,7 @@ public class Frontend implements ActionListener {
 		searchButtonsPanel.add(topButtonPanel, BorderLayout.NORTH);
 		searchButtonsPanel.add(bottomButtonPanel, BorderLayout.SOUTH);
 		
+		threadCount = new AtomicInteger(0);
 		getDirections = new JButton("GET DIRECTIONS");
 		getDirections.addActionListener(this);
 		frame.add(searchButtonsPanel, BorderLayout.SOUTH);
@@ -82,21 +85,41 @@ public class Frontend implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == getDirections) {
-			map.clearRoute();
+			new PathFindingThread(map.getStart(), map.getEnd()).start();
+		}
+	}
+	
+	private class PathFindingThread extends Thread {
+		private int numberID;
+		private Node start, end;
+		
+		private PathFindingThread(Node start, Node end) {
+			this.start = start;
+			this.end = end;
+		}
+
+		@Override
+		public void run() {
+			
 			if (Constants.DEBUG_MODE) {
-				Util.out("---Getting Directions!---");
-				Util.out("Start Node:", map.getStart().toString());
-				Util.out("End Node:", map.getEnd().toString());
+				Util.out("Starting new PathFindingThread:");
+				Util.out("Source:", start.toString());
+				Util.out("Dest:", end.toString());
 			}
-			List<Way> ways = b.getPath(map.getStart(), map.getEnd());
-			if (Constants.DEBUG_MODE) {
-				Util.out("WAYS FOUND:", ways);
-			}
-			if (!ways.isEmpty()) {
+			
+			numberID = threadCount.incrementAndGet();
+			List<Way> ways = b.getPath(start, end);
+			if (threadCount.get() == numberID && !ways.isEmpty()) {
+				map.clearRoute();
+				
+				if (Constants.DEBUG_MODE)
+					Util.out("WAYS FOUND:", ways);
+					
 				map.setCalculatedRoute(ways);
 				map.repaint();
 			}
 		}
+		
 	}
 
 	public static void main(String[] args) {
