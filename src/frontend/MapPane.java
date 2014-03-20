@@ -420,8 +420,16 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			double[] geoOffset = new double[]{pixelOffset2geoOffset(p.y - startP.y), pixelOffset2geoOffset(p.x - startP.x)};
 			//calculate new anchor point (top left lat/lon)
 			double newLat = Corners.topLeft[0] + pixelOffset2geoOffset(p.y - startP.y); 
-			double newLon = Corners.topLeft[1] - pixelOffset2geoOffset(p.x - startP.x); 
+			double newLon = Corners.topLeft[1] - pixelOffset2geoOffset(p.x - startP.x);
+			double oldLat = Corners.topLeft[0];
+			double oldLon = Corners.topLeft[1];
+			
 			Corners.reposition(newLat, newLon); //reposition all corners with new coords
+			if (Corners.topLeft[0] > Constants.MAXIMUM_LATITUDE || Corners.bottomLeft[0] < Constants.MINIMUM_LATITUDE ||
+					Corners.topLeft[1] < Constants.MINIMUM_LONGITUDE || Corners.topRight[1] > Constants.MAXIMUM_LONGITUDE) {
+				return;
+			}
+			
 			
 			startP = e.getPoint(); //re-define start p
 			
@@ -452,6 +460,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		}
 		
 	}
+	
+	
 	
 	public Node getStart() {
 		return source.node;

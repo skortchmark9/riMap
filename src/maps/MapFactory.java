@@ -28,7 +28,7 @@ public class MapFactory {
 	private static ConcurrentHashMap<String, Node> nodes = new ConcurrentHashMap<>();
 	private static ConcurrentHashMap<String, Way> ways = new ConcurrentHashMap<>();
 	
-	public static Way createWay(String wayID) {
+	public static synchronized Way createWay(String wayID) {
 		Way possibleWay= ways.get(wayID);
 		if (possibleWay != null) {
 			return possibleWay;
