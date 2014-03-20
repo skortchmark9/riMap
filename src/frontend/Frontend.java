@@ -87,7 +87,11 @@ public class Frontend implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == getDirections) {
-			new PathFindingThread(map.getStart(), map.getEnd()).start();
+			Node start = map.getStart();
+			Node end = map.getEnd();
+			if (start != null && end != null) {
+				new PathFindingThread(start, end).start();
+			}
 		}
 	}
 	
