@@ -1,15 +1,17 @@
 package graph;
 
 import java.util.Map;
+
+import kdtree.KDimensionable;
 /** 
  * Interface for nodes in graph.
  * @author skortchm
  *
  * @param <T> - the type of value to be stored in the node. 
  */
-public interface PathNode<T> extends Comparable<PathNode<T>> {
-	Map<String, Edge<? extends PathNode<T>>> getNeighbors();
-	Edge<? extends PathNode<T>> getNeighbor(String key);
+public interface PathNode<T extends KDimensionable> extends Comparable<PathNode<T>> {
+	Map<String, Edge<T>> getNeighbors();
+	Edge<T> getNeighbor(String key);
 	T getValue();
 	double getDistance();
 	void setDistance(Double d);
@@ -17,7 +19,6 @@ public interface PathNode<T> extends Comparable<PathNode<T>> {
 	void setAStarDistance(Double d);
 	PathNode<T> getPrevious();
 	void setPrevious(PathNode<T> n);
-	@Override
 	int hashCode();
 	String getName();
 	double getDistanceTo(PathNode<T> n2);

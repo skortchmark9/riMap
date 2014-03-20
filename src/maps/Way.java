@@ -1,11 +1,12 @@
 package maps;
 
+import kdtree.KDimensionable;
 import graph.Edge;
 import backend.Resources;
 
-public class Way implements Edge<PathNodeWrapper> {
+public class Way implements Edge<Node> {
 	
-	PathNodeWrapper target;
+	Node target;
 	String name;
 	Node start;
 	String uniqueID;
@@ -16,7 +17,7 @@ public class Way implements Edge<PathNodeWrapper> {
 	 * @param r
 	 */
 	
-	Way(String uniqueID, String name, Node start, PathNodeWrapper end) {
+	Way(String uniqueID, String name, Node start, Node end) {
 		this.uniqueID = uniqueID;
 		this.name = name;
 		this.start = start;
@@ -35,19 +36,24 @@ public class Way implements Edge<PathNodeWrapper> {
 	 * Gets the PathNode this WAY is pointing to - is its end coordinate.
 	 * 
 	 */
-	@Override
-	public PathNodeWrapper getTarget() {
+//	@Override
+	public Node getTarget() {
 		return target;
 	}
 
-	@Override
+//	@Override
 	public String getName() {
 		return uniqueID;
 	}	
 
-	@Override
+//	@Override
 	public double getWeight() {
-		return start.distanceTo(target.getValue());
+		return start.distanceTo(target);
+	}
+	
+	@Override
+	public String toString() {
+		return uniqueID;
 	}
 
 }

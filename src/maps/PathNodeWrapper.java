@@ -3,30 +3,37 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import kdtree.KDimensionable;
 import graph.Edge;
 import graph.PathNode;
+import maps.Node;
 public class PathNodeWrapper implements PathNode<Node> {
 	
 	private final Node value;
 	private double distance = Double.POSITIVE_INFINITY;
 	private double aStarDistance = Double.POSITIVE_INFINITY;
 	
-	private Map<String, Edge<? extends PathNode<Node>>> neighbors;
+	private Map<String, Edge<Node>> neighbors;
 	private PathNode<Node> previous;
 	
 	public PathNodeWrapper(Node value) {
 		this.value = value;
 	}
+	
+	public PathNodeWrapper(KDimensionable value) {
+		this.value = (Node) value;
+	}
+
 
 	@Override
-	public Map<String, Edge<? extends PathNode<Node>>> getNeighbors() {
+	public Map<String, Edge<Node>> getNeighbors() {
 			if (neighbors == null) {
 				neighbors = new HashMap<>();
 				List<String> wayIDs = getValue().getWayIDs();
 				for(String wayID : wayIDs) {
 					Way w = MapFactory.createWay(wayID);
 					if (w != null) {
-						neighbors.put(w.getTarget().getName(), w);
+						neighbors.put(w.getTarget().getID(), w);
 					}
 				}
 			}
@@ -34,7 +41,7 @@ public class PathNodeWrapper implements PathNode<Node> {
 	}
 
 	@Override
-	public Edge<? extends PathNode<Node>> getNeighbor(String key) {
+	public Edge<Node> getNeighbor(String key) {
 		// TODO Auto-generated method stub
 		return neighbors.get(key);
 	}

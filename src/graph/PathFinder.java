@@ -9,22 +9,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
+import kdtree.KDimensionable;
+import maps.PathNodeWrapper;
 
-public class PathFinder<K extends PathNode<T>, T> {
+
+public class PathFinder<K extends PathNode<T>, T extends KDimensionable> {
 	K source;
 	K dest;
 	Map<String, K> consideredNodes;
 
-	//	PathFinder(String srcName, String dstName, Resources r) {
-	//Should we take two nodes or two names?
 	public PathFinder(K source, K dest) {
 		this.source = source;
 		this.dest = dest;
 		consideredNodes = new HashMap<String, K>();
 	}
 	
-	public List<Edge<? extends PathNode<T>>> getPath() {
-		List<Edge<? extends PathNode<T>>> pathWays = new LinkedList<>();
+	public List<Edge<T>> getPath() {
+		List<Edge<T>> pathWays = new LinkedList<>();
 		constructGraphToDest(source);
 		K sourceNode = consideredNodes.get(source.getName());
 		K destNode = consideredNodes.get(dest.getName());
@@ -41,16 +42,17 @@ public class PathFinder<K extends PathNode<T>, T> {
 			K currentActor = path.get(i);
 			K nextActor =  path.get(i + 1);
 			String movieTitle = null;
-			Edge<? extends PathNode<T>> e = currentActor.getNeighbor(nextActor.getName());
-			if (e.getTarget().equals(nextActor)) {
+			Edge<T> e = currentActor.getNeighbor(nextActor.getName());
+			if (e.getTarget().equals(nextActor.getValue())) {
 				movieTitle = e.getName();
 			}
 			if (movieTitle == null) {
-				return new LinkedList<Edge<? extends PathNode<T>>>();
+				return new LinkedList<Edge<T>>();
 			} else {
 				pathWays.add(e);
 			}
 		}
+		consideredNodes = null;
 		return pathWays;
 	}
 
@@ -79,7 +81,7 @@ public class PathFinder<K extends PathNode<T>, T> {
 			K nextActor =  path.get(i + 1);
 			String movieTitle = null;
 			//FIXME: Does this work? HASHING vs Strings as keys.
-			Edge<? extends PathNode<T>> e = currentActor.getNeighbor(nextActor.getName());
+			Edge<?> e = currentActor.getNeighbor(nextActor.getName());
 			if (e.getTarget().equals(nextActor)) {
 				movieTitle = e.getName();
 			}
@@ -98,7 +100,6 @@ public class PathFinder<K extends PathNode<T>, T> {
 	private void constructGraphToDest(K source) {
 		source.setDistance(0.0);
 		source.setAStarDistance(source.getDistanceTo(dest) + source.getDistance());
-		consideredNodes.put(source.getName(), source);
 		PriorityQueue<K> fringe = new PriorityQueue<>();
 		fringe.offer(source);
 		while (!fringe.isEmpty()) {
@@ -106,14 +107,14 @@ public class PathFinder<K extends PathNode<T>, T> {
 			T nodeValue = currentNode.getValue();
 			consideredNodes.put(currentNode.getName(), currentNode);
 			//TODO define equality relationship here. Do we really want to check this way?
-			if (currentNode.getValue().equals(dest.getValue())) {
+			if (nodeValue.equals(dest.getValue())) {
 				break;
 			}
 			else {
-				Map<String, Edge<? extends PathNode<T>>> edges = currentNode.getNeighbors();
-				for(Edge<? extends PathNode<T>> edge : edges.values()) {
+				Map<String, Edge<T>> edges = currentNode.getNeighbors();
+				for(Edge<T> edge : edges.values()) {
 					//FIXME Again, this is a weird cast.
-					K neighbor = (K) edge.getTarget();
+					K neighbor =  (K) new PathNodeWrapper(edge.getTarget());
 					//We don't want any duplicates 
 					//TODO this section is confusing.
 					if (!neighbor.getValue().equals(nodeValue)) {

@@ -41,11 +41,11 @@ public class MapFactory {
 		if (startLoc == null || endLoc == null) {
 			return null;
 		} else {
-			return createWay(wayID, wayInfo[0], startLoc, new PathNodeWrapper(endLoc));
+			return createWay(wayID, wayInfo[0], startLoc, endLoc);
 		}
 	}
 	
-	private static Way createWay(String wayID, String name, Node start, PathNodeWrapper end) {
+	private static Way createWay(String wayID, String name, Node start, Node end) {
 		Way resultWay = ways.get(wayID);
 		if (resultWay == null) {
 			resultWay = new Way(wayID, name, start, end);
@@ -60,7 +60,7 @@ public class MapFactory {
 			Node startNode = createNode(start);
 			Node endNode = createNode(end);
 			if (endNode != null && startNode != null) {
-				resultWay = createWay(wayID, name, startNode, new PathNodeWrapper(endNode));
+				resultWay = createWay(wayID, name, startNode, endNode);
 			}
 			if (resultWay != null) {
 			ways.put(wayID, resultWay);
@@ -82,12 +82,6 @@ public class MapFactory {
 		for(double i = minLat; i <= maxLat + .01; i+=0.01) {
 			for(double j = maxLon; j >= minLon - .01; j-=0.01) {
 				String searchCode = "/w/" + Util.getFirst4Digits(i) + "." + Util.getFirst4Digits(j);
-				
-				if (Constants.DEBUG_MODE) {
-					Util.out("SC:", searchCode);
-					if (searchCode.equals("/w/4165.7209.189121272.3.1"))
-						Util.out("HERE");
-				}
 				
 				List<List<String>> chunk = Resources.waysFile.searchMultiples(searchCode,
 				SearchType.WILDCARD, "id", "name", "start", "end");

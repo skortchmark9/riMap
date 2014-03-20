@@ -94,7 +94,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		for (Way way : renderedWays) {
 			if (way != null) {
 				int[] start = geo2pixel(way.getStart().getCoordinates());
-				int[] end = geo2pixel(way.getTarget().getValue().getCoordinates());
+				int[] end = geo2pixel(way.getTarget().getCoordinates());
 				
 				if (Constants.DEBUG_MODE) {
 					//Util.out("Start point:", "("+start[0]+",", start[1]+")");
@@ -110,7 +110,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		for (Way way : calculatedRoute) {
 			if (way != null) {
 				int[] start = geo2pixel(way.getStart().getCoordinates());
-				int[] end = geo2pixel(way.getTarget().getValue().getCoordinates());
+				int[] end = geo2pixel(way.getTarget().getCoordinates());
 				
 				if (Constants.DEBUG_MODE) {
 					//Util.out("Start point:", "("+start[0]+",", start[1]+")");
@@ -582,7 +582,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		public void run() {
 			for (Way way : renderList) {
 				int[] start = geo2pixel(way.getStart().getCoordinates());
-				int[] end = geo2pixel(way.getTarget().getValue().getCoordinates());
+				int[] end = geo2pixel(way.getTarget().getCoordinates());
 				brush.setColor(Color.WHITE);
 				brush.drawLine(start[0], start[1], end[0], end[1]);
 			}

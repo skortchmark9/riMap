@@ -1,5 +1,6 @@
 package frontend;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Toolkit;
@@ -31,6 +32,10 @@ public class Frontend implements ActionListener {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		frame.setLayout(new FlowLayout());
+		frame.setBackground(Color.BLACK);
+		frame.setOpacity(1);
+		
+		
 		JPanel searchButtonsPanel = new JPanel(new BorderLayout());
 		JPanel topButtonPanel = new JPanel(new BorderLayout());
 		JPanel bottomButtonPanel = new JPanel(new BorderLayout());
@@ -54,11 +59,8 @@ public class Frontend implements ActionListener {
 		frame.pack();
 		frame.setVisible(true);
 	}
-	
-	
-	
-    
-    private void center(Window w) {
+
+	private void center(Window w) {
         int screenWidth  = Toolkit.getDefaultToolkit().getScreenSize().width;
         int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
 
