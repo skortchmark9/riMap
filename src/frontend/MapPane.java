@@ -11,8 +11,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -43,10 +44,11 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private ClickNeighbor target;
 	private Backend b;
 	private boolean clickSwitch = true;
+	private ExecutorService executor;
 
 	MapPane(Backend b)   {
 		this.b = b;
-		this.setBackground(Color.black);
+		this.setBackground(Constants.MIDNIGHT);
 		this.setPreferredSize(new Dimension(PIXEL_WIDTH, PIXEL_HEIGHT));
 		this.setMaximumSize(getPreferredSize());
 		this.setFocusable(true);
@@ -67,10 +69,15 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		//renderedWays = Collections.synchronizedList(MapFactory.getWaysInRange(0, 0, 0, 0));
 		source = null;
 		target = null;
+		
+		// Make a new thread pool w 8 threads to get ways
+		executor = Executors.newFixedThreadPool(8);
 		renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
 		if (Constants.DEBUG_MODE) {
 			Util.out("Finished - Got All Ways in range", "(Elapsed:", Util.lap() +")");
 		}
+		
+		
 		this.repaint(); //paint the initial set of ways
 		this.requestFocusInWindow();
 		
@@ -84,7 +91,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		Graphics2D g2d = (Graphics2D) g;
 		
 		//Render Ways
-		g2d.setColor(Color.WHITE);
+		g2d.setColor(Constants.GLOW_IN_THE_DARK);
 		for (Way way : renderedWays) {
 			if (way != null) {
 				int[] start = geo2pixel(way.getStart().getCoordinates());
