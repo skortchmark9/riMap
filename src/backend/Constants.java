@@ -1,5 +1,6 @@
 package backend;
 
+import java.awt.Color;
 import java.util.regex.Pattern;
 
 import autocorrect.Generator;
@@ -26,11 +27,16 @@ public class Constants {
 	public static final Ranker defaultRanker = new Ranker(Ranker.CompareMode.MAPS);
 	
 	//Info for rendering lines on map:
-	public static final double INITIAL_LAT = 41.842678; //Home Depot
-	public static final double INITIAL_LON = -71.417541;
+	
+	//NYC:		 	40.771022, -73.970021
+	//Home Depot:	41.842678, -71.417541
+	public static final double INITIAL_LAT = 40.38; //NYC
+	public static final double INITIAL_LON = -73.71;
 	public static final double GEO_DIMENSION_FACTOR = 0.02;
 	public static final double MIN_ZOOM = 0.2;
 	public static final double MAX_ZOOM = 12.0;
+	public static final Color MIDNIGHT = new Color(60, 62, 67);
+	public static final Color GLOW_IN_THE_DARK = new Color(236, 240, 230);
 	
 	//A prime number!
 	public static final int ADJUST_LINE_BUFFER = 4037;
