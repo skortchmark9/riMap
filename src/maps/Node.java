@@ -4,6 +4,7 @@
 package maps;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import kdtree.KDimensionable;
@@ -153,6 +154,6 @@ public class Node implements KDimensionable {
 	
 	@Override
 	public String toString() {
-		return "ID: " + id + "COORDS: " + Arrays.toString(coords);
+		return "ID: " + id + "  COORDS: " + Arrays.toString(coords) + "  WAY IDs: " + wayIDs;
 	}
 }
