@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import kdtree.KDStub;
+import maps.MapFactory;
 import maps.Node;
 import maps.Way;
 import backend.Backend;
@@ -579,17 +580,11 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		
 		@Override
 		public void run() {
-<<<<<<< HEAD
-			for (Way way : renderList) {
-				int[] start = geo2pixel(way.getStart().getCoordinates());
-				int[] end = geo2pixel(way.getTarget().getCoordinates());
-				brush.setColor(Color.WHITE);
-				brush.drawLine(start[0], start[1], end[0], end[1]);
-=======
 			if (Constants.DEBUG_MODE) {
 				Util.out("Starting WayGetter!");
 			}
 			numberID = threadCount.incrementAndGet();
+			MapFactory.getNumWays();
 			List<Way> temp = b.getWaysInRange(this.minLat, this.maxLat, this.minLon, this.maxLon);
 			if (threadCount.get() == numberID) {
 				renderedWays = temp;
@@ -597,11 +592,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				if (Constants.DEBUG_MODE) {
 					Util.out("WayGetter accomplished:", "minLat:", minLat, "maxLat:", maxLat);
 				}
->>>>>>> 54994dfd139390674e4a24f724df8af1b5f0526d
 			}
 		}
-		
 	}
-
 }
 

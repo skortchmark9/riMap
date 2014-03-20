@@ -25,7 +25,7 @@ import backend.Util;
 public class MapFactory {
 	
 	private static HashMap<String, Node> nodes = new HashMap<>();
-	private static HashMap<String, Way> ways = new HashMap<>();
+	private static HashMap<String, Way> ways = new HashMap<>(30000);
 	
 	public static Way createWay(String wayID) {
 		Way possibleWay= ways.get(wayID);
@@ -66,8 +66,13 @@ public class MapFactory {
 			ways.put(wayID, resultWay);
 			} else {
 				return null;
+			}
 		}
 		return resultWay;
+	}
+	
+	public static void getNumWays() {
+		Util.out(ways.size());
 	}
 
 	public static synchronized List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
