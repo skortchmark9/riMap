@@ -1,22 +1,22 @@
 package maps;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import kdtree.KDStub;
 import kdtree.KDTree;
-import kdtree.KDimensionable;
 import autocorrect.RadixTree;
+import backend.BinarySearchFile.SearchType;
 import backend.Constants;
 import backend.Resources;
 import backend.Util;
-import backend.BinarySearchFile.SearchType;
 /**
  * 
  * @author emc3 / skortchm
@@ -66,25 +66,31 @@ public class MapFactory {
 			ways.put(wayID, resultWay);
 			} else {
 				return null;
-			}
 		}
 		return resultWay;
 	}
 
-	public static List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
-		
+	public static synchronized List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
 		if (Constants.DEBUG_MODE) {
 			Util.out("Looking for Ways in Range");
 			Util.resetClock();
 		}
 		
 		List<Way> ways = new LinkedList<>();
-		for(double i = minLat; i <= maxLat + .01; i+=0.01) {
-			for(double j = maxLon; j >= minLon - .01; j-=0.01) {
+		for(double i = minLat; i <= maxLat + 0.01; i+=0.01) {
+			for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
 				String searchCode = "/w/" + Util.getFirst4Digits(i) + "." + Util.getFirst4Digits(j);
 				
-				List<List<String>> chunk = Resources.waysFile.searchMultiples(searchCode,
-				SearchType.WILDCARD, "id", "name", "start", "end");
+				if (Constants.DEBUG_MODE) {
+					Util.out("SC:", searchCode);
+					if (searchCode.equals("/w/4165.7209.189121272.3.1"))
+						Util.out("HERE");
+				}
+				
+				List<List<String>> chunk = new LinkedList<>();
+				//synchronized(Resources.waysFile) {
+				chunk = Resources.waysFile.searchMultiples(searchCode, SearchType.WILDCARD, "id", "name", "start", "end");
+				//}
 				for (List<String> wayInfo : chunk) {
 					if (wayInfo != null && !wayInfo.isEmpty()) {
 						Way possibleWay = createWay(wayInfo.get(0), wayInfo.get(1), wayInfo.get(2), wayInfo.get(3));
@@ -96,9 +102,7 @@ public class MapFactory {
 			}
 		}
 		return ways;
-	}
-	
-	
+	}	
 
 	
 	//TODO : Potentially we could store the nodes created somewhere so that if
@@ -236,6 +240,44 @@ public class MapFactory {
 		}
 		
 		return rt;
+	}
+	
+	
+	public static synchronized List<Way> getWaysInRangeFaster(double minLat, double maxLat, double minLon, double maxLon) {
+		
+		if (Constants.DEBUG_MODE) {
+			Util.out("Looking for Ways in Range using THREADS");
+			Util.resetClock();
+		}
+		
+		List<Way> ways = new LinkedList<>();
+		List<List<String>> wayInfoChunk = Collections.synchronizedList(new LinkedList<List<String>>());
+		ExecutorService executor = Executors.newFixedThreadPool(4);
+		for(double i = minLat; i <= maxLat + 0.01; i+=0.01) {
+			for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
+				String searchCode = "/w/" + Util.getFirst4Digits(i) + "." + Util.getFirst4Digits(j);
+				
+				if (Constants.DEBUG_MODE) {
+					Util.out("SC:", searchCode);
+					if (searchCode.equals("/w/4165.7209.189121272.3.1"))
+						Util.out("HERE");
+				}
+				
+				SearchMultipleWorker worker = new SearchMultipleWorker(wayInfoChunk, searchCode);
+				executor.execute(worker);
+			}
+		}
+		
+		executor.shutdown(); //tell executor to finish all submitted tasks
+		while(!executor.isTerminated()) {} //wait for all tasks to complete
+		for (List<String> wayInfo : wayInfoChunk) {
+			if (wayInfo != null && !wayInfo.isEmpty()) {
+				Way possibleWay = createWay(wayInfo.get(0), wayInfo.get(1), wayInfo.get(2), wayInfo.get(3));
+				if (possibleWay != null)
+					ways.add(possibleWay);
+			}
+		}
+		return ways;
 	}
 	
 }

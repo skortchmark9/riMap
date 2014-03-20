@@ -14,8 +14,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -44,7 +43,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private ClickNeighbor target;
 	private Backend b;
 	private boolean clickSwitch = true;
-	private ExecutorService executor;
+	private AtomicInteger threadCount;
 
 	MapPane(Backend b)   {
 		this.b = b;
@@ -69,7 +68,11 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		//renderedWays = Collections.synchronizedList(MapFactory.getWaysInRange(0, 0, 0, 0));
 		source = null;
 		target = null;
-		renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
+		renderedWays = new LinkedList<>();
+		threadCount = new AtomicInteger(0);
+		//new thread!
+		new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]).start();
+		//renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
 		calculatedRoute = new LinkedList<>();
 		if (Constants.DEBUG_MODE) {
 			Util.out("Finished - Got All Ways in range", "(Elapsed:", Util.lap() +")");
@@ -124,8 +127,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		if (source != null) {
 			
 			if (Constants.DEBUG_MODE) {
-				Util.out("Point A:", "("+source.screenCoords[0]+",", source.screenCoords[1]+")");
-				Util.out("Node ways:", source.node.getWayIDs());
+				//Util.out("Source pixel coords:", "("+source.screenCoords[0]+",", source.screenCoords[1]+")");
+				Util.out("Source Node:", source.node.toString());
 			}
 			g2d.setStroke(new BasicStroke(1));		
 			g2d.setColor(Color.GREEN);
@@ -134,8 +137,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		if (target != null) {
 			
 			if (Constants.DEBUG_MODE) {
-				Util.out("Point B:", "("+target.screenCoords[0]+",", target.screenCoords[1]+")");
-				Util.out("Node ways:", target.node.getWayIDs());
+				//Util.out("Target pixel coords:", "("+target.screenCoords[0]+",", target.screenCoords[1]+")");
+				Util.out("Target Node", target.node.toString());
 			}
 			g2d.setStroke(new BasicStroke(1));		
 			g2d.setColor(Color.RED);
@@ -379,8 +382,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			
 			this.repaint(); // repaint for responsiveness
 			
-			//get all new ways in new range 
-			renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
+			//get all new ways in new range
+			new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]).start();
+			//renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
 			//repaint this component
 			this.repaint();
 		}
@@ -428,11 +432,11 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			if (target != null)
 				target.recalibrate();
 			
-			repaint(); //repaint for responsiveness
-			
+//			renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
+//			repaint();
 			//get all new ways for the render list
-			renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
-			//repaint the map again with new ways
+			
+			new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]).start();
 			repaint();
 		}
 		
@@ -440,13 +444,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		public void mouseClicked(MouseEvent e) {
 			if (Constants.DEBUG_MODE)
 				Util.out("Click registered!");
-			
 			if (clickSwitch) {
 				source = new ClickNeighbor(e.getX(), e.getY());
 				clickSwitch = false;
-			}
-			
-			else {
+			} else {
 				target = new ClickNeighbor(e.getX(), e.getY());
 				clickSwitch = true;
 			}
@@ -569,22 +570,39 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		
 	}
 	
-	private class WayDrawer extends Thread {
-		private Graphics2D brush;
-		private List<Way> renderList;
+	private class WayGetter extends Thread {
+		double minLat, maxLat, minLon, maxLon;
+		int numberID;
 		
-		private WayDrawer(Graphics2D brush, List<Way> list) {
-			this.brush = brush;
-			this.renderList = list;
+		
+		private WayGetter(double minLat, double maxLat, double minLon, double maxLon) {
+			this.minLat = minLat;
+			this.maxLat = maxLat;
+			this.minLon = minLon;
+			this.maxLon = maxLon;
 		}
 		
 		@Override
 		public void run() {
+<<<<<<< HEAD
 			for (Way way : renderList) {
 				int[] start = geo2pixel(way.getStart().getCoordinates());
 				int[] end = geo2pixel(way.getTarget().getCoordinates());
 				brush.setColor(Color.WHITE);
 				brush.drawLine(start[0], start[1], end[0], end[1]);
+=======
+			if (Constants.DEBUG_MODE) {
+				Util.out("Starting WayGetter!");
+			}
+			numberID = threadCount.incrementAndGet();
+			List<Way> temp = b.getWaysInRange(this.minLat, this.maxLat, this.minLon, this.maxLon);
+			if (threadCount.get() == numberID) {
+				renderedWays = temp;
+				repaint();
+				if (Constants.DEBUG_MODE) {
+					Util.out("WayGetter accomplished:", "minLat:", minLat, "maxLat:", maxLat);
+				}
+>>>>>>> 54994dfd139390674e4a24f724df8af1b5f0526d
 			}
 		}
 		

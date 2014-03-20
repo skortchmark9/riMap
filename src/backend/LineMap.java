@@ -36,8 +36,6 @@ import com.google.common.collect.TreeRangeSet;
  */
 public class LineMap {
 	RangeSet<Long> lineMap = TreeRangeSet.create();
-	LineMap() {
-	}
 	
 	/**
 	 * Adds the newLine to the current RangeSet
@@ -50,7 +48,9 @@ public class LineMap {
 			return;
 		}
 		//Closed open is google's syntax for [position, nextNewLine)
-		lineMap.add(Range.closedOpen(position, nextNewLine));
+		synchronized(lineMap) {
+			lineMap.add(Range.closedOpen(position, nextNewLine));
+		}
 	}
 	
 	void putPrev(long position, long prevNewLine) {
@@ -58,7 +58,9 @@ public class LineMap {
 			Util.err("ERROR: Did you mean putNext?");
 			return;
 		} else {
-			lineMap.add(Range.openClosed(prevNewLine, position));
+			synchronized(lineMap) {
+				lineMap.add(Range.openClosed(prevNewLine, position));
+			}
 		}
 	}
 	

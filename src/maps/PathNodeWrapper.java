@@ -42,7 +42,6 @@ public class PathNodeWrapper implements PathNode<Node> {
 
 	@Override
 	public Edge<Node> getNeighbor(String key) {
-		// TODO Auto-generated method stub
 		return neighbors.get(key);
 	}
 

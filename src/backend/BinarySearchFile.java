@@ -24,8 +24,8 @@ public class BinarySearchFile implements AutoCloseable {
 	HashMap<String, Integer> parsePattern;
 	LineMap newLines;
 	String sortingCol;
-	int bufferLength;
-	int tabBufferLength;
+	int bufferLength = Constants.BufferLength;
+	int tabBufferLength = Constants.TabBufferLength;
 	int numCalls;
 	long length;
 	public enum SearchType {WILDCARD, DEFAULT}
@@ -46,8 +46,6 @@ public class BinarySearchFile implements AutoCloseable {
 			System.out.println("ERROR: Unable to open file '" + filePath + "'");
 			System.exit(1);
 		}
-		bufferLength = Constants.BufferLength;
-		tabBufferLength = Constants.TabBufferLength;
 		this.sortingCol = sortingCol;
 		newLines = new LineMap();
 		length = raf.length();
@@ -57,6 +55,14 @@ public class BinarySearchFile implements AutoCloseable {
 				throw new IOException("ERROR: file header not formatted correctly");
 			}
 		}
+	}
+	
+	public BinarySearchFile(BinarySearchFile bsfToCopy) {
+		this.raf = bsfToCopy.raf;
+		this.sortingCol = bsfToCopy.sortingCol;
+		this.newLines = bsfToCopy.newLines;
+		this.length = bsfToCopy.length;
+		this.parsePattern = bsfToCopy.parsePattern;
 	}
 
 	/** Attempts to read the header of an index, actors, or films file.
@@ -147,7 +153,7 @@ public class BinarySearchFile implements AutoCloseable {
 			//The real recursive engine of search. We'll get there in a second. 
 			long wordPosition = search(searchCode.getBytes(UTF8), secondLine, length, s);
 			if (wordPosition < 0) {
-				return null;
+				return new LinkedList<List<String>>();
 			}
 			//wordPosition is the position of the word, but we want the whole line. 
 			long rangeStart = prevNewLine(wordPosition, 0);
@@ -463,6 +469,8 @@ public class BinarySearchFile implements AutoCloseable {
 	 * @throws IOException - in case something goes wrong with the raf. 
 	 */
 	private long skipTabs(long start, long end, int numTabs) throws IOException {
+		if (numTabs == 0)
+			return start;
 		int tabsFound = 0;
 		byte[] arrayToSearch;
 		int arraySize;
@@ -491,6 +499,7 @@ public class BinarySearchFile implements AutoCloseable {
 				return start + i;
 			}
 		}
+		arrayToSearch = null;
 		//if we haven't found it yet.
 		if (start + arraySize < end) {
 			return skipTabs(start + arraySize, end, numTabs - tabsFound);

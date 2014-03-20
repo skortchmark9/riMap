@@ -103,7 +103,7 @@ public class Backend {
 	}
 	
 	public List<Way> getPath(Node source, Node dest) {
-		PathFinder<PathNodeWrapper, Node> p = new PathFinder<PathNodeWrapper, Node>(new PathNodeWrapper(source), new PathNodeWrapper(dest));
+		PathFinder<PathNodeWrapper, Node> p = new PathFinder<>(new PathNodeWrapper(source), new PathNodeWrapper(dest));
 		List<Way> ways = new LinkedList<>();
 		for(Edge<?> edge : p.getPath()) {
 			ways.add((Way) edge);

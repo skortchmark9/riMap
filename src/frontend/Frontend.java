@@ -84,10 +84,13 @@ public class Frontend implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == getDirections) {
-			Node source = map.getStart();
-			Node end = map.getEnd();
 			map.clearRoute();
-			List<Way> ways = b.getPath(source, end);
+			if (Constants.DEBUG_MODE) {
+				Util.out("---Getting Directions!---");
+				Util.out("Start Node:", map.getStart().toString());
+				Util.out("End Node:", map.getEnd().toString());
+			}
+			List<Way> ways = b.getPath(map.getStart(), map.getEnd());
 			if (Constants.DEBUG_MODE) {
 				Util.out("WAYS FOUND:", ways);
 			}
@@ -100,9 +103,9 @@ public class Frontend implements ActionListener {
 
 	public static void main(String[] args) {
 		try {
-			String arg1 = "/Users/samkortchmar/Documents/Brown/Semester IV/CS032/Projects/CS032_Maps/data/mapsfiles/ways.tsv";
-			String arg2	= "/Users/samkortchmar/Documents/Brown/Semester IV/CS032/Projects/CS032_Maps/data/mapsfiles/nodes.tsv";
-			String arg3 = "/Users/samkortchmar/Documents/Brown/Semester IV/CS032/Projects/CS032_Maps/data/mapsfiles/index.tsv";
+			String arg1 = "./data/mapsfiles/ways.tsv";
+			String arg2	= "./data/mapsfiles/nodes.tsv";
+			String arg3 = "./data/mapsfiles/index.tsv";
 			Backend b = new Backend(new String[] {arg1, arg2, arg3});
 			new Frontend(b);
        } catch (IOException e) {

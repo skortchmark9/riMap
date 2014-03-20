@@ -51,7 +51,7 @@ public class SearchAutoFillPane extends JPanel {
 
 		rowSorter = new TableRowSorter<DefaultTableModel>(searchTableModel);
 		searchTable = new JTable(searchTableModel);
-		searchTable.setPreferredSize(new Dimension(605-300, 80));
+		searchTable.setPreferredSize(new Dimension(300, 80));
 		searchTable.setFillsViewportHeight(true);
 		searchTable.getColumnModel().setColumnSelectionAllowed(false);
 		searchTable.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
@@ -205,7 +205,7 @@ public class SearchAutoFillPane extends JPanel {
 			initTableModel();
 			if(!popup.isVisible()) { 
 				Rectangle r = searchField.getBounds();
-				popup.show(searchField, (r.x-98), (r.y+16));
+				popup.show(searchField, (r.x), (r.y+16));
 				popup.setVisible(true);
 			}
 
