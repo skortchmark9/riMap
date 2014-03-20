@@ -69,6 +69,10 @@ public class Backend {
 			Util.memLog();
 		}
 	}
+	
+	private void initPathWayRequester() {
+		
+	}
 
 	private void initAutoCorrect() {
 		long start = 0; //XXX: FOR DEBUGGING

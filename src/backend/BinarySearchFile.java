@@ -56,7 +56,7 @@ public class BinarySearchFile implements AutoCloseable {
 			}
 		}
 	}
-	
+
 	public BinarySearchFile(BinarySearchFile bsfToCopy) {
 		this.raf = bsfToCopy.raf;
 		this.sortingCol = bsfToCopy.sortingCol;
@@ -271,68 +271,70 @@ public class BinarySearchFile implements AutoCloseable {
 	 */
 	long scanForward(byte[] searchCodeBytes, long start, SearchType s) throws IOException {
 		long lastNewLine = start;
-		byte[] arrayToSearch;
-		int arraySize;
-		if ((length - start) < bufferLength) {
-			arraySize = (int) (length - start);
-		}
-		else {
-			arraySize = bufferLength;
-		}
-		arrayToSearch = new byte[arraySize];
-		long endIndex = start + arraySize;
-		raf.seek(start);
-		raf.read(arrayToSearch);
-		boolean foundInThisRun = false;
-		boolean foundAWord = false;
-		for(int i = arraySize - 1; i > 0; i--) {
-			int ch = arrayToSearch[i];
-			endIndex--;
-			if (ch  == '\n') {
-				//					newLines.putPrev(endIndex, endIndex - i);
-				int tabsToSkip = parsePattern.get(sortingCol);
-				int tabsFound = 0;
-				int tabLocation = 0;
-				for(int j = 0; j < arraySize; j++) {
-					if (arrayToSearch[j + i] == '\t') {
-						tabsFound++;
+
+		while (start < length) {
+			byte[] arrayToSearch;
+			int arraySize;
+			if ((length - start) < bufferLength) {
+				arraySize = (int) (length - start);
+			}
+			else {
+				arraySize = bufferLength;
+			}
+			arrayToSearch = new byte[arraySize];
+			long endIndex = start + arraySize;
+			raf.seek(start);
+			raf.read(arrayToSearch);
+			boolean foundInThisRun = false;
+			boolean foundAWord = false;
+			for(int i = arraySize - 1; i > 0; i--) {
+				int ch = arrayToSearch[i];
+				if (ch  == '\n') {
+					newLines.putPrev(endIndex, endIndex - i);
+					int tabsToSkip = parsePattern.get(sortingCol);
+					int tabsFound = 0;
+					int tabLocation = 0;
+					for(int j = 0; j < arraySize; j++) {
+						if (arrayToSearch[j + i] == '\t') {
+							tabsFound++;
+						}
+						if (tabsFound == tabsToSkip) {
+							tabLocation = j;
+							break;
+						}
 					}
-					if (tabsFound == tabsToSkip) {
-						tabLocation = j;
-						break;
+					int wordStart = i + tabLocation + 1; //Perhaps we need to add 1?
+					foundAWord = true;
+					long wordEnd = wordStart + searchCodeBytes.length;
+					long diff = wordEnd - arrayToSearch.length;
+					if (diff > 0) {
+						byte[] extraArray = new byte[(int) diff];
+						raf.seek(wordStart);
+						raf.read(extraArray);
+						arrayToSearch = Util.concatByteArrays(arrayToSearch, extraArray);
 					}
-				}
-				int wordStart = i + tabLocation + 1; //Perhaps we need to add 1?
-				foundAWord = true;
-				long wordEnd = wordStart + searchCodeBytes.length;
-				long diff = wordEnd - arrayToSearch.length;
-				if (diff > 0) {
-					byte[] extraArray = new byte[(int) diff];
-					raf.seek(wordStart);
-					raf.read(extraArray);
-					arrayToSearch = Util.concatByteArrays(arrayToSearch, extraArray);
-				}
-				int cmp = compare(searchCodeBytes, arrayToSearch, wordStart);
-				if (cmp == 0) {
-					if (s == SearchType.WILDCARD) {
-						foundInThisRun = true;
-						break;
-					} else if (arrayToSearch[wordStart + searchCodeBytes.length] == '\t' ||
-							arrayToSearch[wordStart + searchCodeBytes.length] == '\n') {
-						foundInThisRun = true;
-						break;
+					int cmp = compare(searchCodeBytes, arrayToSearch, wordStart);
+					if (cmp == 0) {
+						if (s == SearchType.WILDCARD) {
+							foundInThisRun = true;
+							break;
+						} else if (arrayToSearch[wordStart + searchCodeBytes.length] == '\t' ||
+								arrayToSearch[wordStart + searchCodeBytes.length] == '\n') {
+							foundInThisRun = true;
+							break;
+						}
+					} else {
+						lastNewLine = endIndex - i;
 					}
-				} else {
-					lastNewLine = endIndex;
 				}
 			}
+			if (foundAWord && !foundInThisRun) {
+				return lastNewLine;
+			} else {
+				start = endIndex;
+			}
 		}
-		arrayToSearch = null;
-		if (foundAWord && !foundInThisRun) {
-			return endIndex == start ? start : lastNewLine;
-		} else {
-			return scanForward(searchCodeBytes, endIndex, s);
-		}
+		return start;
 	}
 
 	String search(String searchCode) {
@@ -521,20 +523,20 @@ public class BinarySearchFile implements AutoCloseable {
 				long chunkEnd = (i == Constants.numThreads) ? length : nextNewLine(secondLine + (chunkSize * i), length);
 				long chunkStart = nextNewLine((secondLine + (chunkSize * (i - 1))), chunkEnd);
 				chunks.addAll(readChunk(chunkStart, chunkEnd, xs));
-				
+
 				if (Constants.DEBUG_MODE) {
 					Util.out("Finished chunk: " + (i - 1) + " of: " + Constants.numThreads);
 				}
-				
+
 			}
 		}
 		catch (IOException e) {
 			Util.err("ERROR: readChunks could not read the file.");
 		}
-		
+
 		if (Constants.DEBUG_MODE)
 			Util.out("Finished Reading");
-		
+
 		return chunks;
 	}
 
@@ -683,7 +685,7 @@ public class BinarySearchFile implements AutoCloseable {
 		}
 		return 0;
 	}
-	
+
 	int compare(byte[] a, byte[] b, int bIndex) {
 		return jCompare(a, b, bIndex);
 	}
