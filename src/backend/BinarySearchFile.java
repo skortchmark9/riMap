@@ -24,8 +24,6 @@ public class BinarySearchFile implements AutoCloseable {
 	HashMap<String, Integer> parsePattern;
 	LineMap newLines;
 	String sortingCol;
-	int bufferLength = Constants.BufferLength;
-	int tabBufferLength = Constants.TabBufferLength;
 	int numCalls;
 	long length;
 	public enum SearchType {WILDCARD, DEFAULT}
@@ -44,7 +42,7 @@ public class BinarySearchFile implements AutoCloseable {
 			raf = new RandomAccessFile(filePath, "r");				
 		} catch(FileNotFoundException ex) {
 			System.out.println("ERROR: Unable to open file '" + filePath + "'");
-			System.exit(1);
+			throw ex;
 		}
 		this.sortingCol = sortingCol;
 		newLines = new LineMap();
@@ -187,10 +185,10 @@ public class BinarySearchFile implements AutoCloseable {
 		while (start > 0) {
 			byte[] arrayToSearch;
 			int arraySize;
-			if (start < bufferLength)
+			if (start < Constants.BufferLength)
 				arraySize = (int) (start); //If there isn't enough space at the top of the file.
 			else
-				arraySize = bufferLength;
+				arraySize = Constants.BufferLength;
 			arrayToSearch = new byte[arraySize];
 			long startIndex = start - arraySize;
 			raf.seek(startIndex);
@@ -275,11 +273,11 @@ public class BinarySearchFile implements AutoCloseable {
 		while (start < length) {
 			byte[] arrayToSearch;
 			int arraySize;
-			if ((length - start) < bufferLength) {
+			if ((length - start) < Constants.BufferLength) {
 				arraySize = (int) (length - start);
 			}
 			else {
-				arraySize = bufferLength;
+				arraySize = Constants.BufferLength;
 			}
 			arrayToSearch = new byte[arraySize];
 			long endIndex = start + arraySize;
@@ -475,11 +473,11 @@ public class BinarySearchFile implements AutoCloseable {
 		int tabsFound = 0;
 		byte[] arrayToSearch;
 		int arraySize;
-		if ((end - start) < tabBufferLength) {
+		if ((end - start) < Constants.TabBufferLength) {
 			arraySize = (int) (end - start);
 		}
 		else {
-			arraySize = tabBufferLength;
+			arraySize = Constants.TabBufferLength;
 		}
 		if (arraySize < 0) {
 			System.out.println("HER");
@@ -583,11 +581,11 @@ public class BinarySearchFile implements AutoCloseable {
 		raf.seek(start);
 		byte[] arrayToSearch;
 		int arraySize;
-		if ((end - start) < bufferLength) {
+		if ((end - start) < Constants.BufferLength) {
 			arraySize = (int) (end - start);
 		}
 		else {
-			arraySize = bufferLength;
+			arraySize = Constants.BufferLength;
 		}
 		arrayToSearch = new byte[arraySize];
 		raf.read(arrayToSearch);
@@ -626,11 +624,11 @@ public class BinarySearchFile implements AutoCloseable {
 		}
 		byte[] arrayToSearch;
 		int arraySize;
-		if ((start - beginning) < bufferLength) {
+		if ((start - beginning) < Constants.BufferLength) {
 			arraySize = (int) (start - beginning);
 		}
 		else {
-			arraySize = bufferLength;
+			arraySize = Constants.BufferLength;
 		}
 		arrayToSearch = new byte[arraySize];
 		raf.seek(start - arraySize);
