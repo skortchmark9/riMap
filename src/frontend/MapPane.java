@@ -425,11 +425,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			double oldLon = Corners.topLeft[1];
 			
 			Corners.reposition(newLat, newLon); //reposition all corners with new coords
-			if (Corners.topLeft[0] > Constants.MAXIMUM_LATITUDE || Corners.bottomLeft[0] < Constants.MINIMUM_LATITUDE ||
-					Corners.topLeft[1] < Constants.MINIMUM_LONGITUDE || Corners.topRight[1] > Constants.MAXIMUM_LONGITUDE) {
-				return;
-			}
-			
+		
 			
 			startP = e.getPoint(); //re-define start p
 			

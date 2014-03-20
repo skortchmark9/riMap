@@ -77,13 +77,19 @@ public class Frontend implements ActionListener {
 		searchButtonsPanel.add(bottomButtonPanel);
 		searchButtonsPanel.add(calcStreetNames);
 		
-		threadCount = new AtomicInteger(0);
+		JPanel sidePanel = new JPanel();
+		sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.PAGE_AXIS));
+		sidePanel.add(searchButtonsPanel);
 		getDirections = new JButton("GET DIRECTIONS");
 		getDirections.addActionListener(this);
-		frame.add(searchButtonsPanel, BorderLayout.SOUTH);
+		sidePanel.add(getDirections);
+		sidePanel.setBackground(Color.BLACK);
+		sidePanel.setOpaque(true);
+		
+		threadCount = new AtomicInteger(0);
+		frame.add(sidePanel, BorderLayout.WEST);
 		map = new MapPane(b);
-		frame.add(map);
-		frame.add(getDirections);
+		frame.add(map, BorderLayout.CENTER);
 		frame.pack();
 		frame.setVisible(true);
 	}
@@ -140,7 +146,6 @@ public class Frontend implements ActionListener {
 				box3.setBackground(Color.WHITE);
 				box4.setBackground(Color.WHITE);
 				map.setPoints(sourceNode, sourceNode);
-				frame.setCursor(busyCursor);
 				new PathFindingThread(sourceNode, endNode).start();
 			}
 		}
@@ -156,6 +161,7 @@ public class Frontend implements ActionListener {
 
 		@Override
 		public void run() {
+			
 			if (Constants.DEBUG_MODE) {
 				Util.out("Starting new PathFindingThread:");
 				Util.out("Source:", start.toString());
@@ -171,7 +177,6 @@ public class Frontend implements ActionListener {
 					Util.out("WAYS FOUND:", ways);
 				map.setCalculatedRoute(ways);
 				map.repaint();
-				frame.setCursor(defaultCursor);
 			}
 		}
 	}
