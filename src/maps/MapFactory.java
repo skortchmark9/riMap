@@ -72,7 +72,9 @@ public class MapFactory {
 	}
 	
 	public static void getNumWays() {
+		if (Constants.DEBUG_MODE) {
 		Util.out(ways.size());
+		}
 	}
 
 	public static synchronized List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
