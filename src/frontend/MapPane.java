@@ -450,7 +450,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			clearRoute();
 			repaint();
 		}
-		
 	}
 	
 	public Node getStart() {
@@ -459,6 +458,16 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	
 	public Node getEnd() {
 		return target.node;
+	}
+	
+	public boolean hasPoints() {
+		return source != null && target != null;
+	}
+	
+	public void setPoints(Node start, Node end) {
+		source = new ClickNeighbor(start);
+		target = new ClickNeighbor(end);
+		repaint();
 	}
 
 
@@ -553,6 +562,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			double[] geoCoords = pixel2geo(x,y);
 			KDStub p = new KDStub(geoCoords[0], geoCoords[1]);
 			node = b.getNearestNeighbors(1, p).get(0);
+			screenCoords = geo2pixel(node.getCoordinates());
+		}
+		
+		private ClickNeighbor(Node n) {
 			screenCoords = geo2pixel(node.getCoordinates());
 		}
 		

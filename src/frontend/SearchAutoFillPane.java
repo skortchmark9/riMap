@@ -46,12 +46,14 @@ public class SearchAutoFillPane extends JPanel {
 		name = new JLabel(paneName);
 		this.add(name, BorderLayout.NORTH);
 		this.b = b;
-		setBackground(Color.PINK);
 		searchTableModel = new DefaultTableModel();
+		searchField = new JTextField(10);
+		searchField.getInputMap().put(KeyStroke.getKeyStroke("pressed UP"), "nothing");
+		searchField.getInputMap().put(KeyStroke.getKeyStroke("pressed DOWN"), "nothing");
 
 		rowSorter = new TableRowSorter<DefaultTableModel>(searchTableModel);
 		searchTable = new JTable(searchTableModel);
-		searchTable.setPreferredSize(new Dimension(300, 80));
+		searchTable.setPreferredSize(new Dimension(searchField.getPreferredSize().width - 8, 80));
 		searchTable.setFillsViewportHeight(true);
 		searchTable.getColumnModel().setColumnSelectionAllowed(false);
 		searchTable.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
@@ -59,9 +61,6 @@ public class SearchAutoFillPane extends JPanel {
 		searchTable.setGridColor(Color.WHITE);
 		searchTable.setEnabled(false);
 
-		searchField = new JTextField(25);
-		searchField.getInputMap().put(KeyStroke.getKeyStroke("pressed UP"), "nothing");
-		searchField.getInputMap().put(KeyStroke.getKeyStroke("pressed DOWN"), "nothing");
 
 		searchField.addFocusListener(new FocusListener() {
 		    @Override
@@ -171,10 +170,12 @@ public class SearchAutoFillPane extends JPanel {
 		popup.setVisible(false);
 		popup.setBorder(BorderFactory.createEmptyBorder());
 
-		this.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 		this.add(searchField, BorderLayout.CENTER);
-		this.setPreferredSize(new Dimension(500, 40));
 
+	}
+	
+	public String getText() {
+		return searchField.getText();
 	}
 
 	private final void newFilter() {
@@ -205,7 +206,8 @@ public class SearchAutoFillPane extends JPanel {
 			initTableModel();
 			if(!popup.isVisible()) { 
 				Rectangle r = searchField.getBounds();
-				popup.show(searchField, (r.x), (r.y+16));
+				
+				popup.show(searchField, 0 + 4, (r.y+16));
 				popup.setVisible(true);
 			}
 

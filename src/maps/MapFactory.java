@@ -25,8 +25,8 @@ import backend.Util;
  */
 public class MapFactory {
 	
-	private static ConcurrentHashMap<String, Node> nodes = new ConcurrentHashMap<>();
-	private static ConcurrentHashMap<String, Way> ways = new ConcurrentHashMap<>();
+	private static ConcurrentHashMap<String, Node> nodes = new ConcurrentHashMap<>(65000);
+	private static ConcurrentHashMap<String, Way> ways = new ConcurrentHashMap<>(35000);
 	
 	public static Way createWay(String wayID) {
 		Way possibleWay= ways.get(wayID);
@@ -74,7 +74,13 @@ public class MapFactory {
 	
 	public static void getNumWays() {
 		if (Constants.DEBUG_MODE) {
-		Util.out(ways.size());
+		Util.out("Num Ways", ways.size());
+		}
+	}
+	
+	public static void getNumNodes() {
+		if (Constants.DEBUG_MODE) {
+		Util.out("Num Nodes", nodes.size());
 		}
 	}
 
