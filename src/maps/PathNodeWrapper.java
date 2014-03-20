@@ -11,7 +11,6 @@ public class PathNodeWrapper implements PathNode<Node> {
 	private double distance = Double.POSITIVE_INFINITY;
 	private double aStarDistance = Double.POSITIVE_INFINITY;
 	
-	//NOTE: Eclipse gives compile errors when the map has PathNodes.
 	private Map<String, Edge<? extends PathNode<Node>>> neighbors;
 	private PathNode<Node> previous;
 	

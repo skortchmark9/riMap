@@ -1,4 +1,5 @@
 package frontend;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -11,7 +12,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -36,9 +37,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private static double scale = 1.0;
 	private static final int PIXEL_WIDTH = 700;
 	private static final int PIXEL_HEIGHT = 700;
-	//private List<Node> startLocs;
-	//private List<Node> endLocs;
-	private List<Way> renderedWays;
+	private List<Way> renderedWays, calculatedRoute;
 	private ClickNeighbor source;
 	private ClickNeighbor target;
 	private Backend b;
@@ -68,6 +67,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		source = null;
 		target = null;
 		renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
+		calculatedRoute = new LinkedList<>();
 		if (Constants.DEBUG_MODE) {
 			Util.out("Finished - Got All Ways in range", "(Elapsed:", Util.lap() +")");
 		}
@@ -85,6 +85,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		
 		//Render Ways
 		g2d.setColor(Color.WHITE);
+		g2d.setStroke(new BasicStroke(1));
 		for (Way way : renderedWays) {
 			if (way != null) {
 				int[] start = geo2pixel(way.getStart().getCoordinates());
@@ -99,6 +100,21 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			}
 		}
 		
+		g2d.setColor(Color.BLUE);
+		g2d.setStroke(new BasicStroke(3));		
+		for (Way way : calculatedRoute) {
+			if (way != null) {
+				int[] start = geo2pixel(way.getStart().getCoordinates());
+				int[] end = geo2pixel(way.getTarget().getValue().getCoordinates());
+				
+				if (Constants.DEBUG_MODE) {
+					//Util.out("Start point:", "("+start[0]+",", start[1]+")");
+					//Util.out("End point:", "("+end[0]+",", end[1]+")");
+				}
+				g2d.drawLine(start[0], start[1], end[0], end[1]);
+			}
+		}
+		
 		//Render Click Points
 		if (source != null) {
 			
@@ -106,7 +122,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				Util.out("Point A:", "("+source.screenCoords[0]+",", source.screenCoords[1]+")");
 				Util.out("Node ways:", source.node.getWayIDs());
 			}
-			
+			g2d.setStroke(new BasicStroke(1));		
 			g2d.setColor(Color.GREEN);
 			g2d.drawOval(source.screenCoords[0] - 5, source.screenCoords[1] - 5, 10, 10);
 		}
@@ -116,7 +132,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				Util.out("Point B:", "("+target.screenCoords[0]+",", target.screenCoords[1]+")");
 				Util.out("Node ways:", target.node.getWayIDs());
 			}
-			
+			g2d.setStroke(new BasicStroke(1));		
 			g2d.setColor(Color.RED);
 			g2d.drawOval(target.screenCoords[0] - 5, target.screenCoords[1] - 5, 10, 10);
 		}
@@ -163,6 +179,19 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		double lat = Corners.topLeft[0] - latOffset;
 		double lon = Corners.topLeft[1] + lonOffset;
 		return new double[]{lat,lon};
+	}
+	
+	
+	/**
+	 * Sets the calculated route to be drawn over the map.
+	 * @param route - the list of ways to be drawn.
+	 */
+	public void setCalculatedRoute(List<Way> route) {
+		calculatedRoute = route;
+	}
+	
+	public void clearRoute() {
+		calculatedRoute = new LinkedList<>();
 	}
 	
 	
@@ -416,18 +445,22 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				target = new ClickNeighbor(e.getX(), e.getY());
 				clickSwitch = true;
 			}
+			clearRoute();
 			repaint();
 		}
 		
 	}
-
-
-	void parseWay(String way) {
-		String[] locs = Constants.tab.split(way);
-//		startLocs.add(new PathNode(Double.parseDouble(locs[0]), Double.parseDouble(locs[1])));
-//		endLocs.add(new PathNode(Double.parseDouble(locs[2]), Double.parseDouble(locs[3])));
+	
+	public Node getStart() {
+		return source.node;
 	}
 	
+	public Node getEnd() {
+		return target.node;
+	}
+
+
+
 	/**
 	 * A class containing the latitude and longitude coordinates
 	 * of all 4 corners of the map view. Each corner is represented
