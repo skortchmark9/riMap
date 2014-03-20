@@ -118,35 +118,10 @@ public class Frontend implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == getDirections) {
-			if (map.hasPoints()) {
-			new PathFindingThread(map.getStart(), map.getEnd()).start();
-			} else {
-				//TODO Message box for communicating with user?
-			}
-		} else if (e.getSource() == calcStreetNames) {
-			String xs1a = box1.getText();
-			String xs2a = box2.getText();
-			String xs1b = box3.getText();
-			String xs2b = box4.getText();
-			Node sourceNode = MapFactory.createIntersection(xs1a, xs2a);
-			Node endNode = MapFactory.createIntersection(xs1b, xs2b);
-
-			if (sourceNode == null || endNode == null) {				
-			if (sourceNode == null) {
-				box1.setBackground(Color.RED);
-				box2.setBackground(Color.RED);
-			}
-			if (endNode == null) {
-				box3.setBackground(Color.RED);
-				box4.setBackground(Color.RED);
-			}
-			} else {
-				box1.setBackground(Color.WHITE);
-				box2.setBackground(Color.WHITE);
-				box3.setBackground(Color.WHITE);
-				box4.setBackground(Color.WHITE);
-				map.setPoints(sourceNode, sourceNode);
-				new PathFindingThread(sourceNode, endNode).start();
+			Node start = map.getStart();
+			Node end = map.getEnd();
+			if (start != null && end != null) {
+				new PathFindingThread(start, end).start();
 			}
 		}
 	}
@@ -154,6 +129,7 @@ public class Frontend implements ActionListener {
 	private class PathFindingThread extends Thread {
 		private int numberID;
 		private Node start, end;
+		
 		private PathFindingThread(Node start, Node end) {
 			this.start = start;
 			this.end = end;

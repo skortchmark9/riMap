@@ -39,9 +39,9 @@ public class AutoCorrectDemo {
 				frame.setLayout(new FlowLayout());
 				Backend b = null;
 				try {
-					String arg1 = "/Users/samkortchmar/Documents/Brown/Semester IV/CS032/Projects/CS032_Maps/data/mapsfiles/ways.tsv";
-					String arg2	= "/Users/samkortchmar/Documents/Brown/Semester IV/CS032/Projects/CS032_Maps/data/mapsfiles/nodes.tsv";
-					String arg3 = "/Users/samkortchmar/Documents/Brown/Semester IV/CS032/Projects/CS032_Maps/data/mapsfiles/index.tsv";
+					String arg1 = "./data/mapsfiles/ways.tsv";
+					String arg2	= "./data/mapsfiles/nodes.tsv";
+					String arg3 = "./data/mapsfiles/index.tsv";
 					b = new Backend(new String[] {arg1, arg2, arg3}, BackendType.AC);
 	           } catch (IOException e) {
 					e.printStackTrace();
