@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -24,8 +25,8 @@ import backend.Util;
  */
 public class MapFactory {
 	
-	private static HashMap<String, Node> nodes = new HashMap<>();
-	private static HashMap<String, Way> ways = new HashMap<>();
+	private static ConcurrentHashMap<String, Node> nodes = new ConcurrentHashMap<>();
+	private static ConcurrentHashMap<String, Way> ways = new ConcurrentHashMap<>();
 	
 	public static Way createWay(String wayID) {
 		Way possibleWay= ways.get(wayID);
@@ -63,6 +64,7 @@ public class MapFactory {
 				resultWay = createWay(wayID, name, startNode, new PathNodeWrapper(endNode));
 			}
 			if (resultWay != null)
+				
 				ways.put(wayID, resultWay);
 			else
 				return null;
