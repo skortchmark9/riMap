@@ -5,6 +5,7 @@ package backend;
 
 import java.text.DecimalFormat;
 
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 /**
@@ -14,7 +15,7 @@ import javax.swing.JTextField;
 public class Util {
 	
 	private static long START = 0;
-	private static JTextField msgBox;
+	private static JTextArea msgBox;
 	
 	/**
 	 * Better than System.out.println. Prints any number of things in a line to STDOUT.
@@ -126,15 +127,14 @@ public class Util {
 		return false;
 	}
 
-	public static void setGUIMessageBox(JTextField msgBox) {
-		Util.msgBox = msgBox;
+	public static void setGUIMessageBox(JTextArea msgBox2) {
+		Util.msgBox = msgBox2;
 	}
 	
 	public static void guiMessage(String str) {
 		if (msgBox == null) return;
 		str += "\n";
-		String curr = msgBox.getText();
-		msgBox.setText(curr + str);
+		msgBox.append(str);
 	}
 	
 }

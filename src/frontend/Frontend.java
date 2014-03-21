@@ -19,6 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import maps.Node;
@@ -32,7 +33,7 @@ public class Frontend implements ActionListener {
 	SearchAutoFillPane box1, box2, box3, box4;
 	JButton getDirections, calcStreetNames, clearPoints;
 	JLabel start, end;
-	JTextField msgBox;
+	JTextArea msgBox;
 	JFrame frame;
 	MapPane map;
 	Backend b;
@@ -91,15 +92,17 @@ public class Frontend implements ActionListener {
 		clearPoints.addActionListener(this);
 		sidePanel.add(clearPoints);
 		
-		msgBox = new JTextField();
+		msgBox = new JTextArea();
 		msgBox.setEditable(false);
 		msgBox.setPreferredSize(new Dimension(100, 50));
 		Util.setGUIMessageBox(msgBox);
-		sidePanel.add(new JScrollPane(msgBox));
+		msgBox.setOpaque(false);
+		sidePanel.add(new JScrollPane(msgBox, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 		Util.guiMessage("Hi!");
+		Util.guiMessage("Hada!");
 		Util.guiMessage("Hi!");
-		Util.guiMessage("Hi!");
-		Util.guiMessage("Hi!");
+		Util.guiMessage("asad!");
+		Util.guiMessage("kjshdfks");
 		
 		
 		sidePanel.setBackground(Color.BLACK);
