@@ -573,11 +573,14 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	
 	/**
 	 * Clears the points on the screen which
-	 * were created by clicking the map.
+	 * were created by clicking the map, then clears
+	 * the route (if it's painted)
 	 */
 	void clearClickPoints() {
 		source = null;
 		target = null;
+		clickSwitch = true;
+		clearRoute();
 		this.repaint();
 	}
 	

@@ -2,23 +2,14 @@ package frontend;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
-import java.awt.Toolkit;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -27,6 +18,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 
 import maps.Node;
 import maps.Way;
@@ -39,6 +32,7 @@ public class Frontend implements ActionListener {
 	SearchAutoFillPane box1, box2, box3, box4;
 	JButton getDirections, calcStreetNames, clearPoints;
 	JLabel start, end;
+	JTextField msgBox;
 	JFrame frame;
 	MapPane map;
 	Backend b;
@@ -88,10 +82,26 @@ public class Frontend implements ActionListener {
 		JPanel sidePanel = new JPanel();
 		sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.PAGE_AXIS));
 		sidePanel.add(searchButtonsPanel);
-		getDirections = new JButton("GET DIRECTIONS");
 		
+		getDirections = new JButton("GET DIRECTIONS");
 		getDirections.addActionListener(this);
 		sidePanel.add(getDirections);
+		
+		clearPoints = new JButton("CLEAR POINTS ON MAP");
+		clearPoints.addActionListener(this);
+		sidePanel.add(clearPoints);
+		
+		msgBox = new JTextField();
+		msgBox.setEditable(false);
+		msgBox.setPreferredSize(new Dimension(100, 50));
+		Util.setGUIMessageBox(msgBox);
+		sidePanel.add(new JScrollPane(msgBox));
+		Util.guiMessage("Hi!");
+		Util.guiMessage("Hi!");
+		Util.guiMessage("Hi!");
+		Util.guiMessage("Hi!");
+		
+		
 		sidePanel.setBackground(Color.BLACK);
 		sidePanel.setOpaque(true);
 		
@@ -123,6 +133,8 @@ public class Frontend implements ActionListener {
 					Util.out("ERROR: the search timed out - try again with more time?");
 				}
 			}
+		} else if (e.getSource() == clearPoints) {
+			map.clearClickPoints();
 		}
 	}
 

@@ -5,6 +5,8 @@ package backend;
 
 import java.text.DecimalFormat;
 
+import javax.swing.JTextField;
+
 /**
  * @author emc3
  *
@@ -12,6 +14,7 @@ import java.text.DecimalFormat;
 public class Util {
 	
 	private static long START = 0;
+	private static JTextField msgBox;
 	
 	/**
 	 * Better than System.out.println. Prints any number of things in a line to STDOUT.
@@ -121,6 +124,17 @@ public class Util {
 				|| Constants.MINIMUM_LONGITUDE >= minLon || Constants.MAXIMUM_LONGITUDE <= maxLon)
 			return true;
 		return false;
+	}
+
+	public static void setGUIMessageBox(JTextField msgBox) {
+		Util.msgBox = msgBox;
+	}
+	
+	public static void guiMessage(String str) {
+		if (msgBox == null) return;
+		str += "\n";
+		String curr = msgBox.getText();
+		msgBox.setText(curr + str);
 	}
 	
 }
