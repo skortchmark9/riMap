@@ -12,6 +12,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -644,6 +645,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		 * @param n - the existing node to wrap in this ClickNeighbor
 		 */
 		private ClickNeighbor(Node n) {
+			this.node = n;
 			screenCoords = geo2pixel(node.getCoordinates());
 		}
 		

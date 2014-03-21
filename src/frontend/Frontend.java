@@ -22,6 +22,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import com.sun.org.apache.bcel.internal.generic.IfInstruction;
+
 import maps.MapFactory;
 import maps.Node;
 import maps.Way;
@@ -30,6 +32,14 @@ import backend.Constants;
 import backend.PathWayRequester;
 import backend.Util;
 
+/**
+ * A Class representing the Front-end of the maps program.
+ * creates a JFrame and a few JPanels and interfaces between 
+ * these buttons and the backend. Also makes some calls to 
+ * update the map based on user input.
+ * 
+ * @author skortchm / emc3
+ */
 public class Frontend implements ActionListener {
 	SearchAutoFillPane box1, box2, box3, box4;
 	JButton getDirections, calcStreetNames, clearPoints;
@@ -43,57 +53,79 @@ public class Frontend implements ActionListener {
 	final Cursor busyCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 	PathWayRequester pwRequester;
 
+	/**
+	 * Main constructor.<br>
+	 * Creates a new JFrame and initializes the map inside of that.
+	 * Also puts a few buttons on the screen.
+	 * @param b - the backend which drives the Maps application
+	 */
 	public Frontend(Backend b) {
-		this.b = b;
+		this.b = b; //set backend reference
+		
+		//JFrame init
 		frame = new JFrame("MAPS");
 		frame.setTitle("MAPS - By Samuel Kortchmar and Eli Martinez Cohen");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		frame.setLayout(new FlowLayout());
 		frame.getContentPane().setBackground(Color.BLACK);
+		
+		//pwRequester handles requests to the backend for shortes path searches.
 		pwRequester = new PathWayRequester(b);		
 
-		calcStreetNames = new JButton("Calculate from cross-streets");
-		calcStreetNames.addActionListener(this);
-
+		//Some panels to hold our buttons and search boxes
 		JPanel searchButtonsPanel = new JPanel();
-		searchButtonsPanel.setLayout(new BoxLayout(searchButtonsPanel, BoxLayout.PAGE_AXIS));
 		JPanel topButtonPanel = new JPanel();
 		JPanel bottomButtonPanel = new JPanel();
+		
+		//layouts
+		searchButtonsPanel.setLayout(new BoxLayout(searchButtonsPanel, BoxLayout.PAGE_AXIS));
+		topButtonPanel.setLayout(new BoxLayout(topButtonPanel, BoxLayout.LINE_AXIS));
+		bottomButtonPanel.setLayout(new BoxLayout(bottomButtonPanel, BoxLayout.LINE_AXIS));	
+		
+		
+		//Button for text input boxes (find directions by street names)
+		calcStreetNames = new JButton("Calculate from cross-streets");
+		calcStreetNames.addActionListener(this);
+		
+		//search boxes
 		box1 = new SearchAutoFillPane(b, "Cross Street 1");
 		box2 = new SearchAutoFillPane(b, "Cross Street 2");
 		box3 = new SearchAutoFillPane(b, "Cross Street 1");
 		box4 = new SearchAutoFillPane(b, "Cross Street 2");
-		topButtonPanel.setLayout(new BoxLayout(topButtonPanel, BoxLayout.LINE_AXIS));
+		
+		//Labels for search panel
 		start = new JLabel("Start: ");
 		start.setFont(new Font("Sans-Serif", Font.ITALIC, 16));
-
-		topButtonPanel.add(start);
-		topButtonPanel.add(box1);
-		topButtonPanel.add(box2);
-		bottomButtonPanel.setLayout(new BoxLayout(bottomButtonPanel, BoxLayout.LINE_AXIS));		
 		end = new JLabel("  End: ");
 		end.setFont(new Font("Sans-Serif", Font.ITALIC, 16));
 
+		//Add shit to GUI
 		bottomButtonPanel.add(end);
 		bottomButtonPanel.add(box3);
 		bottomButtonPanel.add(box4);
 		searchButtonsPanel.add(topButtonPanel);
 		searchButtonsPanel.add(bottomButtonPanel);
 		searchButtonsPanel.add(calcStreetNames);
+		topButtonPanel.add(start);
+		topButtonPanel.add(box1);
+		topButtonPanel.add(box2);
 
+		//one last panel
 		JPanel sidePanel = new JPanel();
 		sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.PAGE_AXIS));
-		sidePanel.add(searchButtonsPanel);
-
+		
 		getDirections = new JButton("GET DIRECTIONS");
 		getDirections.addActionListener(this);
-		sidePanel.add(getDirections);
 
 		clearPoints = new JButton("CLEAR POINTS ON MAP");
 		clearPoints.addActionListener(this);
-		sidePanel.add(clearPoints);
 
+		sidePanel.add(searchButtonsPanel);
+		sidePanel.add(getDirections);
+		sidePanel.add(clearPoints);
+		
+		//message box to print messages to the user
 		msgBox = new JTextArea();
 		msgBox.setEditable(false);
 		msgBox.setPreferredSize(new Dimension(100, 400));
@@ -108,15 +140,23 @@ public class Frontend implements ActionListener {
 		sidePanel.setOpaque(true);
 
 		threadCount = new AtomicInteger(0);
-		frame.add(sidePanel, BorderLayout.WEST);
+		
+		//Create a new map!
 		map = new MapPane(b);
+		
+		//add panels to Frame
+		frame.add(sidePanel, BorderLayout.WEST);
 		frame.add(map, BorderLayout.CENTER);
 		frame.pack();
 		frame.setVisible(true);
 	}
-
+	
+	/**
+	 * Handles the various buttons' actions from the GUI
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		//Get Directions from the Screen points (defined by clicking)
 		if (e.getSource() == getDirections) {
 			if (map.hasPoints()) {
 				Node start = map.getStart();
@@ -134,9 +174,15 @@ public class Frontend implements ActionListener {
 					Util.guiMessage("ERROR: the search timed out - try again with more time?");
 				}
 			}
-		} else if (e.getSource() == clearPoints) {
+		} 
+		
+		//clear onscreen points
+		else if (e.getSource() == clearPoints) {
 			map.clearClickPoints();
-		} else if (e.getSource() == calcStreetNames) {
+		} 
+		
+		//Calculate path from inputed street names
+		else if (e.getSource() == calcStreetNames) {
 			String xs1S = box1.getText();
 			String xs2S = box2.getText();
 			String xs1E = box3.getText();
@@ -148,11 +194,15 @@ public class Frontend implements ActionListener {
 				return;
 			}
 			if (dest == null) {
-				Util.guiMessage("Could not find intersection of: " + xs1S + " and " +  xs2S);
+				Util.guiMessage("Could not find intersection of: " + xs1E + " and " +  xs2E);
 				return;
 			}
 			List<Way> wayList;
-			map.setPoints(source, dest);
+			if (Constants.DEBUG_MODE) {
+				Util.out("Get Directions Between:");
+				Util.out(source.toString(), "\n", dest.toString());
+			}
+			map.setPoints(source, dest); //draw points to map
 			try {
 				wayList = pwRequester.getWays(source, dest, 5);
 				map.clearRoute();
