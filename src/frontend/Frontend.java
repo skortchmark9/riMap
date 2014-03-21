@@ -43,9 +43,10 @@ public class Frontend implements ActionListener {
 	final Cursor busyCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 	PathWayRequester pwRequester;
 
-	Frontend(Backend b) {
+	public Frontend(Backend b) {
 		this.b = b;
 		frame = new JFrame("MAPS");
+		frame.setTitle("MAPS - By Samuel Kortchmar and Eli Martinez Cohen");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		frame.setLayout(new FlowLayout());

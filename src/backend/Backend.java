@@ -2,24 +2,20 @@ package backend;
 
 import graph.Edge;
 import graph.PathFinder;
-import graph.PathNode;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import kdtree.KDStub;
 import kdtree.KDTree;
 import kdtree.KDimensionable;
-import backend.BinarySearchFile.SearchType;
-import autocorrect.Engine;
-import autocorrect.RadixTree;
 import maps.MapFactory;
 import maps.Node;
 import maps.PathNodeWrapper;
 import maps.Way;
+import autocorrect.Engine;
+import autocorrect.RadixTree;
 
 public class Backend {
 
@@ -30,9 +26,8 @@ public class Backend {
 	public Backend(String[] args, BackendType...ts) throws IOException {
 		if (args.length != 3) {
 			Util.err("ERROR: Incorrect number of resources");
-			System.exit(1);
+			throw new IOException();
 		}
-
 		try {
 			new Resources(args[0], args[1], args[2]);
 		} catch (IOException e) {

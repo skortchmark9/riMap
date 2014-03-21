@@ -11,7 +11,7 @@ public class MapsCLI implements Runnable{
 	
 	Backend b;
 
-	MapsCLI(Backend b) {
+	public MapsCLI(Backend b) {
 		this.b = b;
 		run();
 	}

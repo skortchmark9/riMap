@@ -30,7 +30,7 @@ public class PathTester {
 		}
 		else {
 		PathFinder<PathNodeWrapper, Node> p = new PathFinder<PathNodeWrapper, Node>(new PathNodeWrapper(source), new PathNodeWrapper(dest));
-		p.getPath();
+		p.printPath();
 		}
 	}
 	
@@ -45,7 +45,6 @@ public class PathTester {
 		source = b.getNearestNeighbors(1, source).get(0);
 		dest = b.getNearestNeighbors(1, dest).get(0);
 	}
-	
 	
 	private void CLIParse(String s) {
 		List<String> matchList = new ArrayList<>(4);
