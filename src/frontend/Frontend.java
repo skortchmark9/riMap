@@ -37,7 +37,7 @@ import backend.Util;
 
 public class Frontend implements ActionListener {
 	SearchAutoFillPane box1, box2, box3, box4;
-	JButton getDirections, calcStreetNames;
+	JButton getDirections, calcStreetNames, clearPoints;
 	JLabel start, end;
 	JFrame frame;
 	MapPane map;
@@ -89,6 +89,7 @@ public class Frontend implements ActionListener {
 		sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.PAGE_AXIS));
 		sidePanel.add(searchButtonsPanel);
 		getDirections = new JButton("GET DIRECTIONS");
+		
 		getDirections.addActionListener(this);
 		sidePanel.add(getDirections);
 		sidePanel.setBackground(Color.BLACK);
@@ -106,10 +107,10 @@ public class Frontend implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == getDirections) {
-			Node start = map.getStart();
-			Node end = map.getEnd();
-			List<Way> wayList;
-			if (start != null && end != null) {
+			if (map.hasPoints()) {
+				Node start = map.getStart();
+				Node end = map.getEnd();
+				List<Way> wayList;
 				try {
 					wayList = pwRequester.getWays(start, end, 5);
 					map.clearRoute();
