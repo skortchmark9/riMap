@@ -49,7 +49,13 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private boolean clickSwitch = true;
 	private AtomicInteger threadCount;
 	private ExecutorService executor;
-
+	
+	/**
+	 * Construct a MapPane linked to the given backend.
+	 * The MapPane is responsible for drawing ways as 
+	 * well as zooming / panning over the map.
+	 * @param b - the backend to link to this MapPane.
+	 */
 	MapPane(Backend b)   {
 		this.b = b;
 		this.setBackground(Constants.MIDNIGHT);
@@ -78,8 +84,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		//new thread!
 		executor = Executors.newSingleThreadExecutor();
 		executor.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
-		//new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]).start();
-		//renderedWays = b.getWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
 		calculatedRoute = new LinkedList<>();
 		if (Constants.DEBUG_MODE) {
 			Util.out("Finished - Got All Ways in range", "(Elapsed:", Util.lap() +")");
@@ -220,6 +224,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		calculatedRoute = route;
 	}
 	
+	/**
+	 * Clear the currently painted "shortest route"
+	 * (the route referred to is the route found by Dijkstra's)
+	 */
 	public void clearRoute() {
 		calculatedRoute = new LinkedList<>();
 	}
@@ -227,8 +235,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	
 	/**
 	 * Converts a pixel length to a geo length
-	 * @param pixelOffset
+	 * @param pixelOffset - the length of the offset in pixels
 	 * @return
+	 * the length of the offset in lat/lon degrees
 	 */
 	public double pixelOffset2geoOffset(int pixelOffset) {
 			double pixelRatio = ((double) pixelOffset) / ((double) PIXEL_WIDTH);
@@ -293,9 +302,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	
 	/**
 	 * Zooms the map view out (unless we are at min zoom)
+	 * Also launches a new thread to get the new ways to paint 
 	 */
 	private void zoomOut() {
-		//only zoom out if we are before theshold
+		//only zoom out if we are before threshold
 		if (scale > Constants.MIN_ZOOM) {
 			double oldGeoWidth = Constants.GEO_DIMENSION_FACTOR / scale; //get the old width
 			scale *= 0.8; //decrement scale
@@ -315,16 +325,15 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			if (target != null)
 				target.recalibrate();
 			
-			this.repaint(); //repaint for responsiveness
-			
-			//get all new ways in new range 
-			new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]).start();
+			//get all new ways in new range
+			executor = Executors.newSingleThreadExecutor();
+			executor.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
 			this.repaint();
 		}
 	}
 	
 	/**
-	 * Zooms the map view in
+	 * Zooms the map view in (unless we are at max zoom)
 	 */
 	private void zoomIn() {
 		//only zoom in if we are before threshold
@@ -354,6 +363,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	
 	/**
 	 * Zooms the mouse in according to the current mouse position
+	 * (unless we are at max zoom)
 	 * @param mousePos - the mouse point to zoom in towards
 	 */
 	private void zoomIn(Point mousePos) {
@@ -382,6 +392,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	
 	/**
 	 * Zooms the map out according to the current mouse position 
+	 * (unless we are at min zoom)
 	 * @param mousePos - the mousePoint to zoom out from
 	 */
 	private void zoomOut(Point mousePos) {
@@ -405,12 +416,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			
 			//get all new ways in new range
 			executor.shutdownNow();
-//			try {
-//				executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
 			executor = Executors.newSingleThreadExecutor();
 			executor.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
 			//new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]).start();
@@ -437,7 +442,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 */
 	private class MouseHandler extends MouseAdapter {
 		
-		private Point startP;
+		private Point startP; //start point of dragging interactions
 		
 		@Override
 		public void mousePressed(MouseEvent e) {
@@ -447,7 +452,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		@Override
 		public void mouseDragged(MouseEvent e) {
 			Point p = e.getPoint();
-			double[] geoOffset = new double[]{pixelOffset2geoOffset(p.y - startP.y), pixelOffset2geoOffset(p.x - startP.x)};
 			//calculate new anchor point (top left lat/lon)
 			double newLat = Corners.topLeft[0] + pixelOffset2geoOffset(p.y - startP.y); 
 			double newLon = Corners.topLeft[1] - pixelOffset2geoOffset(p.x - startP.x);
@@ -488,19 +492,42 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	}
 	
 	
-	
+	/**
+	 * @return
+	 * the node stored at the green circle,
+	 * or the "start" click point.
+	 * This method may return null if no ClickNeighbor has
+	 * been created for the start node (i.e. if the start node was cleared).
+	 */
 	public Node getStart() {
 		return source.node;
 	}
 	
+	/**
+	 * @return
+	 * the node stored at the red circle,
+	 * or the "end" click point.
+	 * This method may return null if no ClickNeighbor has
+	 * been created for the start node (i.e. if the start node was cleared).
+	 */
 	public Node getEnd() {
 		return target.node;
 	}
 	
+	/**
+	 * @return
+	 * if both clickpoints have been defined on the map, i.e. both start and end have 
+	 * been created by clicking, this method returns true. false otherwise.
+	 */
 	public boolean hasPoints() {
 		return source != null && target != null;
 	}
 	
+	/**
+	 * Sets the click points on the map for painting
+	 * @param start - the start node to paint (green circle)
+	 * @param end - the end node to paint (red circle)
+	 */
 	public void setPoints(Node start, Node end) {
 		source = new ClickNeighbor(start);
 		target = new ClickNeighbor(end);
@@ -612,13 +639,17 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			screenCoords = geo2pixel(node.getCoordinates());
 		}
 		
+		/**
+		 * Construct a ClickNeighbor using an existing node.
+		 * @param n - the existing node to wrap in this ClickNeighbor
+		 */
 		private ClickNeighbor(Node n) {
 			screenCoords = geo2pixel(node.getCoordinates());
 		}
 		
 		/**
 		 * This method re-calibrates the screen coordinates 
-		 * after any translation 
+		 * after any translation. basically sets up the click neighbor for repainting.
 		 */
 		private void recalibrate() {
 			screenCoords = geo2pixel(node.getCoordinates()); 
@@ -626,11 +657,26 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		
 	}
 	
+	/**
+	 * Private class that extends thread
+	 * Basically queries the backend for ways in a given range.
+	 * @author emc3
+	 *
+	 */
 	private class WayGetter extends Thread {
-		double minLat, maxLat, minLon, maxLon;
-		int numberID;
+		double minLat, maxLat, minLon, maxLon; //the range to search in  for ways
+		int numberID; //the ID of this thread
 		
-		
+		/**
+		 * Default constructor.
+		 * Stores the range in which to search for ways 
+		 * (the backend is queried using this range in this class's run() method
+		 * 
+		 * @param minLat - minimum lat to search
+		 * @param maxLat - max lat to search
+		 * @param minLon - minimum lon to search
+		 * @param maxLon - max lon to search
+		 */
 		private WayGetter(double minLat, double maxLat, double minLon, double maxLon) {
 			this.minLat = minLat;
 			this.maxLat = maxLat;
@@ -638,6 +684,16 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			this.maxLon = maxLon;
 		}
 		
+		
+		/**
+		 * Queries the backend for ways within the given range.
+		 * The range is defined by the WayGetter() constructor's parameters.
+		 * This method also defines the object's number ID. This number
+		 * ID is used to ensure that only the most RECENTLY LAUNCHED THREAD
+		 * is used to defined the list of ways to render. This prevents the glitchy 
+		 * shit that happens when you have the render list being set to different
+		 * lists of ways in different ranges asynchronously. 
+		 */
 		@Override
 		public void run() {
 			if (Constants.DEBUG_MODE) {

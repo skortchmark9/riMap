@@ -152,6 +152,7 @@ public class Frontend implements ActionListener {
 				return;
 			}
 			List<Way> wayList;
+			map.setPoints(source, dest);
 			try {
 				wayList = pwRequester.getWays(source, dest, 5);
 				map.clearRoute();
