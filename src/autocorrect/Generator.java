@@ -25,7 +25,15 @@ public class Generator {
 		}
 	}
 
-
+	/**
+	 * Generates all suggestions for autocorrection - if the previous word is
+	 * not the empty string, then it filters out all suggestions whose bigram
+	 * probability is 0. 
+	 * @param previousWord - the previous word of input. 
+	 * @param currentWord - the current word of input.
+	 * @param rt - the radixTree. 
+	 * @return - the 
+	 */
 	public LinkedList<Suggestion> generateSuggestions(String previousWord, String currentWord, RadixTree rt) {
 		LinkedList<Suggestion> allSuggestions = new LinkedList<>();
 		if (this.prefix)
@@ -34,9 +42,6 @@ public class Generator {
 			allSuggestions.addAll(rt.whitespace(currentWord));
 
 		allSuggestions.addAll(rt.levenshtein(currentWord, this.led));
-		if (Constants.DEBUG_MODE) {
-			Util.out(allSuggestions.size());
-		}
 		if (previousWord.length() > 0) {
 			LinkedList<Suggestion> filteredSuggestions = new LinkedList<>();
 			for(Suggestion s : allSuggestions) {
