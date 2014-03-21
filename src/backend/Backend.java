@@ -60,8 +60,14 @@ public class Backend {
 			Util.out("Start KD Build");
 			Util.memLog();
 		}
-
-		kd = MapFactory.createKDTree();
+		
+		
+		try {
+			kd = MapFactory.createKDTree();
+		} catch (IOException e) {
+			Util.out("ERROR Loading KDTree from nodes file");
+			System.exit(1);
+		}
 
 		if (Constants.DEBUG_MODE) {
 			Util.out("Created KDTree from Node List", "(Elapsed:", Util.lap()+")");
@@ -70,9 +76,6 @@ public class Backend {
 		}
 	}
 	
-	private void initPathWayRequester() {
-		
-	}
 
 	private void initAutoCorrect() {
 		long start = 0; //XXX: FOR DEBUGGING
@@ -82,18 +85,23 @@ public class Backend {
 			Util.memLog();
 		}
 
-		RadixTree rt = MapFactory.createRadixTree();
-		if (rt.isEmpty()) {
-			Util.err("ERROR: Could not instantiate AutoCorrectEngine");
-			return;
-		} else {
-			if(Constants.DEBUG_MODE) Util.out("Done with radix tree. building engine...");
-			autoCorrectEngine = new Engine(Constants.defaultGenerator, Constants.defaultRanker, rt);
-			if(Constants.DEBUG_MODE) Util.out("Done.");
-		}
-		if (Constants.DEBUG_MODE) {
-			Util.out("End Autoc build (Total Elapsed:", Util.timeSince(start)+")");
-			Util.memLog();
+		RadixTree rt;
+		try {
+			rt = MapFactory.createRadixTree();
+			if (rt.isEmpty()) {
+				Util.err("ERROR: Could not instantiate AutoCorrectEngine");
+				return;
+			} else {
+				if(Constants.DEBUG_MODE) Util.out("Done with radix tree. building engine...");
+				autoCorrectEngine = new Engine(Constants.defaultGenerator, Constants.defaultRanker, rt);
+				if(Constants.DEBUG_MODE) Util.out("Done.");
+			}
+			if (Constants.DEBUG_MODE) {
+				Util.out("End Autoc build (Total Elapsed:", Util.timeSince(start)+")");
+				Util.memLog();
+			}
+		} catch (IOException e) {
+			Util.out("ERROR: Unable to load RadixTree from index file");
 		}
 	}
 
