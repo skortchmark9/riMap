@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import maps.MapFactory;
 import maps.Node;
 import maps.Way;
 import backend.Backend;
@@ -40,7 +41,7 @@ public class Frontend implements ActionListener {
 	final Cursor defaultCursor = Cursor.getDefaultCursor();
 	final Cursor busyCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 	PathWayRequester pwRequester;
-	
+
 	Frontend(Backend b) {
 		this.b = b;
 		frame = new JFrame("MAPS");
@@ -49,10 +50,10 @@ public class Frontend implements ActionListener {
 		frame.setLayout(new FlowLayout());
 		frame.getContentPane().setBackground(Color.BLACK);
 		pwRequester = new PathWayRequester(b);		
-		
+
 		calcStreetNames = new JButton("Calculate from cross-streets");
 		calcStreetNames.addActionListener(this);
-		
+
 		JPanel searchButtonsPanel = new JPanel();
 		searchButtonsPanel.setLayout(new BoxLayout(searchButtonsPanel, BoxLayout.PAGE_AXIS));
 		JPanel topButtonPanel = new JPanel();
@@ -78,19 +79,19 @@ public class Frontend implements ActionListener {
 		searchButtonsPanel.add(topButtonPanel);
 		searchButtonsPanel.add(bottomButtonPanel);
 		searchButtonsPanel.add(calcStreetNames);
-		
+
 		JPanel sidePanel = new JPanel();
 		sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.PAGE_AXIS));
 		sidePanel.add(searchButtonsPanel);
-		
+
 		getDirections = new JButton("GET DIRECTIONS");
 		getDirections.addActionListener(this);
 		sidePanel.add(getDirections);
-		
+
 		clearPoints = new JButton("CLEAR POINTS ON MAP");
 		clearPoints.addActionListener(this);
 		sidePanel.add(clearPoints);
-		
+
 		msgBox = new JTextField();
 		msgBox.setEditable(false);
 		msgBox.setPreferredSize(new Dimension(100, 50));
@@ -100,11 +101,11 @@ public class Frontend implements ActionListener {
 		Util.guiMessage("Hi!");
 		Util.guiMessage("Hi!");
 		Util.guiMessage("Hi!");
-		
-		
+
+
 		sidePanel.setBackground(Color.BLACK);
 		sidePanel.setOpaque(true);
-		
+
 		threadCount = new AtomicInteger(0);
 		frame.add(sidePanel, BorderLayout.WEST);
 		map = new MapPane(b);
@@ -130,15 +131,44 @@ public class Frontend implements ActionListener {
 					map.setCalculatedRoute(wayList);
 					map.repaint();
 				} catch (TimeoutException e1) {
-					Util.out("ERROR: the search timed out - try again with more time?");
+					Util.guiMessage("ERROR: the search timed out - try again with more time?");
 				}
 			}
 		} else if (e.getSource() == clearPoints) {
 			map.clearClickPoints();
+		} else if (e.getSource() == calcStreetNames) {
+			String xs1S = box1.getText();
+			String xs2S = box2.getText();
+			String xs1E = box3.getText();
+			String xs2E = box4.getText();
+			Node source = MapFactory.createIntersection(xs1S, xs2S);
+			Node dest = MapFactory.createIntersection(xs1E, xs2E);
+			if (source == null) {
+				Util.guiMessage("Could not find intersection of: " + xs1S + " and " +  xs2S);
+				return;
+			}
+			if (dest == null) {
+				Util.guiMessage("Could not find intersection of: " + xs1S + " and " +  xs2S);
+				return;
+			}
+			List<Way> wayList;
+			try {
+				wayList = pwRequester.getWays(source, dest, 5);
+				map.clearRoute();
+				if (wayList.size() == 0) {
+					Util.guiMessage("Could not find route between intersections");
+				}  else {
+					if (Constants.DEBUG_MODE) {
+						Util.out("WAYS FOUND:", wayList);
+					}
+					map.setCalculatedRoute(wayList);
+					map.repaint();
+				}
+			} catch (TimeoutException e1) {
+				Util.guiMessage("ERROR: the search timed out - try again with more time?");
+			}
 		}
 	}
-
-
 
 	public static void main(String[] args) {
 		try {
@@ -147,7 +177,7 @@ public class Frontend implements ActionListener {
 			String arg3 = "./data/mapsfiles/index.tsv";
 			Backend b = new Backend(new String[] {arg1, arg2, arg3});
 			new Frontend(b);
-       } catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
