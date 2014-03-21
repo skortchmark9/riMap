@@ -31,7 +31,6 @@ public class BinarySearchFileTest {
 	public void testSearchMultiples() {
 		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
 			List<List<String>> results = b.searchMultiples("10th Avenue", "name", "nodes");
-			System.out.println(results);
 			assertTrue(results.size() == 3);
 			for(List<String> list : results) {
 				assertTrue(list.get(0).equals("10th Avenue"));
@@ -100,24 +99,6 @@ public class BinarySearchFileTest {
 			assertTrue(false);
 		}
 	}
-
-	@Test
-	public void testDecimalDigitTest() {
-		double testValue = Constants.INITIAL_LAT;
-		assertTrue(84 == Util.decimalDigits(testValue, 2));
-		assertTrue(8 == Util.decimalDigits(testValue, 1));
-		assertTrue(0 == Util.decimalDigits(testValue, 0));
-		assertTrue(0 == Util.decimalDigits(testValue, -1));
-		testValue = Constants.INITIAL_LON;
-		assertTrue (-41 == Util.decimalDigits(testValue, 2));
-		assertTrue(-4 == Util.decimalDigits(testValue, 1));
-		assertTrue(0 == Util.decimalDigits(testValue, 0));
-		assertTrue(0 ==  Util.decimalDigits(testValue, -1));
-		testValue = -73.8000;
-		Util.out(Util.getFirst4Digits(testValue));
-		
-	}
-
 
 
 	@Test

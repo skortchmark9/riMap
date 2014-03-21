@@ -347,13 +347,11 @@ public class BinarySearchFile implements AutoCloseable {
 						long wordEnd = wordStart + searchCodeBytes.length;
 						long diff = wordEnd - arrayToSearch.length;
 						if (diff > 0) {
-							System.out.println("HERE");
 							byte[] extraArray = new byte[(int) diff];
 							raf.seek(wordStart);
 							raf.read(extraArray);
 							arrayToSearch = Util.concatByteArrays(arrayToSearch, extraArray);
 						}
-						Util.out(string(arrayToSearch));
 						int cmp = compare(searchCodeBytes, arrayToSearch, wordStart);
 						if (cmp == 0) {
 							start = lastNewLine;
@@ -447,9 +445,6 @@ public class BinarySearchFile implements AutoCloseable {
 			long mid = (top + bottom) / 2;
 			long followingNewLine = nextNewLine(mid, bottom);
 			boolean lastSearch = false;
-			if (followingNewLine > bottom) {
-				Util.out("HERE");
-			}
 			if (followingNewLine == bottom) {
 				followingNewLine = prevNewLine(mid, top);
 				if (followingNewLine == top) { //We've reached the top of the file, so we've got one more shot to check.
@@ -528,12 +523,6 @@ public class BinarySearchFile implements AutoCloseable {
 		}
 		else {
 			arraySize = Constants.TabBufferLength;
-		}
-		if (arraySize < 0) {
-			System.out.println("HER");
-			byte[] test = new byte[Constants.BufferLength];
-			raf.read(test);
-			Util.out(string(test));
 		}
 		arrayToSearch = new byte[arraySize];
 		raf.seek(start);
