@@ -136,6 +136,13 @@ public class SearchAutoFillPane extends JPanel {
 					//Do whatever you want here
 					break;
 				}
+				
+				case KeyEvent.VK_TAB:
+				{
+					if (popup.isVisible()) {
+						hidePopup();
+					}
+				}
 
 				case KeyEvent.VK_ENTER:
 				{
@@ -148,6 +155,7 @@ public class SearchAutoFillPane extends JPanel {
 						int end = searchField.getSelectionEnd();
 						searchField.setSelectionStart(end);
 						searchField.setSelectionEnd(end);
+						hidePopup();
 						} else {
 							hidePopup();
 						}
