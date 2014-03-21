@@ -101,22 +101,22 @@ public class BinarySearchFileTest {
 		}
 	}
 
-	@Test
-	public void testDecimalDigitTest() {
-		double testValue = Constants.INITIAL_LAT;
-		assertTrue(84 == Util.decimalDigits(testValue, 2));
-		assertTrue(8 == Util.decimalDigits(testValue, 1));
-		assertTrue(0 == Util.decimalDigits(testValue, 0));
-		assertTrue(0 == Util.decimalDigits(testValue, -1));
-		testValue = Constants.INITIAL_LON;
-		assertTrue (-41 == Util.decimalDigits(testValue, 2));
-		assertTrue(-4 == Util.decimalDigits(testValue, 1));
-		assertTrue(0 == Util.decimalDigits(testValue, 0));
-		assertTrue(0 ==  Util.decimalDigits(testValue, -1));
-		testValue = -73.8000;
-		Util.out(Util.getFirst4Digits(testValue));
-		
-	}
+//	@Test
+//	public void testDecimalDigitTest() {
+//		double testValue = Constants.INITIAL_LAT;
+//		assertTrue(84 == Util.decimalDigits(testValue, 2));
+//		assertTrue(8 == Util.decimalDigits(testValue, 1));
+//		assertTrue(0 == Util.decimalDigits(testValue, 0));
+//		assertTrue(0 == Util.decimalDigits(testValue, -1));
+//		testValue = Constants.INITIAL_LON;
+//		assertTrue (-41 == Util.decimalDigits(testValue, 2));
+//		assertTrue(-4 == Util.decimalDigits(testValue, 1));
+//		assertTrue(0 == Util.decimalDigits(testValue, 0));
+//		assertTrue(0 ==  Util.decimalDigits(testValue, -1));
+//		testValue = -73.8000;
+//		Util.out(Util.getFirst4Digits(testValue));
+//		
+//	}
 
 
 
