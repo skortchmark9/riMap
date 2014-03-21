@@ -9,7 +9,18 @@ import backend.Backend;
 import frontend.Frontend;
 
 public class Main {
-
+	
+	/**
+	 * the main line of the Maps program.
+	 * Parses the arguments for correctness.
+	 * The arguments should be of the form 
+	 * <p>
+	 * &lt;wayz&gt; &lt;nodez&gt; &lt;indecks&gt;
+	 * <p>
+	 * If the --gui flag is set, a new FrontEnd() is created
+	 * otherwise the program will run simpleton in the command line. 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		boolean gui = false;
 		List<String> WNI = new LinkedList<>();

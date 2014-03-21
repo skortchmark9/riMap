@@ -17,12 +17,31 @@ import maps.Way;
 import autocorrect.Engine;
 import autocorrect.RadixTree;
 
+
+/**
+ * Backend class for the Maps application.
+ * the same backend is used to drive both the command-line-interface and the 
+ * GUI.
+ * 
+ * the backend is sort of used like an interface between the FrontEnd or CLI and
+ * the MapFactory and various other classes that actually do the hard work of the program.
+ * @author emc3 / skortchm
+ *
+ */
 public class Backend {
 
-	KDTree<Node> kd = null;
+	KDTree<Node> kd = null; //the KDTree!
 	Engine autoCorrectEngine = null;
 	public enum BackendType {KD, AC};
-
+	
+	/**
+	 * Main constructor for the backend.
+	 * Init's the ways / nodes / index files by creating a new Resources(),
+	 * BackendType is an enum used for testing. 
+	 * @param args - an array containing the filepaths of the resource files (ways.tsv / nodes.tsv / index.tsv)
+	 * @param ts - the Backend type. used for testing.
+	 * @throws IOException if the files are invalid and Resources could not be instantiated properly. 
+	 */
 	public Backend(String[] args, BackendType...ts) throws IOException {
 		if (args.length != 3) {
 			Util.err("ERROR: Incorrect number of resources");
@@ -47,7 +66,10 @@ public class Backend {
 			}
 		}
 	}
-
+	
+	/**
+	 * Initializes a new KDTree by querying MapFactory
+	 */
 	private void initKDTree() {
 		long start = 0; //FOR DEBUGGING
 		if (Constants.DEBUG_MODE) {
@@ -56,11 +78,10 @@ public class Backend {
 			Util.memLog();
 		}
 		
-		
 		try {
 			kd = MapFactory.createKDTree();
 		} catch (IOException e) {
-			Util.out("ERROR Loading KDTree from nodes file");
+			Util.err("ERROR: Loading KDTree from nodes file failed");
 			System.exit(1);
 		}
 
@@ -71,7 +92,9 @@ public class Backend {
 		}
 	}
 	
-
+	/**
+	 * Initializes the AutoCorrect tree by querying the MapFactory
+	 */
 	private void initAutoCorrect() {
 		long start = 0; //XXX: FOR DEBUGGING
 		if (Constants.DEBUG_MODE) {
@@ -80,7 +103,7 @@ public class Backend {
 			Util.memLog();
 		}
 
-		RadixTree rt;
+		RadixTree rt; //we store our words in a RadixTree rather than a Trie.
 		try {
 			rt = MapFactory.createRadixTree();
 			if (rt.isEmpty()) {
@@ -99,7 +122,12 @@ public class Backend {
 			Util.out("ERROR: Unable to load RadixTree from index file");
 		}
 	}
-
+	
+	/**
+	 * 
+	 * @param name
+	 * @return
+	 */
 	public List<String> getAutoCorrections(String name) {
 		if (autoCorrectEngine != null) {
 			return autoCorrectEngine.suggest(name);
