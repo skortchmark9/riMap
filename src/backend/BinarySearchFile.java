@@ -55,6 +55,12 @@ public class BinarySearchFile implements AutoCloseable {
 		}
 	}
 
+
+	/**
+	 * A copy of the BinarySearchFile to be used by threads so they don't
+	 * interfere with each other. 
+	 * @param bsfToCopy - the binarySearchFile in question.
+	 */
 	public BinarySearchFile(BinarySearchFile bsfToCopy) {
 		this.raf = bsfToCopy.raf;
 		this.sortingCol = bsfToCopy.sortingCol;
@@ -129,14 +135,40 @@ public class BinarySearchFile implements AutoCloseable {
 		return resultsArray;
 	}
 
+	/**
+	 * Gets the contents of each x column from the line y;
+	 * @param y - the line to be parsed
+	 * @param xs - the arguments to look for.
+	 * @return- an array whose columns correspond to the xs we searched for.
+	 */
 	public String[] getXsByY(String y, String ...xs) {
 		return getXs(search(y), xs);
 	}
 
+
+	/**
+	 * DEFAULT WRAPPER <br>
+	 * This function searches for all occurrences of the given search code.
+	 * @param searchCode - the word we're searching for. 
+	 * @param xs - the column information we want from the lines containing
+	 * the search code.
+	 * @return - a list of lists - the first list holds lists whose information
+	 * corresponds to the x we searched for. 
+	 */
 	public List<List<String>> searchMultiples(String searchCode, String ...xs){ 
 		return searchMultiples(searchCode, SearchType.DEFAULT, xs); 
 	}
 
+	/**
+	 * This function searches for all occurrences of the given search code.
+	 * @param searchCode - the word we're searching for. 
+	 * @param s - a SearchType - DEFAULT searches for exact matches, while
+	 * WILDCARD searches for words whose first letters match searchCode.
+	 * @param xs - the column information we want from the lines containing
+	 * the search code.
+	 * @return - a list of lists - the first list holds lists whose information
+	 * corresponds to the x we searched for. 
+	 */
 	public List<List<String>> searchMultiples(String searchCode, SearchType s, String...xs) {
 		try {
 			long secondLine = nextNewLine(0, length);
@@ -154,12 +186,18 @@ public class BinarySearchFile implements AutoCloseable {
 				return new LinkedList<List<String>>();
 			}
 			//wordPosition is the position of the word, but we want the whole line. 
+
+			//We find the beginning newLine of the line in question
 			long rangeStart = prevNewLine(wordPosition, 0);
+			//We find the end newLine
 			long rangeEnd = nextNewLine(wordPosition, length);
 			byte[] searchCodeBytes = searchCode.getBytes();
 
+			//We search for the first occurrence of the searchCode
 			rangeStart = scanBackward(searchCodeBytes, rangeStart, s);
+			//Now the last one.
 			rangeEnd = scanForward(searchCodeBytes, rangeEnd, s);
+			//Then we read all the lines between rangestart and end.
 			return readChunk(rangeStart, rangeEnd + 1, xs);
 		} catch (IOException e) {
 			return null;
@@ -335,6 +373,12 @@ public class BinarySearchFile implements AutoCloseable {
 		return start;
 	}
 
+
+	/**
+	 * Searches for the given searchcode in the file.
+	 * @param searchCode
+	 * @return
+	 */
 	String search(String searchCode) {
 		return search(searchCode, SearchType.DEFAULT);
 	}
@@ -406,7 +450,6 @@ public class BinarySearchFile implements AutoCloseable {
 			}
 			long lastTab = skipTabs(followingNewLine, bottom, parsePattern.get(sortingCol));
 			raf.seek(lastTab + 1);
-			//XXX: changing to only do one read, with an extra byte
 			byte[] tempField = new byte[word.length + 1]; //get one extra byte for use in the else clause below
 			raf.read(tempField);
 			int follow = tempField[tempField.length-1]; //returns the extra byte
@@ -418,11 +461,10 @@ public class BinarySearchFile implements AutoCloseable {
 				return search(word, followingNewLine, bottom, s);
 			}
 			else {
-				//int follow = raf.read(); //either returns byte or -1 (end of file~)
 				if (s == SearchType.WILDCARD) {
 					return lastTab + 1;
 				}	else {
-					if (follow == '\t' || follow == '\n') { //Could we save time by eliminating this read?
+					if (follow == '\t' || follow == '\n') {
 						return lastTab + 1;
 					} else {
 						return (lastSearch) ? -1 : search(word, top, followingNewLine, s);
@@ -435,7 +477,15 @@ public class BinarySearchFile implements AutoCloseable {
 		}
 	}
 
-	public long  getByTabs(long newLine, long bottom) throws IOException {
+
+	/** Skips sortingCol tabs in the line.
+	 * 
+	 * @param newLine - the initial newLine
+	 * @param bottom - the bottom boundary of the search
+	 * @return - the position of the sortingColth tab.
+	 * @throws IOException - if there is a read problem
+	 */
+	public long getByTabs(long newLine, long bottom) throws IOException {
 		return skipTabs(newLine, bottom, parsePattern.get(sortingCol));
 	}
 
@@ -443,20 +493,11 @@ public class BinarySearchFile implements AutoCloseable {
 	 * Creates a string from a byte[] using the UTF-8 character set.
 	 * 
 	 * @param bytes - the byte array
-	 * @return 
+	 * @return  - a new String
 	 * the string created from the bytes. 
 	 */
 	public static String string(byte[] bytes) {
 		return new String(bytes, UTF8);
-	}
-
-
-	/**
-	 * Wrapper for System.out print stream
-	 * @param s  - string to print to standard out
-	 */
-	public static void out(String s) {
-		System.out.println(s);
 	}
 
 	/** Skips some tabs. Assumes a start is a new line and end is a new line also.
@@ -468,8 +509,9 @@ public class BinarySearchFile implements AutoCloseable {
 	 * @throws IOException - in case something goes wrong with the raf. 
 	 */
 	private long skipTabs(long start, long end, int numTabs) throws IOException {
-		if (numTabs == 0)
+		if (numTabs == 0) {
 			return start;
+		}
 		int tabsFound = 0;
 		byte[] arrayToSearch;
 		int arraySize;
@@ -493,7 +535,7 @@ public class BinarySearchFile implements AutoCloseable {
 			if (ch  == '\t') {
 				tabsFound++;
 			}
-			//We return the last tab index to keep with the convention of next/prevNewLine.
+			//We return the last tab's index to keep with the convention of next/prevNewLine.
 			if (tabsFound == numTabs) {
 				return start + i;
 			}
@@ -508,39 +550,52 @@ public class BinarySearchFile implements AutoCloseable {
 		}
 	}	
 
-	public List<List<String>> readChunks(String...xs) {
+
+	/**WRAPPER
+	 * Breaks up a binary search file into a given number of chunks and
+	 * then reads each of them.
+	 * @param xs - the information we are searching for
+	 * @return - a list of lists, one inner list for each line whose info is xs
+	 * @throws IOException - if there is an issue reading chunks
+	 */
+	public List<List<String>> readChunks(String...xs) throws IOException {
 		return readChunks(Constants.numThreads, xs);
 	}
 
-	private List<List<String>> readChunks(int numThreads, String...xs) {
+	/**
+	 * Breaks up a binary search file into a given number of chunks and
+	 * then reads each of them.
+	 * @param xs - the information we are searching for
+	 * @return - a list of lists, one inner list for each line whose info is xs
+	 */
+	private List<List<String>> readChunks(int numThreads, String...xs) throws IOException {
 		List<List<String>> chunks = new LinkedList<>();
-		try {
-			long secondLine = nextNewLine(0, length);
-			long chunkSize = (length - secondLine) / numThreads + 1;
-			for(int i = 1; i <= Constants.numThreads; i++) {
-				long chunkEnd = (i == Constants.numThreads) ? length : nextNewLine(secondLine + (chunkSize * i), length);
-				long chunkStart = nextNewLine((secondLine + (chunkSize * (i - 1))), chunkEnd);
-				chunks.addAll(readChunk(chunkStart, chunkEnd, xs));
-
-				if (Constants.DEBUG_MODE) {
-					Util.out("Finished chunk: " + (i - 1) + " of: " + Constants.numThreads);
-				}
-
+		long secondLine = nextNewLine(0, length);
+		long chunkSize = (length - secondLine) / numThreads + 1;
+		for(int i = 1; i <= Constants.numThreads; i++) {
+			long chunkEnd = (i == Constants.numThreads) ? length : nextNewLine(secondLine + (chunkSize * i), length);
+			long chunkStart = nextNewLine((secondLine + (chunkSize * (i - 1))), chunkEnd);
+			chunks.addAll(readChunk(chunkStart, chunkEnd, xs));
+			if (Constants.DEBUG_MODE) {
+				Util.out("Finished chunk: " + (i - 1) + " of: " + Constants.numThreads);
 			}
-		}
-		catch (IOException e) {
-			Util.err("ERROR: readChunks could not read the file.");
-		}
 
+		}
 		if (Constants.DEBUG_MODE)
 			Util.out("Finished Reading");
-
 		return chunks;
 	}
 
-	private List<List<String>> readChunk(long start, long end, String...xs) {
+	/**
+	 * Reads an array between start and end and then parses it by xs.
+	 * @param start - the initial point from which to read
+	 * @param end - the end point. 
+	 * @param xs - the arguments we are passing. 
+	 * @return - a list of lists, one inner list for each line whose info is xs
+	 * @throws IOException - if tthere is an issue with seek or read.
+	 */
+	private List<List<String>> readChunk(long start, long end, String...xs) throws IOException {
 		List<List<String>> lines = new LinkedList<>();
-		try {
 			start++;
 			byte[] chunk = new byte[(int) (end - start)];
 			raf.seek(start);
@@ -550,11 +605,9 @@ public class BinarySearchFile implements AutoCloseable {
 				if (chunk[i] == '\n') {
 					lines.add(Arrays.asList(getXs(string(Arrays.copyOfRange(chunk, lastNewLine + 1, i)), xs)));
 					lastNewLine = i;
+					//TODO WHY NOT SAVE THE NEWLINE HERE.
 				}
 			}
-		} catch (IOException e) {
-			return lines;
-		}
 		return lines;
 	}
 
@@ -566,14 +619,10 @@ public class BinarySearchFile implements AutoCloseable {
 	 * @throws IOException - in case of problems with raf. 
 	 */
 	public long nextNewLine(long start, long end) throws IOException {
-		/*if (Constants.ADJUST_LINE_BUFFER % numCalls== 0) {
-			int suggestedLength = newLines.suggestLineLength(length);
-			Util.out("SUGGESTED LENGTH OF BYTE BUFFER", suggestedLength, "IMPLEMENTING");
-			bufferLength = suggestedLength;
-		}*/
 		if (start > end) {
 			return end;
 		}
+		//attempts to find a cachedNewLine.
 		Long cachedNewLine = newLines.getNextNewLine(start);
 		if (cachedNewLine != null) {
 			return cachedNewLine < end ? cachedNewLine : end;
@@ -592,8 +641,8 @@ public class BinarySearchFile implements AutoCloseable {
 		for(int i = 0; i < arraySize; i++) {
 			int ch = arrayToSearch[i];
 			if (ch  == '\n') {
+				//saves it for next time
 				newLines.putNext(start, start + i);
-				//				numCalls++;
 				return start + i;
 			}
 		}
@@ -613,11 +662,6 @@ public class BinarySearchFile implements AutoCloseable {
 	 * @throws IOException
 	 */
 	public long prevNewLine(long start, long beginning) throws IOException {
-		/*		if (Constants.ADJUST_LINE_BUFFER % numCalls == 0) {
-			int suggestedLength = newLines.suggestLineLength(length);
-			Util.out("SUGGESTED LENGTH OF BYTE BUFFER", suggestedLength, "IMPLEMENTING");
-			bufferLength = suggestedLength;
-		}*/
 		Long cachedPrevLine = newLines.getPrevNewLine(start);
 		if (cachedPrevLine != null) {
 			return cachedPrevLine > beginning ? cachedPrevLine : beginning;
@@ -637,7 +681,6 @@ public class BinarySearchFile implements AutoCloseable {
 			int ch = arrayToSearch[i];
 			if (ch  == '\n') {
 				newLines.putPrev(start, start - arraySize + i);
-				//				numCalls++;
 				return start - arraySize + i;
 			}
 		}
@@ -650,7 +693,7 @@ public class BinarySearchFile implements AutoCloseable {
 	}
 
 	/** 
-	 * from class, lexicographically compares two byte[]s.
+	 * Lexicographically compares two byte[]s.
 	 * The index file is weirdly sorted so that words with
 	 * special characters are pushed to the end. Not lexicographical
 	 * which was advertised, so that's confusing. Therefore, we've
@@ -660,12 +703,16 @@ public class BinarySearchFile implements AutoCloseable {
 	 * more negative bytes is less. However, if only one byte[] has
 	 * a special character, the positive number will represent the
 	 * standard character and should be less.
-	 * @param a 
-	 * @param b
-	 * @return
+	 * @param a - the first array (negative if this is less) 
+	 * @param b - the second array (positive if this is less)
+	 * @param bIndex - the initial index of the b array (for variable length)
+	 * comparison. 
+	 * @return - an int 
 	 */
 	static int jCompare(byte[] a, byte[] b, int bIndex) {
 		for(int i = 0; i < a.length; i++) {
+			//If the arrays are different lengths, bIndex finds the start place in
+			//array b.
 			int relativeIndex = i + bIndex;
 			if (b.length <= i) {
 				return 1;
@@ -684,24 +731,35 @@ public class BinarySearchFile implements AutoCloseable {
 		return 0;
 	}
 
+	/**
+	 * Allows us to compare arrays of variable length
+	 * @param a - the first array (negative if this is less) 
+	 * @param b - the second array (positive if this is less)
+	 * @param bIndex
+	 * @return
+	 */
 	int compare(byte[] a, byte[] b, int bIndex) {
 		return jCompare(a, b, bIndex);
 	}
-
+	/**
+	 * If the arrays are the same length.
+	 * @param a
+	 * @param b
+	 * @return
+	 */
 	int compare(byte[] a, byte[] b) {
 		return jCompare(a, b, 0);
 	}
 
 	@Override
-	//Attempts to close the file. If it can't, closes the file. 
+	//Attempts to close the file.
 	public void close() {
 		try {
 			if (raf != null) {
 				raf.close();
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			System.out.println("Closing...");
+			Util.out("Closing...");
 			System.exit(1);
 		}
 	}

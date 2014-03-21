@@ -1,5 +1,6 @@
 package maps;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,6 +29,12 @@ public class MapFactory {
 	private static ConcurrentHashMap<String, Node> nodes = new ConcurrentHashMap<>(65000);
 	private static ConcurrentHashMap<String, Way> ways = new ConcurrentHashMap<>(35000);
 	
+	/**
+	 * Creates a way from the wayID. Attempts to find a cached way if one
+	 * doesn't exist. If not, searches the waysFile.
+	 * @param wayID - the wayID in question. 
+	 * @return - a Way, or null if one cannot be created.
+	 */
 	public static synchronized Way createWay(String wayID) {
 		Way possibleWay= ways.get(wayID);
 		if (possibleWay != null) {
@@ -46,6 +53,14 @@ public class MapFactory {
 		}
 	}
 	
+	/**
+	 * Creates a way from the following pieces of information.
+	 * @param wayID - the ID of the way
+	 * @param name - its name, if it has one
+	 * @param start - its starting coordinate
+	 * @param end - its ending point on the map.
+	 * @return - a Way
+	 */
 	private static Way createWay(String wayID, String name, Node start, Node end) {
 		Way resultWay = ways.get(wayID);
 		if (resultWay == null) {
@@ -55,6 +70,14 @@ public class MapFactory {
 		return resultWay;
 	}
 	
+	/**
+	 * Creates a way if we don't have the actual nodes, but only their names
+	 * @param wayID - the wayID we are searching for. 
+	 * @param name - the name of the way in question
+	 * @param start - the name of its start node
+	 * @param end - the name of its end node
+	 * @return - a way.
+	 */
 	private static Way createWay(String wayID, String name, String start, String end) {
 		Way resultWay = ways.get(wayID);
 		if (resultWay == null) {
@@ -72,18 +95,33 @@ public class MapFactory {
 		return resultWay;
 	}
 	
+	/**
+	 * A method for the curious to see how many ways there are.
+	 */
 	public static void getNumWays() {
 		if (Constants.DEBUG_MODE) {
 		Util.out("Num Ways", ways.size());
 		}
 	}
 	
+	/**
+	 * A method for the curious to see how many ways there are.
+	 */
 	public static void getNumNodes() {
 		if (Constants.DEBUG_MODE) {
 		Util.out("Num Nodes", nodes.size());
 		}
 	}
 
+	/**
+	 * Gets all the ways within a given lat-lng range. Threaded, to allow 
+	 * quick access and loading of ways while keeping the GUI responding.
+	 * @param minLat - the minLat of the block
+	 * @param maxLat - the maxLat of the block
+	 * @param minLon - the minLon of the block
+	 * @param maxLon - the maxLon of the block
+	 * @return - 
+	 */
 	public static synchronized List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
 		if (Constants.DEBUG_MODE) {
 			Util.out("Looking for Ways in Range");
@@ -119,8 +157,17 @@ public class MapFactory {
 	}	
 
 	
-	//TODO : Potentially we could store the nodes created somewhere so that if
-	//we encounter them again we can just call them from a HashMap or something.
+	
+/*******	NODE CREATION WRAPPERS - THEY ARE ALL KINDA THE SAME ********/
+	
+	/**
+	 * Method for creating nodes from the following pieces of information.
+	 * @param nodeID - the ID of the node in question.
+	 * @param latitude - the latitude of the node in question 
+	 * @param longitude - the longitude of the node in question.
+	 * @param ways
+	 * @return
+	 */
 	private static Node createNode(String nodeID, String latitude, String longitude, String ways) {
 		double lat = 0;
 		double lon = 0;
@@ -129,6 +176,7 @@ public class MapFactory {
 			lat = Double.parseDouble(latitude);
 			lon = Double.parseDouble(longitude);
 			waysList = Arrays.asList(Constants.comma.split(ways));
+		//If we can't parse its coordinates, we'll return null;
 		} catch (NumberFormatException nfe) {
 			return null;
 		}
@@ -141,6 +189,11 @@ public class MapFactory {
 		}
 	}
 	
+	/**
+	 * Attempts to find the node from the hashmap of nodes, if not, gets it from file.
+	 * @param nodeID - the ID of the node in question.
+	 * @return
+	 */
 	static Node createNode(String nodeID) {
 		Node possibleNode = nodes.get(nodeID);
 		if (possibleNode != null) {
@@ -155,6 +208,13 @@ public class MapFactory {
 		}
 	}
 	
+	/** Creates an intersection from two street names.
+	 * Finds the names of the streets in the file, and then finds nodes that appear
+	 * in both of those streets' ways. 
+	 * @param streetName1
+	 * @param streetName2
+	 * @return - the Node that is their intersection.
+	 */
 	public static Node createIntersection(String streetName1, String streetName2) {
 		List<List<String>> street1nodeLists = Resources.indexFile.searchMultiples(streetName1, "nodes");
 		Set<String> street1nodeIDs = new HashSet<>();
@@ -166,13 +226,18 @@ public class MapFactory {
 		List<List<String>> street2nodeLists = Resources.indexFile.searchMultiples(streetName2, "nodes");
 		if (street2nodeLists == null) {
 			Util.err("ERROR: StreetName2 has no node lists");
+			return null;
 		}
 		for(List<String> nodeList : street2nodeLists) {
 			for(String nodes : nodeList) {
 				for(String node : Constants.comma.split(nodes)) {
 					if (street1nodeIDs.contains(node)) {
-						//TODO: What if multiples?
-						return createNode(node);
+						
+						Node result =  createNode(node);
+						if (Constants.DEBUG_MODE) {
+							Util.out(result);
+						}
+						return result;
 					}
 				}
 			}
@@ -180,7 +245,8 @@ public class MapFactory {
 		return null;
 	}
 	
-	public static KDTree<Node> createKDTree() {
+	/** Attempts to create a KDTree from the nodes file we have. */
+	public static KDTree<Node> createKDTree() throws IOException {
 		long start = 0; //XXX: FOR DEBUGGING
 		if (Constants.DEBUG_MODE) {
 			Util.out("Reading node data from file to List (System Calls):");
@@ -220,7 +286,7 @@ public class MapFactory {
 		return new KDTree<Node>(nodeList);
 	}
 	
-	public static RadixTree createRadixTree() {
+	public static RadixTree createRadixTree() throws IOException {
 		long start = 0; //XXX: FOR DEBUGGING
 		if (Constants.DEBUG_MODE) {
 			Util.out("Reading index file for names:");
