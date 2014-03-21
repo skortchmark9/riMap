@@ -31,7 +31,6 @@ public class BinarySearchFileTest {
 	public void testSearchMultiples() {
 		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
 			List<List<String>> results = b.searchMultiples("10th Avenue", "name", "nodes");
-			System.out.println(results);
 			assertTrue(results.size() == 3);
 			for(List<String> list : results) {
 				assertTrue(list.get(0).equals("10th Avenue"));
@@ -117,8 +116,6 @@ public class BinarySearchFileTest {
 //		Util.out(Util.getFirst4Digits(testValue));
 //		
 //	}
-
-
 
 	@Test
 	public void testReadChunks() throws IOException {
