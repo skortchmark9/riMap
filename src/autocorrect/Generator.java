@@ -2,9 +2,6 @@ package autocorrect;
 
 import java.util.LinkedList;
 
-import backend.Constants;
-import backend.Util;
-
 public class Generator {
 	/** Responsible for generating Suggestions for Ranker to Rank. Only to be used by engine.*/
 	private Boolean prefix = false;

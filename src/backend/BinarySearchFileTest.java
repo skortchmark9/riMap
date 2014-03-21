@@ -23,6 +23,39 @@ public class BinarySearchFileTest {
 	//Applied for multiple rows
 	String ways = "./data/mapsfiles/ways.tsv";
 
+	
+	/**
+	 * This test should fail - there is a bug in scan forward.
+	 */
+	@Test
+	public void testSearchMultiples() {
+		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
+			List<List<String>> results = b.searchMultiples("10th Avenue", "name", "nodes");
+			System.out.println(results);
+			assertTrue(results.size() == 3);
+			for(List<String> list : results) {
+				assertTrue(list.get(0).equals("10th Avenue"));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			assertTrue(false);
+		}
+	}
+	
+	@Test
+	public void testSearchSingleMultiple() {
+		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
+			List<List<String>> results = b.searchMultiples("Olive St", "name", "nodes");
+			assertTrue(results.get(0).get(0).equals("Olive St"));
+			assertTrue(results.size() == 1);
+		} catch (IOException e) {
+			e.printStackTrace();
+			assertTrue(false);
+		}
+	}
+
+
+	
 	@Test
 	public void searchForWeirdWay() {
 		try (BinarySearchFile b = new BinarySearchFile(ways, "id", "id", "name", "start", "end")) {
@@ -32,7 +65,6 @@ public class BinarySearchFileTest {
 			e.printStackTrace();
 		}
 	}
-	/*
 	@Test
 	public void capitalizeTest() {
 		String orig = "what up";
@@ -49,33 +81,7 @@ public class BinarySearchFileTest {
 		}
 	
 	
-	@Test
-	public void testSearchSingleMultiple() {
-		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
-			List<List<String>> results = b.searchMultiples("Olive St", "name", "nodes");
-			assertTrue(results.get(0).get(0).equals("Olive St"));
-			assertTrue(results.size() == 1);
-		} catch (IOException e) {
-			e.printStackTrace();
-			assertTrue(false);
-		}
-	}
 
-	
-	@Test
-	public void testSearchMultiples() {
-		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
-			List<List<String>> results = b.searchMultiples("10th Avenue", "name", "nodes");
-			assertTrue(results.size() == 3);
-			for(List<String> list : results) {
-				assertTrue(list.get(0).equals("10th Avenue"));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			assertTrue(false);
-		}
-	}
-	
 	@Test
 	public void wildCardMultipleTest() {
 		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {

@@ -11,7 +11,6 @@ import maps.MapFactory;
 
 import org.junit.Test;
 
-import backend.BinarySearchFile;
 import backend.Constants;
 import backend.Resources;
 

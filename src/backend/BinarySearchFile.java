@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.google.common.collect.ObjectArrays;
-
 /**
  * Searchable file which reads from the disk, without reading the file into memory.
  * It also reads the headers of tsv style documents and parses them appropriately.
@@ -241,7 +239,6 @@ public class BinarySearchFile implements AutoCloseable {
 			for(int i = 0; i < arraySize; i++) {
 				int ch = arrayToSearch[i];
 				if (ch  == '\n') {
-					//TODO make sure this is right for all cases.
 					newLines.putNext(startIndex, startIndex + i);
 					//Depending on the file, we may need to skip some tabs.
 					int tabsToSkip = parsePattern.get(sortingCol);
@@ -260,7 +257,6 @@ public class BinarySearchFile implements AutoCloseable {
 					//so we need to add 1
 					int wordStart = i + tabLocation + 1;
 					foundWord = true;
-					//XXX added
 					long wordEnd = wordStart + searchCodeBytes.length;
 					long diff = wordEnd - arrayToSearch.length;
 					if (diff > 0) {
@@ -274,10 +270,12 @@ public class BinarySearchFile implements AutoCloseable {
 						lastNewLine = startIndex + i;
 						if (s == SearchType.WILDCARD) {
 							foundMatch = true;
+							start = lastNewLine;
 							break;
 						} else if (arrayToSearch[wordStart + searchCodeBytes.length] == '\t' ||
 								arrayToSearch[wordStart + searchCodeBytes.length] == '\n') {
 							foundMatch = true;
+							start = lastNewLine;
 							break;
 						}
 					}
@@ -293,6 +291,7 @@ public class BinarySearchFile implements AutoCloseable {
 		return start;
 	}
 
+
 	/** 
 	 * This function does a small but difficult job. It finds the last
 	 * occurrence of the given word (searchCodeBytes) in the file.
@@ -305,74 +304,83 @@ public class BinarySearchFile implements AutoCloseable {
 	 * @return - the newline holding the last occurrence of the word.
 	 * @throws IOException - if there are issues with seek or read.
 	 */
-	long scanForward(byte[] searchCodeBytes, long start, SearchType s) throws IOException {
-		long lastNewLine = start;
-
-		while (start < length) {
-			byte[] arrayToSearch;
-			int arraySize;
-			if ((length - start) < Constants.BufferLength) {
-				arraySize = (int) (length - start);
-			}
-			else {
-				arraySize = Constants.BufferLength;
-			}
-			arrayToSearch = new byte[arraySize];
-			long endIndex = start + arraySize;
-			raf.seek(start);
-			raf.read(arrayToSearch);
-			boolean foundInThisRun = false;
-			boolean foundAWord = false;
-			for(int i = arraySize - 1; i > 0; i--) {
-				int ch = arrayToSearch[i];
-				if (ch  == '\n') {
-					newLines.putPrev(endIndex, endIndex - i);
-					int tabsToSkip = parsePattern.get(sortingCol);
-					int tabsFound = 0;
-					int tabLocation = 0;
-					for(int j = 0; j < arraySize; j++) {
-						if (arrayToSearch[j + i] == '\t') {
-							tabsFound++;
+		long scanForward(byte[] searchCodeBytes, long start, SearchType s) throws IOException {
+			long lastNewLine = start;
+			while (start < length) {
+				byte[] arrayToSearch;
+				int arraySize;
+				if ((length - start) < Constants.BufferLength) {
+					arraySize = (int) (length - start);
+				}
+				else {
+					arraySize = Constants.BufferLength;
+				}
+				arrayToSearch = new byte[arraySize];
+				long endIndex = start + arraySize;
+				//The end position of the array we look through.
+				raf.seek(start);
+				raf.read(arrayToSearch);
+				boolean foundInThisRun = false;
+				boolean foundAWord = false;
+				for(int i = arraySize - 1; i > 0; i--) {
+					//We search backwards through the array
+					int ch = arrayToSearch[i];
+					if (ch  == '\n') {
+						//If we find a newline, we compare the word on the line against our search.
+						newLines.putPrev(endIndex, endIndex - i + 1);
+						lastNewLine = endIndex - i + 1;
+						int tabsToSkip = parsePattern.get(sortingCol);
+						int tabsFound = 0;
+						int tabLocation = 0;
+						//We skip the number of tabs we need.
+						for(int j = 0; j < arraySize; j++) {
+							if (arrayToSearch[j + i] == '\t') {
+								tabsFound++;
+							}
+							if (tabsFound == tabsToSkip) {
+								tabLocation = j;
+								break;
+							}
 						}
-						if (tabsFound == tabsToSkip) {
-							tabLocation = j;
-							break;
+						int wordStart = i + tabLocation + 1;
+						foundAWord = true;
+						long wordEnd = wordStart + searchCodeBytes.length;
+						long diff = wordEnd - arrayToSearch.length;
+						if (diff > 0) {
+							System.out.println("HERE");
+							byte[] extraArray = new byte[(int) diff];
+							raf.seek(wordStart);
+							raf.read(extraArray);
+							arrayToSearch = Util.concatByteArrays(arrayToSearch, extraArray);
+						}
+						Util.out(string(arrayToSearch));
+						int cmp = compare(searchCodeBytes, arrayToSearch, wordStart);
+						if (cmp == 0) {
+							start = lastNewLine;
+							if (s == SearchType.WILDCARD) {
+								//If we've found the word, the search will adjust the bounds of start
+								foundInThisRun = true;
+								break; // the for loop
+							} else if (arrayToSearch[wordStart + searchCodeBytes.length] == '\t' ||
+									arrayToSearch[wordStart + searchCodeBytes.length] == '\n') {
+								foundInThisRun = true;
+								break; // the for loop
+							}
+						} else {
+							//We adjust lastNewLine.
+//							lastNewLine = endIndex - i + 1;
 						}
 					}
-					int wordStart = i + tabLocation + 1; //Perhaps we need to add 1?
-					foundAWord = true;
-					long wordEnd = wordStart + searchCodeBytes.length;
-					long diff = wordEnd - arrayToSearch.length;
-					if (diff > 0) {
-						byte[] extraArray = new byte[(int) diff];
-						raf.seek(wordStart);
-						raf.read(extraArray);
-						arrayToSearch = Util.concatByteArrays(arrayToSearch, extraArray);
-					}
-					int cmp = compare(searchCodeBytes, arrayToSearch, wordStart);
-					if (cmp == 0) {
-						if (s == SearchType.WILDCARD) {
-							foundInThisRun = true;
-							break;
-						} else if (arrayToSearch[wordStart + searchCodeBytes.length] == '\t' ||
-								arrayToSearch[wordStart + searchCodeBytes.length] == '\n') {
-							foundInThisRun = true;
-							break;
-						}
-					} else {
-						lastNewLine = endIndex - i;
-					}
+				} //end for
+				//Still the while loop.
+				if (foundAWord && !foundInThisRun) {
+					return start;
+				} else {
+					start = endIndex;
 				}
 			}
-			if (foundAWord && !foundInThisRun) {
-				return lastNewLine;
-			} else {
-				start = endIndex;
-			}
+			return start;
 		}
-		return start;
-	}
-
 
 	/**
 	 * Searches for the given searchcode in the file.
@@ -596,18 +604,18 @@ public class BinarySearchFile implements AutoCloseable {
 	 */
 	private List<List<String>> readChunk(long start, long end, String...xs) throws IOException {
 		List<List<String>> lines = new LinkedList<>();
-			start++;
-			byte[] chunk = new byte[(int) (end - start)];
-			raf.seek(start);
-			raf.read(chunk);
-			int lastNewLine = -1;
-			for(int i = 0; i < chunk.length; i++) {
-				if (chunk[i] == '\n') {
-					lines.add(Arrays.asList(getXs(string(Arrays.copyOfRange(chunk, lastNewLine + 1, i)), xs)));
-					lastNewLine = i;
-					//TODO WHY NOT SAVE THE NEWLINE HERE.
-				}
+		start++;
+		byte[] chunk = new byte[(int) (end - start)];
+		raf.seek(start);
+		raf.read(chunk);
+		int lastNewLine = -1;
+		for(int i = 0; i < chunk.length; i++) {
+			if (chunk[i] == '\n') {
+				lines.add(Arrays.asList(getXs(string(Arrays.copyOfRange(chunk, lastNewLine + 1, i)), xs)));
+				lastNewLine = i;
+				//TODO WHY NOT SAVE THE NEWLINE HERE.
 			}
+		}
 		return lines;
 	}
 

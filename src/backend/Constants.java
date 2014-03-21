@@ -39,9 +39,7 @@ public class Constants {
 	public static final Color MIDNIGHT = new Color(60, 62, 67);
 	public static final Color GLOW_IN_THE_DARK = new Color(236, 240, 230);
 	
-	//A prime number!
-	public static final int ADJUST_LINE_BUFFER = 4037;
-	public static final int BufferLength = 512;
+	public static final int BufferLength = 520;
 	public static final int TabBufferLength = 256;
 
 	/**
