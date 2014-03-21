@@ -161,10 +161,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			int bottomRight[] = geo2pixel(new double[]{Constants.MINIMUM_LATITUDE, Constants.MAXIMUM_LONGITUDE});
 			int bottomLeft[] = geo2pixel(new double[]{Constants.MINIMUM_LATITUDE, Constants.MINIMUM_LONGITUDE});
 			g2d.setColor(Color.ORANGE);
-			g2d.drawLine(topLeft[0], topRight[1], topLeft[0], topRight[1]); //top boundary
-			g2d.drawLine(topRight[0], bottomRight[1], topRight[0], bottomRight[1]); //right boundary
-			g2d.drawLine(bottomLeft[0], bottomRight[1], bottomLeft[0], bottomRight[1]); //bottom boundary
-			g2d.drawLine(topLeft[0], bottomLeft[1], topLeft[0], bottomLeft[1]); //leftboundary
+			g2d.drawLine(topLeft[0], topLeft[1], topRight[0], topRight[1]); //top boundary
+			g2d.drawLine(topRight[0], topRight[1], bottomRight[0], bottomRight[1]); //right boundary
+			g2d.drawLine(bottomLeft[0], bottomLeft[1], bottomRight[0], bottomRight[1]); //bottom boundary
+			g2d.drawLine(topLeft[0], topLeft[1], bottomLeft[0], bottomLeft[1]); //leftboundary
 		}
 	}
 	
@@ -539,7 +539,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			double width = Constants.GEO_DIMENSION_FACTOR/scale;
 			
 			//Check to make sure move is in bounds
-			if (lat > Constants.MAXIMUM_LATITUDE + 0.002 || lat+width < Constants.MINIMUM_LATITUDE - 0.002 ||
+			if (lat > Constants.MAXIMUM_LATITUDE + 0.002 || lat-width < Constants.MINIMUM_LATITUDE - 0.002 ||
 					lon < Constants.MINIMUM_LONGITUDE - 0.002 || lon+width > Constants.MAXIMUM_LONGITUDE + 0.002) {
 				return;
 			}
