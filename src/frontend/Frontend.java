@@ -170,17 +170,5 @@ public class Frontend implements ActionListener {
 			}
 		}
 	}
-
-	public static void main(String[] args) {
-		try {
-			String arg1 = "./data/mapsfiles/ways.tsv";
-			String arg2	= "./data/mapsfiles/nodes.tsv";
-			String arg3 = "./data/mapsfiles/index.tsv";
-			Backend b = new Backend(new String[] {arg1, arg2, arg3});
-			new Frontend(b);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 }
 
