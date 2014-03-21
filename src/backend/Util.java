@@ -14,8 +14,8 @@ import javax.swing.JTextField;
  */
 public class Util {
 	
-	private static long START = 0;
-	private static JTextArea msgBox;
+	private static long START = 0; //the 'clock'
+	private static JTextArea msgBox; //the message box in the gui to which meaningful messages can be printed to the user
 	
 	/**
 	 * Better than System.out.println. Prints any number of things in a line to STDOUT.
@@ -50,12 +50,24 @@ public class Util {
 		System.err.println(str);
 	}
 	
+	
+	/**
+	 * Logs the current state of the 
+	 * Virtual memory. (should be only used as an
+	 * estimate). 
+	 */
 	public static void memLog() {
 		Runtime r = Runtime.getRuntime();
 		out("\t--MEM--");
 		out("\tALLOC'd:", (((double)r.totalMemory())/1048576.0)+"MB", "|", "FREE:", ((double)(r.freeMemory())/1048576.0)+"MB", "|", "MAX:", (((double) r.maxMemory())/1048576.0)+"MB");
 	}
 	
+	
+	/**
+	 * T
+	 * @param x
+	 * @return
+	 */
 	public static String getFirst4Digits(double x) {
 		x = Math.abs(x);
 		String num = String.valueOf(x);
