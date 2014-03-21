@@ -135,6 +135,8 @@ public class Util {
 		if (msgBox == null) return;
 		str += "\n";
 		msgBox.append(str);
+		int lines = msgBox.getLineCount();
+		//NEED TO GET ROW HEIGHT
 	}
 	
 }

@@ -97,7 +97,9 @@ public class Frontend implements ActionListener {
 		msgBox.setPreferredSize(new Dimension(100, 50));
 		Util.setGUIMessageBox(msgBox);
 		msgBox.setOpaque(false);
-		sidePanel.add(new JScrollPane(msgBox, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+		JScrollPane scroller = new JScrollPane(msgBox, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scroller.setPreferredSize(new Dimension(100, 50));
+		sidePanel.add(scroller);
 		Util.guiMessage("Hi!");
 		Util.guiMessage("Hada!");
 		Util.guiMessage("Hi!");
