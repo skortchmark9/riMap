@@ -145,10 +145,6 @@ public class Util {
 	
 	public static void guiMessage(String str) {
 		if (msgBox == null) return;
-		str += "\n";
-		msgBox.append(str);
-		int lines = msgBox.getLineCount();
-		//NEED TO GET ROW HEIGHT
+		msgBox.setText(str + "\n" + msgBox.getText());
 	}
-	
 }

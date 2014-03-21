@@ -95,20 +95,13 @@ public class Frontend implements ActionListener {
 
 		msgBox = new JTextArea();
 		msgBox.setEditable(false);
-		msgBox.setPreferredSize(new Dimension(100, 50));
+		msgBox.setPreferredSize(new Dimension(100, 400));
 		Util.setGUIMessageBox(msgBox);
 		msgBox.setOpaque(false);
 		JScrollPane scroller = new JScrollPane(msgBox, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scroller.setPreferredSize(new Dimension(100, 50));
 		sidePanel.add(scroller);
-		Util.guiMessage("Hi!");
-		Util.guiMessage("Hada!");
-		Util.guiMessage("Hi!");
-
-
-		Util.guiMessage("asad!");
-		Util.guiMessage("kjshdfks");
-		
+		Util.guiMessage("Console: look here for messages");
 		
 		sidePanel.setBackground(Color.BLACK);
 		sidePanel.setOpaque(true);
@@ -120,7 +113,6 @@ public class Frontend implements ActionListener {
 		frame.pack();
 		frame.setVisible(true);
 	}
-
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
