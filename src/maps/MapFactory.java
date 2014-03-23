@@ -1,15 +1,15 @@
 package maps;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -26,9 +26,9 @@ import backend.Util;
  */
 public class MapFactory {
 
-	private static ConcurrentHashMap<String, Node> nodes = new ConcurrentHashMap<>(65000);
-	private static ConcurrentHashMap<String, Way> ways = new ConcurrentHashMap<>(35000);
-	private static ConcurrentHashMap<String, List<String>> wayArray;
+	private static Map<String, Node> nodes = new HashMap<>(65000);
+	private static Map<String, Way> ways = new HashMap<>(35000);
+	private static Map<String, List<String>> wayArray;
 
 	/**
 	 * Creates a way from the wayID. Attempts to find a cached way if one
@@ -326,7 +326,7 @@ public class MapFactory {
 		}
 		if (wayArray == null) {
 			int size = (int) Math.ceil((Constants.MAXIMUM_LATITUDE - Constants.MINIMUM_LATITUDE) * 100);
-			wayArray = new ConcurrentHashMap<>(size);
+			wayArray = new HashMap<>(size);
 		}
 
 		List<Way> ways = new LinkedList<>();
