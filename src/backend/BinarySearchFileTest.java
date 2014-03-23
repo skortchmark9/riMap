@@ -8,8 +8,6 @@ import java.io.RandomAccessFile;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NavigableMap;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 
 import backend.BinarySearchFile.SearchType;
@@ -23,10 +21,16 @@ public class BinarySearchFileTest {
 	//Applied for multiple rows
 	String ways = "./data/mapsfiles/ways.tsv";
 
-	
-	/**
-	 * This test should fail - there is a bug in scan forward.
-	 */
+	@Test
+	public void searchForWeirdWay2() {
+		try (BinarySearchFile b = new BinarySearchFile(ways, "id", "id", "name", "start", "end")) {
+			List<List<String>> results = b.searchMultiples("/w/4183.7140", SearchType.WILDCARD, "id", "name", "start", "end");
+			Util.out(results);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	@Test
 	public void testSearchMultiples() {
 		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
@@ -40,7 +44,10 @@ public class BinarySearchFileTest {
 			assertTrue(false);
 		}
 	}
-	
+
+
+
+
 	@Test
 	public void testSearchSingleMultiple() {
 		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
@@ -54,22 +61,37 @@ public class BinarySearchFileTest {
 	}
 
 
-	
+	@Test
+	public void wildCardMultipleTest() {
+		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
+			List<List<String>> results = b.searchMultiples("2nd ", SearchType.WILDCARD, "name", "nodes");
+			assertTrue(results.size() == 26);
+		} catch (IOException e) {
+			e.printStackTrace();
+			assertTrue(false);
+		}
+	}
+
+
 	@Test
 	public void searchForWeirdWay() {
 		try (BinarySearchFile b = new BinarySearchFile(ways, "id", "id", "name", "start", "end")) {
-			List<List<String>> results = b.searchMultiples("/w/4188.7131", SearchType.WILDCARD, "id", "name", "start", "end");
-			Util.out(results);
+			List<List<String>> results = b.searchMultiples("/w/4200.7131", SearchType.WILDCARD, "id", "name", "start", "end");
+			assertTrue(results.get(0).get(0).equals("/w/4200.7131.158595100.112.2"));
+			assertTrue(results.get(results.size() -1).get(0).equals("/w/4200.7131.158595100.118.1"));
+
+		//	Util.out(results);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+
 	@Test
 	public void capitalizeTest() {
 		String orig = "what up";
 		assertTrue(Util.capitalizeAll(orig).equals("What Up"));
 	}
-	
+
 	@Test
 	public void testConcatByte() {
 		byte[] first = new byte[] {1, 2, 3,4, 5};
@@ -77,20 +99,9 @@ public class BinarySearchFileTest {
 		byte[] result = Util.concatByteArrays(first, second);
 		byte[] expected = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 		assertTrue(Arrays.equals(result, expected));
-		}
-	
-	
-
-	@Test
-	public void wildCardMultipleTest() {
-		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
-			assertTrue(b.searchMultiples("2nd ", SearchType.WILDCARD, "name", "nodes").size() == 26);
-		} catch (IOException e) {
-			e.printStackTrace();
-			assertTrue(false);
-		}
 	}
-	
+
+
 	@Test
 	public void wildCardTest() {
 		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
@@ -100,22 +111,11 @@ public class BinarySearchFileTest {
 		}
 	}
 
-//	@Test
-//	public void testDecimalDigitTest() {
-//		double testValue = Constants.INITIAL_LAT;
-//		assertTrue(84 == Util.decimalDigits(testValue, 2));
-//		assertTrue(8 == Util.decimalDigits(testValue, 1));
-//		assertTrue(0 == Util.decimalDigits(testValue, 0));
-//		assertTrue(0 == Util.decimalDigits(testValue, -1));
-//		testValue = Constants.INITIAL_LON;
-//		assertTrue (-41 == Util.decimalDigits(testValue, 2));
-//		assertTrue(-4 == Util.decimalDigits(testValue, 1));
-//		assertTrue(0 == Util.decimalDigits(testValue, 0));
-//		assertTrue(0 ==  Util.decimalDigits(testValue, -1));
-//		testValue = -73.8000;
-//		Util.out(Util.getFirst4Digits(testValue));
-//		
-//	}
+	@Test
+	public void testDecimalDigitTest() {
+		double testValue = Constants.INITIAL_LAT;
+		assertTrue(Util.getFirst4Digits(testValue).equals("4184"));
+	}
 
 	@Test
 	public void testReadChunks() throws IOException {
@@ -124,7 +124,6 @@ public class BinarySearchFileTest {
 		b.close();
 		assertTrue(true);
 	}
-	//Applied for single row - fix readchunks
 
 	@Test
 	public void testStringParse() {
@@ -182,10 +181,10 @@ public class BinarySearchFileTest {
 			if (!(cmp < 0)) {
 				int follow = line.charAt(name1.length());
 				if (!(follow == '\t' || follow == '\n')) {
-				System.err.println("jCompare Failed! Compare returned: " + cmp);
-				System.err.println("\tfirst: " + name1);
-				System.err.println("\tsecond: " + name2);
-				assertTrue(false);
+					System.err.println("jCompare Failed! Compare returned: " + cmp);
+					System.err.println("\tfirst: " + name1);
+					System.err.println("\tsecond: " + name2);
+					assertTrue(false);
 				}
 			}
 		}
@@ -211,9 +210,9 @@ public class BinarySearchFileTest {
 
 	@Test
 	public void WrongKey() throws Exception {
-		Resources r = new Resources(1);
+		new Resources(1);
 		assertTrue(null == Resources.indexFile.getXsByY("Taylor Lautner", "NEKEY"));
-		r.closeResources();
+		Resources.closeResources();
 	} 
 
 	@Test
@@ -226,27 +225,27 @@ public class BinarySearchFileTest {
 	@Test
 	public void BinarySearchNotThere() throws Exception {
 		//I don't think we want this behavior.
-		Resources r = new Resources(1);
+		new Resources(1);
 		assertTrue(Resources.indexFile.getXsByY("Taylor Badass", "name") == null);
-		r.closeResources();
+		Resources.closeResources();
 	} 
 
 
 	@Test
 	public void ActorCorrectLength() throws Exception {
-		Resources r = new Resources(1);
+		new Resources(1);
 		assertTrue(Resources.indexFile.search("Taylor Swift").equals("Taylor Swift\t/m/0dl567"));
-		r.closeResources();
+		Resources.closeResources();
 	}
 
 
 	@Test
 	public void testModdedComparator() {
-		byte[] a = "Sylvester Stallone".getBytes();
-//		assertTrue(BinarySearchFile.jCompare(a, b, 0) < 0);
-//		assertTrue(BinarySearchFile.jCompare(b, a, 0) > 0);
-//		assertTrue(BinarySearchFile.jCompare(b, c, 0) < 0);
-//		assertTrue(BinarySearchFile.jCompare(a, c, 0) < 0);
+		//byte[] a = "Sylvester Stallone".getBytes();
+		//		assertTrue(BinarySearchFile.jCompare(a, b, 0) < 0);
+		//		assertTrue(BinarySearchFile.jCompare(b, a, 0) > 0);
+		//		assertTrue(BinarySearchFile.jCompare(b, c, 0) < 0);
+		//		assertTrue(BinarySearchFile.jCompare(a, c, 0) < 0);
 	}
 
 	@Test
@@ -258,11 +257,10 @@ public class BinarySearchFileTest {
 
 	@Test
 	public void BinarySearchTest() throws Exception {
-		Resources r = new Resources(1);
-		assertTrue(r.indexFile.search("Fabio Stallone").equals("Fabio Stallone\t/m/07z32y_"));
-		r.closeResources();
+		new Resources(1);
+		assertTrue(Resources.indexFile.search("Fabio Stallone").equals("Fabio Stallone\t/m/07z32y_"));
+		Resources.closeResources();
 	}
-
 
 	@Test
 	public void testMatcher() {
@@ -290,7 +288,7 @@ public class BinarySearchFileTest {
 
 	@Test
 	public void testNewLine() throws Exception {
-		Resources r = new Resources(1);
+		new Resources(1);
 		RandomAccessFile raf = Resources.indexFile.raf;
 		long start = 77;
 		long newLineStart = Resources.indexFile.prevNewLine(start, 0);
@@ -298,8 +296,8 @@ public class BinarySearchFileTest {
 		raf.seek(newLineStart);
 		byte[] word = new byte[(int) (pos - newLineStart)];
 		raf.read(word);
-		assertTrue(r.indexFile.search("Samuel L. Jackson").equals("Samuel L. Jackson\t/m/0f5xn"));
-		r.closeResources();
+		assertTrue(Resources.indexFile.search("Samuel L. Jackson").equals("Samuel L. Jackson\t/m/0f5xn"));
+		Resources.closeResources();
 	}
 
 
@@ -312,16 +310,16 @@ public class BinarySearchFileTest {
 	}
 	@Test
 	public void SearchByName() throws Exception {
-		Resources r = new Resources(1);
+		new Resources(1);
 		assertTrue(Resources.indexFile.search("Samuel L. Jackson").equals("Samuel L. Jackson\t/m/0f5xn"));
-		r.closeResources();
+		Resources.closeResources();
 	}
 
 	@Test
 	public void SearchMoviesByID() throws Exception {
-		Resources r = new Resources(1);
+		new Resources(1);
 		assertTrue(Resources.waysFile.getXsByY("/m/02x3lt7", "name")[0].equals("Hannah Montana: The Movie"));
-		r.closeResources();
+		Resources.closeResources();
 	}
 	/*
 	@Test //Ant didn't like this test for some reason. It works though.
