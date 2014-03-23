@@ -1,8 +1,6 @@
 package maps;
 
-import kdtree.KDimensionable;
 import graph.Edge;
-import backend.Resources;
 
 public class Way implements Edge<Node> {
 	

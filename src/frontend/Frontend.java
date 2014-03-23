@@ -8,10 +8,8 @@ import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -20,9 +18,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
-
-import com.sun.org.apache.bcel.internal.generic.IfInstruction;
 
 import maps.MapFactory;
 import maps.Node;
@@ -48,7 +43,6 @@ public class Frontend implements ActionListener {
 	JFrame frame;
 	MapPane map;
 	Backend b;
-	private AtomicInteger threadCount;
 	final Cursor defaultCursor = Cursor.getDefaultCursor();
 	final Cursor busyCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 	PathWayRequester pwRequester;
@@ -70,7 +64,7 @@ public class Frontend implements ActionListener {
 		frame.setLayout(new FlowLayout());
 		frame.getContentPane().setBackground(Color.BLACK);
 		
-		//pwRequester handles requests to the backend for shortes path searches.
+		//pwRequester handles requests to the backend for shortest path searches.
 		pwRequester = new PathWayRequester(b);		
 
 		//Some panels to hold our buttons and search boxes
@@ -138,8 +132,6 @@ public class Frontend implements ActionListener {
 		
 		sidePanel.setBackground(Color.BLACK);
 		sidePanel.setOpaque(true);
-
-		threadCount = new AtomicInteger(0);
 		
 		//Create a new map!
 		map = new MapPane(b);

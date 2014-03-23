@@ -24,6 +24,7 @@ public class PathFinder<K extends PathNode<T>, T extends KDimensionable> {
 		consideredNodes = new HashMap<String, K>();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<Edge<T>> getPath() {
 		List<Edge<T>> pathWays = new LinkedList<>();
 		constructGraphToDest(source);
@@ -56,6 +57,7 @@ public class PathFinder<K extends PathNode<T>, T extends KDimensionable> {
 		return pathWays;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void printPath() {
 		//Populates 'nodes' and performs djikstra's algorithm, assigning distances
 		//and previous nodes to each one.
@@ -114,6 +116,7 @@ public class PathFinder<K extends PathNode<T>, T extends KDimensionable> {
 				Map<String, Edge<T>> edges = currentNode.getNeighbors();
 				for(Edge<T> edge : edges.values()) {
 					//FIXME Again, this is a weird cast.
+					@SuppressWarnings("unchecked")
 					K neighbor =  (K) new PathNodeWrapper(edge.getTarget());
 					//We don't want any duplicates 
 					//TODO this section is confusing.

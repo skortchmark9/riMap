@@ -3,10 +3,7 @@
  */
 package backend;
 
-import java.text.DecimalFormat;
-
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 /**
  * @author emc3
@@ -140,7 +137,8 @@ public class Util {
 	 * @return the time of clock start
 	 */
 	public static long resetClock() {
-		return (START = System.currentTimeMillis()); 
+		START = System.currentTimeMillis(); 
+		return START;
 	}
 	
 	/**

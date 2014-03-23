@@ -1,9 +1,6 @@
 package backend;
 
-import static org.junit.Assert.*;
-
-import java.util.NavigableMap;
-import java.util.TreeMap;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 

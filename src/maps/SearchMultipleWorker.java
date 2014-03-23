@@ -3,8 +3,8 @@ package maps;
 import java.util.List;
 
 import backend.BinarySearchFile;
-import backend.Resources;
 import backend.BinarySearchFile.SearchType;
+import backend.Resources;
 
 class SearchMultipleWorker implements Runnable {
 	private List<List<String>> wayInfoChunk;
@@ -38,6 +38,8 @@ class SearchMultipleWorker implements Runnable {
 		synchronized(wayInfoChunk) {
 			wayInfoChunk.addAll(templist);
 		}
+		//TODO is this okay?
+		f.close();
 		//wayInfoChunk.addAll(Resources.waysFile.searchMultiples(searchCode, SearchType.WILDCARD, "id", "name", "start", "end"));
 	}
 	

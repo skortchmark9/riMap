@@ -4,7 +4,6 @@
 package maps;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import kdtree.KDimensionable;
@@ -82,6 +81,7 @@ public class Node implements KDimensionable {
 		return 2;
 	}
 	
+	@SuppressWarnings("unused")
 	private double manhattanDistanceTo(KDimensionable kd) {
 		double[] otherCoords = kd.getCoordinates();
 		double latDiff = Math.abs(coords[0] - otherCoords[0]);
@@ -90,6 +90,7 @@ public class Node implements KDimensionable {
 		return latDiff + lonDiff;
 	}
 	
+	@SuppressWarnings("unused")
 	private double squareDistanceTo(KDimensionable kd) {
 		double[] otherCoords = kd.getCoordinates();
 		double dist = Math.pow(coords[0] - otherCoords[0], 2) + Math.pow(coords[1] - otherCoords[1], 2);

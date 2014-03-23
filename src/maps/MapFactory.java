@@ -3,7 +3,6 @@ package maps;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -113,50 +112,7 @@ public class MapFactory {
 		}
 	}
 
-	/**
-	 * Gets all the ways within a given lat-lng range. Threaded, to allow 
-	 * quick access and loading of ways while keeping the GUI responding.
-	 * @param minLat - the minLat of the block
-	 * @param maxLat - the maxLat of the block
-	 * @param minLon - the minLon of the block
-	 * @param maxLon - the maxLon of the block
-	 * @return - 
-	 */
-	public static synchronized List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
-		if (Constants.DEBUG_MODE) {
-			Util.out("Looking for Ways in Range");
-			Util.resetClock();
-		}
-		
-		List<Way> ways = new LinkedList<>();
-		for(double i = minLat; i <= maxLat + 0.01; i+=0.01) {
-			for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
-				String searchCode = "/w/" + Util.getFirst4Digits(i) + "." + Util.getFirst4Digits(j);
-				
-				if (Constants.DEBUG_MODE) {
-					Util.out("SC:", searchCode);
-					if (searchCode.equals("/w/4165.7209.189121272.3.1"))
-						Util.out("HERE");
-				}
-				
-				List<List<String>> chunk = new LinkedList<>();
-				//synchronized(Resources.waysFile) {
-				chunk = Resources.waysFile.searchMultiples(searchCode, SearchType.WILDCARD, "id", "name", "start", "end");
-				//}
-				for (List<String> wayInfo : chunk) {
-					if (wayInfo != null && !wayInfo.isEmpty()) {
-						Way possibleWay = createWay(wayInfo.get(0), wayInfo.get(1), wayInfo.get(2), wayInfo.get(3));
-						if (possibleWay != null) {
-							ways.add(possibleWay);
-						}
-					}
-				}
-			}
-		}
-		return ways;
-	}	
 
-	
 	
 /*******	NODE CREATION WRAPPERS - THEY ARE ALL KINDA THE SAME ********/
 	
@@ -252,9 +208,7 @@ public class MapFactory {
 			Util.out("Reading node data from file to List (System Calls):");
 			start = Util.resetClock();
 		}
-		
 		List<List<String>> nodes = Resources.nodesFile.readChunks("id", "latitude", "longitude", "ways");
-		
 		if (Constants.DEBUG_MODE) {
 			Util.out("Populated List with node data.", "(Elapsed:", Util.timeSince(start) + ")");
 			Util.memLog();
@@ -335,19 +289,13 @@ public class MapFactory {
 		ExecutorService executor = Executors.newFixedThreadPool(4);
 		for(double i = minLat; i <= maxLat + 0.01; i+=0.01) {
 			for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
+				Util.resetClock();
 				String searchCode = "/w/" + Util.getFirst4Digits(i) + "." + Util.getFirst4Digits(j);
-				
-				if (Constants.DEBUG_MODE) {
-					Util.out("SC:", searchCode);
-					if (searchCode.equals("/w/4165.7209.189121272.3.1"))
-						Util.out("HERE");
-				}
-				
 				SearchMultipleWorker worker = new SearchMultipleWorker(wayInfoChunk, searchCode);
 				executor.execute(worker);
+				Util.out("This block took:", Util.lap());
 			}
 		}
-		
 		executor.shutdown(); //tell executor to finish all submitted tasks
 		while(!executor.isTerminated()) {} //wait for all tasks to complete
 		for (List<String> wayInfo : wayInfoChunk) {
@@ -359,5 +307,53 @@ public class MapFactory {
 		}
 		return ways;
 	}
+	
+	/**
+	 * Gets all the ways within a given lat-lng range. Threaded, to allow 
+	 * quick access and loading of ways while keeping the GUI responding.
+	 * @param minLat - the minLat of the block
+	 * @param maxLat - the maxLat of the block
+	 * @param minLon - the minLon of the block
+	 * @param maxLon - the maxLon of the block
+	 * @return - 
+	 */
+	public static synchronized List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+		if (Constants.DEBUG_MODE) {
+			Util.out("Looking for Ways in Range");
+			Util.resetClock();
+		}
+		
+		List<Way> ways = new LinkedList<>();
+		long start = Util.resetClock();
+		for(double i = minLat; i <= maxLat + 0.01; i+=0.01) {
+			for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
+				String searchCode = "/w/" + Util.getFirst4Digits(i) + "." + Util.getFirst4Digits(j); //lAT/LNG
+	//			String searchCode = "/w/" + Util.getFirst4Digits(i) + "."; //JUST LATS
+
+				Util.resetClock();
+				if (Constants.DEBUG_MODE) {
+					Util.out("SC:", searchCode);
+				}
+				
+				List<List<String>> chunk = new LinkedList<>();
+				//synchronized(Resources.waysFile) {
+				chunk = Resources.waysFile.searchMultiples(searchCode, SearchType.WILDCARD, "id", "name", "start", "end");
+				//}
+				for (List<String> wayInfo : chunk) {
+					if (wayInfo != null && !wayInfo.isEmpty()) {
+						Way possibleWay = createWay(wayInfo.get(0), wayInfo.get(1), wayInfo.get(2), wayInfo.get(3));
+						if (possibleWay != null) {
+							ways.add(possibleWay);
+						}
+					}
+				}
+				Util.out("SC:", searchCode, "This block took:", Util.lap());
+			}
+		}
+		Util.out("This search took: ", System.currentTimeMillis() - start);
+		return ways;
+	}	
+
+	
 	
 }

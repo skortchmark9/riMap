@@ -6,7 +6,6 @@ import java.awt.FlowLayout;
 import java.io.IOException;
 
 import javax.swing.JFrame;
-import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;

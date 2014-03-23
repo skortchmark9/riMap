@@ -25,7 +25,7 @@ public class Resources {
 		indexFile =  new BinarySearchFile("./data/baconfiles/index.tsv", "name", "name", "nodes");
 	}
 
-	public void closeResources() {
+	public static void closeResources() {
 		waysFile.close();
 		nodesFile.close();
 		indexFile.close();
