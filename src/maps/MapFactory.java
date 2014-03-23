@@ -1,6 +1,7 @@
 package maps;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -24,10 +25,11 @@ import backend.Util;
  *
  */
 public class MapFactory {
-	
+
 	private static ConcurrentHashMap<String, Node> nodes = new ConcurrentHashMap<>(65000);
 	private static ConcurrentHashMap<String, Way> ways = new ConcurrentHashMap<>(35000);
-	
+	private static ConcurrentHashMap<String, List<String>> wayArray;
+
 	/**
 	 * Creates a way from the wayID. Attempts to find a cached way if one
 	 * doesn't exist. If not, searches the waysFile.
@@ -51,7 +53,7 @@ public class MapFactory {
 			return createWay(wayID, wayInfo[0], startLoc, endLoc);
 		}
 	}
-	
+
 	/**
 	 * Creates a way from the following pieces of information.
 	 * @param wayID - the ID of the way
@@ -68,7 +70,7 @@ public class MapFactory {
 		}
 		return resultWay;
 	}
-	
+
 	/**
 	 * Creates a way if we don't have the actual nodes, but only their names
 	 * @param wayID - the wayID we are searching for. 
@@ -86,36 +88,36 @@ public class MapFactory {
 				resultWay = createWay(wayID, name, startNode, endNode);
 			}
 			if (resultWay != null) {
-			ways.put(wayID, resultWay);
+				ways.put(wayID, resultWay);
 			} else {
 				return null;
 			}
 		}
 		return resultWay;
 	}
-	
+
 	/**
 	 * A method for the curious to see how many ways there are.
 	 */
 	public static void getNumWays() {
 		if (Constants.DEBUG_MODE) {
-		Util.out("Num Ways", ways.size());
+			Util.out("Num Ways", ways.size());
 		}
 	}
-	
+
 	/**
 	 * A method for the curious to see how many ways there are.
 	 */
 	public static void getNumNodes() {
 		if (Constants.DEBUG_MODE) {
-		Util.out("Num Nodes", nodes.size());
+			Util.out("Num Nodes", nodes.size());
 		}
 	}
 
 
-	
-/*******	NODE CREATION WRAPPERS - THEY ARE ALL KINDA THE SAME ********/
-	
+
+	/*******	NODE CREATION WRAPPERS - THEY ARE ALL KINDA THE SAME ********/
+
 	/**
 	 * Method for creating nodes from the following pieces of information.
 	 * @param nodeID - the ID of the node in question.
@@ -132,7 +134,7 @@ public class MapFactory {
 			lat = Double.parseDouble(latitude);
 			lon = Double.parseDouble(longitude);
 			waysList = Arrays.asList(Constants.comma.split(ways));
-		//If we can't parse its coordinates, we'll return null;
+			//If we can't parse its coordinates, we'll return null;
 		} catch (NumberFormatException nfe) {
 			return null;
 		}
@@ -144,7 +146,7 @@ public class MapFactory {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Attempts to find the node from the hashmap of nodes, if not, gets it from file.
 	 * @param nodeID - the ID of the node in question.
@@ -163,7 +165,7 @@ public class MapFactory {
 			return createNode(nodeID, nodeInfo[0], nodeInfo[1], nodeInfo[2]);
 		}
 	}
-	
+
 	/** Creates an intersection from two street names.
 	 * Finds the names of the streets in the file, and then finds nodes that appear
 	 * in both of those streets' ways. 
@@ -188,7 +190,7 @@ public class MapFactory {
 			for(String nodes : nodeList) {
 				for(String node : Constants.comma.split(nodes)) {
 					if (street1nodeIDs.contains(node)) {
-						
+
 						Node result =  createNode(node);
 						if (Constants.DEBUG_MODE) {
 							Util.out(result);
@@ -200,7 +202,7 @@ public class MapFactory {
 		}
 		return null;
 	}
-	
+
 	/** Attempts to create a KDTree from the nodes file we have. */
 	public static KDTree<Node> createKDTree() throws IOException {
 		long start = 0; //XXX: FOR DEBUGGING
@@ -215,7 +217,7 @@ public class MapFactory {
 			Util.out("Creating Node objects from node data:");
 			start = Util.resetClock();
 		}
-		
+
 		List<Node> nodeList = new LinkedList<>();
 		//Iterators here because we are parsing a lot of data and we want to make the best use of our
 		//underlying data structure. The wrapper list is a LinkedList and the underlying one is an arrayList.
@@ -229,17 +231,17 @@ public class MapFactory {
 				}
 			}
 		}
-		
+
 		if (Constants.DEBUG_MODE) {
 			Util.out("Finished Nodes creation", "(Elapsed:", Util.timeSince(start) + ")");
 			Util.memLog();
 			Util.out("Creating KDTree from Nodes List:");
 			Util.resetClock();
 		}
-		
+
 		return new KDTree<Node>(nodeList);
 	}
-	
+
 	public static RadixTree createRadixTree() throws IOException {
 		long start = 0; //XXX: FOR DEBUGGING
 		if (Constants.DEBUG_MODE) {
@@ -247,15 +249,15 @@ public class MapFactory {
 			Util.memLog();
 			start = Util.resetClock();
 		}
-		
+
 		List<List<String>> names = Resources.indexFile.readChunks("name");
-		
+
 		if (Constants.DEBUG_MODE) {
 			Util.out("Done reading names to list.", "(Elapsed:", Util.timeSince(start) + ")");
 			Util.out("Creating Tree from List:");
 			start = Util.resetClock();
 		}
-		
+
 		RadixTree rt = new RadixTree();
 		for(List<String> nameList : names) {
 			String lastWord = "";
@@ -268,22 +270,22 @@ public class MapFactory {
 				}
 			}
 		}
-		
+
 		if (Constants.DEBUG_MODE) {
 			Util.out("Done inserting names from list to Radix Tree.", "(Elapsed:", Util.timeSince(start) + ")");
 		}
-		
+
 		return rt;
 	}
-	
-	
+
+
 	public static synchronized List<Way> getWaysInRangeFaster(double minLat, double maxLat, double minLon, double maxLon) {
-		
+
 		if (Constants.DEBUG_MODE) {
 			Util.out("Looking for Ways in Range using THREADS");
 			Util.resetClock();
 		}
-		
+
 		List<Way> ways = new LinkedList<>();
 		List<List<String>> wayInfoChunk = Collections.synchronizedList(new LinkedList<List<String>>());
 		ExecutorService executor = Executors.newFixedThreadPool(4);
@@ -307,7 +309,7 @@ public class MapFactory {
 		}
 		return ways;
 	}
-	
+
 	/**
 	 * Gets all the ways within a given lat-lng range. Threaded, to allow 
 	 * quick access and loading of ways while keeping the GUI responding.
@@ -322,38 +324,47 @@ public class MapFactory {
 			Util.out("Looking for Ways in Range");
 			Util.resetClock();
 		}
-		
+		if (wayArray == null) {
+			int size = (int) Math.ceil((Constants.MAXIMUM_LATITUDE - Constants.MINIMUM_LATITUDE) * 100);
+			wayArray = new ConcurrentHashMap<>(size);
+		}
+
 		List<Way> ways = new LinkedList<>();
 		long start = Util.resetClock();
 		for(double i = minLat; i <= maxLat + 0.01; i+=0.01) {
 			for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
 				String searchCode = "/w/" + Util.getFirst4Digits(i) + "." + Util.getFirst4Digits(j); //lAT/LNG
-	//			String searchCode = "/w/" + Util.getFirst4Digits(i) + "."; //JUST LATS
-
 				Util.resetClock();
 				if (Constants.DEBUG_MODE) {
 					Util.out("SC:", searchCode);
 				}
-				
-				List<List<String>> chunk = new LinkedList<>();
-				//synchronized(Resources.waysFile) {
-				chunk = Resources.waysFile.searchMultiples(searchCode, SearchType.WILDCARD, "id", "name", "start", "end");
-				//}
-				for (List<String> wayInfo : chunk) {
-					if (wayInfo != null && !wayInfo.isEmpty()) {
-						Way possibleWay = createWay(wayInfo.get(0), wayInfo.get(1), wayInfo.get(2), wayInfo.get(3));
-						if (possibleWay != null) {
-							ways.add(possibleWay);
+
+				List<String> wayIDsInRange = wayArray.get(searchCode);
+				if (wayIDsInRange !=null) {
+					for(String wayID : wayIDsInRange) {
+						ways.add(createWay(wayID));
+					}
+				} else {				
+					List<List<String>> chunk = new LinkedList<>();
+					//synchronized(Resources.waysFile) {
+					chunk = Resources.waysFile.searchMultiples(searchCode, SearchType.WILDCARD, "id", "name", "start", "end");
+					//}
+					List<String> wayIDsInBlock = new LinkedList<>();
+					for (List<String> wayInfo : chunk) {
+						if (wayInfo != null && !wayInfo.isEmpty()) {
+							Way possibleWay = createWay(wayInfo.get(0), wayInfo.get(1), wayInfo.get(2), wayInfo.get(3));
+							if (possibleWay != null) {
+								ways.add(possibleWay);
+							}
+							wayIDsInBlock.add(wayInfo.get(0));
 						}
 					}
+					Util.out("SC:", searchCode, "This block took:", Util.lap());
+					wayArray.put(searchCode, wayIDsInBlock);
 				}
-				Util.out("SC:", searchCode, "This block took:", Util.lap());
 			}
 		}
 		Util.out("This search took: ", System.currentTimeMillis() - start);
 		return ways;
-	}	
-
-	
-	
+	}
 }
