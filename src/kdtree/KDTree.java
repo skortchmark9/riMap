@@ -20,6 +20,8 @@ public class KDTree<KDType extends KDimensionable> {
 	private KDNode _root;
 	private int _k = 0; //number of dimensions
 	private long _size;
+	private List<MinMaxPair> bounds;
+	
 
 	private NeighborList _neighborList;
 	
@@ -39,6 +41,7 @@ public class KDTree<KDType extends KDimensionable> {
 			_k = k;
 		else
 			System.err.println("ERROR: KDTree constructor: Dimension must be at least 1");
+		bounds = new ArrayList<>(_k);
 	}
 	
 	/**
@@ -59,12 +62,22 @@ public class KDTree<KDType extends KDimensionable> {
 			ArrayList<KDType> l = new ArrayList<>(collection);
 			KDimensionComparator comparator = new KDimensionComparator(i); //compare nodes on axis i
 			Collections.sort(l, comparator); //sort the list using comparator : ascending by axis i
+			double min = l.get(0).getCoordinates()[i];
+			double max = l.get(l.size() - 1).getCoordinates()[i];
+			bounds.add(new MinMaxPair(min, max));
 			superList.add(l);
 		}
 		_root = this.recursiveBuildFaster(superList, 0); //build a new KDTree from the collection.
 	}
 	
+	public double getMax(int axis) {
+		return bounds.get(axis).getMax();
+	}
 	
+	public double getMin(int axis) {
+		return bounds.get(axis).getMin();
+	}
+
 	/**
 	 * This was the old constructor.
 	 * Used recursiveBuild() instead of recursiveBuildFaster() 
@@ -215,7 +228,6 @@ public class KDTree<KDType extends KDimensionable> {
 		_size++;
 		return node;
 	}
-	
 	
 	/**
 	 * Searches this tree for at most n nearest neighbors 
@@ -581,6 +593,23 @@ public class KDTree<KDType extends KDimensionable> {
 		private void putRight(KDNode node) {
 			_right = node;
 		}	
+	}
+	
+	private class MinMaxPair {
+		double minValue;
+		double maxValue;
+		
+		MinMaxPair(double min, double max) {
+			minValue = min;
+			maxValue = max;
+		}
+		
+		double getMin() {
+			return minValue;
+		}
+		double getMax() {
+			return maxValue;
+		}
 	}
 	
 	

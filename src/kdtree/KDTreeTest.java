@@ -5,17 +5,36 @@ package kdtree;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import maps.MapFactory;
+import maps.Node;
+
 import org.junit.Test;
+
+import backend.Constants;
+import backend.Resources;
 
 /**
  * @author emc3
  *
  */
 public class KDTreeTest {
+	
+	
+	
+	@Test
+	public void testGettingBounds() throws IOException {
+		new Resources("./data/mapsfiles/ways.tsv", "./data/mapsfiles/nodes.tsv", "./data/mapsfiles/index.tsv");
+		KDTree<Node> kd = MapFactory.createKDTree();
+		assertTrue(kd.getMax(0) == Constants.MAXIMUM_LATITUDE);
+		assertTrue(kd.getMin(0) == Constants.MINIMUM_LATITUDE);
+		assertTrue(kd.getMax(1) == Constants.MAXIMUM_LONGITUDE);
+		assertTrue(kd.getMin(1) == Constants.MINIMUM_LONGITUDE);
+	}
 	
 	/**
 	 * Test that the new constructing method actually constructs a tree.

@@ -57,9 +57,11 @@ public class Backend {
 		if (options.size() == 0) {
 			initAutoCorrect();
 			initKDTree();
+			initBoundaries();
 		} else {
 			if (options.contains(BackendType.KD)) {
 				initKDTree();			
+				initBoundaries();
 			}
 			if (options.contains(BackendType.AC)) {
 				initAutoCorrect();
@@ -90,6 +92,16 @@ public class Backend {
 			Util.out("End KD Build (Total Elapsed:", Util.timeSince(start)+")");
 			Util.memLog();
 		}
+	}
+	
+	void initBoundaries() {
+		if (kd == null) {
+			Util.err("ERROR: Could not load boundaries because KD Tree is not initialized");
+		}
+		Constants.MAXIMUM_LATITUDE = kd.getMax(0);
+		Constants.MINIMUM_LATITUDE = kd.getMin(0);
+		Constants.MAXIMUM_LONGITUDE = kd.getMax(1);
+		Constants.MINIMUM_LONGITUDE = kd.getMin(1);
 	}
 	
 	/**
@@ -147,7 +159,10 @@ public class Backend {
 	}
 
 	public List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
-		return MapFactory.getWaysInRange(minLat, maxLat, minLon, maxLon);
+		long start = System.currentTimeMillis();		
+		List<Way> results = MapFactory.getWaysInRange(minLat, maxLat, minLon, maxLon);
+		Util.out("GETTING WAYS TOOK: ", System.currentTimeMillis() - start);
+		return results;
 	}
 
 	public List<Node> getNearestNeighbors(int num, KDimensionable testPoint) {
