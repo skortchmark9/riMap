@@ -36,7 +36,7 @@ public class MapFactory {
 	 * @param wayID - the wayID in question. 
 	 * @return - a Way, or null if one cannot be created.
 	 */
-	public static synchronized Way createWay(String wayID) {
+	public static Way createWay(String wayID) {
 		Way possibleWay= ways.get(wayID);
 		if (possibleWay != null) {
 			return possibleWay;
@@ -291,11 +291,9 @@ public class MapFactory {
 		ExecutorService executor = Executors.newFixedThreadPool(4);
 		for(double i = minLat; i <= maxLat + 0.01; i+=0.01) {
 			for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
-				Util.resetClock();
 				String searchCode = "/w/" + Util.getFirst4Digits(i) + "." + Util.getFirst4Digits(j);
 				SearchMultipleWorker worker = new SearchMultipleWorker(wayInfoChunk, searchCode);
 				executor.execute(worker);
-				Util.out("This block took:", Util.lap());
 			}
 		}
 		executor.shutdown(); //tell executor to finish all submitted tasks
@@ -346,9 +344,7 @@ public class MapFactory {
 					}
 				} else {				
 					List<List<String>> chunk = new LinkedList<>();
-					//synchronized(Resources.waysFile) {
 					chunk = Resources.waysFile.searchMultiples(searchCode, SearchType.WILDCARD, "id", "name", "start", "end");
-					//}
 					List<String> wayIDsInBlock = new LinkedList<>();
 					for (List<String> wayInfo : chunk) {
 						if (wayInfo != null && !wayInfo.isEmpty()) {
@@ -359,12 +355,10 @@ public class MapFactory {
 							wayIDsInBlock.add(wayInfo.get(0));
 						}
 					}
-					Util.out("SC:", searchCode, "This block took:", Util.lap());
 					wayArray.put(searchCode, wayIDsInBlock);
 				}
 			}
 		}
-		Util.out("This search took: ", System.currentTimeMillis() - start);
 		return ways;
 	}
 }
