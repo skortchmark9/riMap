@@ -9,7 +9,7 @@ import backend.Backend;
 import frontend.Frontend;
 
 public class Main {
-	
+
 	/**
 	 * the main line of the Maps program.
 	 * Parses the arguments for correctness.
@@ -36,18 +36,16 @@ public class Main {
 				}
 			}
 		}
-		Backend b = null;
+			Backend b = null;
 			try {
 				b = new Backend(WNI.toArray(new String[3]));
 			} catch (IOException e) {
-			System.out.println("ERROR: Could not instantiate backend");
-			System.exit(1);
+				System.out.println("ERROR: Could not instantiate backend");
+				System.exit(1);
+			}
+			if (gui)
+				new Frontend(b);
+			else
+				new MapsCLI(b);
 		}
-		
-		if (gui) {
-			new Frontend(b);
-		} else {
-			new MapsCLI(b);
-		}
-	}
 }

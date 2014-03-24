@@ -9,7 +9,7 @@ import autocorrect.Ranker;
 public class Constants {
 	
 	//XXX DEBUG MODE
-	public static final boolean DEBUG_MODE = true; //XXX TURN THIS OFF BEFORE HANDIN / SYSTEM TESTS
+	public static final boolean DEBUG_MODE = false; //XXX TURN THIS OFF BEFORE HANDIN / SYSTEM TESTS
 	//XXX DEBUG MODE
 	
 	//Precompiled regex patterns to make split and replace faster. 
@@ -30,7 +30,7 @@ public class Constants {
 	public static final double INITIAL_LAT = 41.842678; //Home Depot
 	public static final double INITIAL_LON = -71.417541;
 	public static final double GEO_DIMENSION_FACTOR = 0.02;
-	public static final double MIN_ZOOM = 0.2;
+	public static final double MIN_ZOOM = 0.1;
 	public static final double MAX_ZOOM = 12.0;
 	public static final Color MIDNIGHT = new Color(60, 62, 67);
 	public static final Color GLOW_IN_THE_DARK = new Color(236, 240, 230);

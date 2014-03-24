@@ -33,6 +33,11 @@ public class Backend {
 	KDTree<Node> kd = null; //the KDTree!
 	Engine autoCorrectEngine = null;
 	public enum BackendType {KD, AC};
+	boolean done;
+	
+	public Backend() {
+		done = false;
+	}
 	
 	/**
 	 * Main constructor for the backend.
@@ -43,6 +48,11 @@ public class Backend {
 	 * @throws IOException if the files are invalid and Resources could not be instantiated properly. 
 	 */
 	public Backend(String[] args, BackendType...ts) throws IOException {
+		this();
+		initBackend(args, ts);
+	}
+	
+	public void initBackend(String[] args, BackendType...ts) throws IOException {
 		if (args.length != 3) {
 			Util.err("ERROR: Incorrect number of resources");
 			throw new IOException();
@@ -67,7 +77,13 @@ public class Backend {
 				initAutoCorrect();
 			}
 		}
+		done = true;
 	}
+	
+	public boolean isDone() {
+		return done;
+	}
+
 	
 	/**
 	 * Initializes a new KDTree by querying MapFactory

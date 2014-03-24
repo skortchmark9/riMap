@@ -54,6 +54,12 @@ public class Frontend implements ActionListener {
 	 * Also puts a few buttons on the screen.
 	 * @param b - the backend which drives the Maps application
 	 */
+	
+	public Frontend() {
+		
+	}
+	
+	
 	public Frontend(Backend b) {
 		this.b = b; //set backend reference
 		
@@ -127,8 +133,7 @@ public class Frontend implements ActionListener {
 		//Note these lines are necessary because we don't handle appending text
 		//from the event dispatching thread.
 		DefaultCaret caret = (DefaultCaret)msgBox.getCaret();
-		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-		
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);		
 		Util.setGUIMessageBox(msgBox);
 		sidePanel.add(new JScrollPane(msgBox));
 		Util.guiMessage("Console: look here for messages");
