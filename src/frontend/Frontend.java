@@ -2,10 +2,10 @@ package frontend;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -18,6 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.text.DefaultCaret;
 
 import maps.MapFactory;
 import maps.Node;
@@ -120,14 +121,16 @@ public class Frontend implements ActionListener {
 		sidePanel.add(clearPoints);
 		
 		//message box to print messages to the user
-		msgBox = new JTextArea();
+		msgBox = new JTextArea(5, 20);
+		msgBox.setMargin(new Insets(5,5,5,5));		
 		msgBox.setEditable(false);
-		msgBox.setPreferredSize(new Dimension(100, 400));
+		//Note these lines are necessary because we don't handle appending text
+		//from the event dispatching thread.
+		DefaultCaret caret = (DefaultCaret)msgBox.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		
 		Util.setGUIMessageBox(msgBox);
-		msgBox.setOpaque(false);
-		JScrollPane scroller = new JScrollPane(msgBox, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		scroller.setPreferredSize(new Dimension(100, 50));
-		sidePanel.add(scroller);
+		sidePanel.add(new JScrollPane(msgBox));
 		Util.guiMessage("Console: look here for messages");
 		
 		sidePanel.setBackground(Color.BLACK);

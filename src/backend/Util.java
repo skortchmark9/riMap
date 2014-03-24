@@ -7,7 +7,6 @@ import javax.swing.JTextArea;
 
 /**
  * @author emc3
- *
  */
 public class Util {
 	
@@ -182,8 +181,8 @@ public class Util {
 	 * Sets the Util msgBox reference to the message box in the gui.
 	 * @param msgBox2 - the message box to set as the new message box reference
 	 */
-	public static void setGUIMessageBox(JTextArea msgBox2) {
-		Util.msgBox = msgBox2;
+	public static void setGUIMessageBox(JTextArea msgBox) {
+		Util.msgBox = msgBox;
 	}
 	
 	/**
@@ -195,6 +194,7 @@ public class Util {
 	 */
 	public static void guiMessage(String str) {
 		if (msgBox == null) return;
-		msgBox.setText(str + "\n" + msgBox.getText());
+		msgBox.append(str + "\n");
+		msgBox.revalidate();
 	}
 }
