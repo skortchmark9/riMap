@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -47,29 +48,55 @@ public class Frontend implements ActionListener {
 	final Cursor defaultCursor = Cursor.getDefaultCursor();
 	final Cursor busyCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 	PathWayRequester pwRequester;
+	LoadingPane loadingScreen;
 
 	/**
 	 * Main constructor.<br>
 	 * Creates a new JFrame and initializes the map inside of that.
 	 * Also puts a few buttons on the screen.
-	 * @param b - the backend which drives the Maps application
-	 */
-	
-	public Frontend() {
-		
-	}
-	
-	
+	 */	
 	public Frontend(Backend b) {
-		this.b = b; //set backend reference
-		
-		//JFrame init
 		frame = new JFrame("MAPS");
 		frame.setTitle("MAPS - By Samuel Kortchmar and Eli Martinez Cohen");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		frame.setLayout(new FlowLayout());
 		frame.getContentPane().setBackground(Color.BLACK);
+		JPanel boilerPlate = new JPanel();
+		boilerPlate.setLayout(new BoxLayout(boilerPlate, BoxLayout.Y_AXIS));
+		boilerPlate.setBorder(BorderFactory.createEmptyBorder(300, 100, 100, 100));
+		boilerPlate.setOpaque(false);
+		
+		String[] titles = {"       MAPS", "BY ELIAS MARTINEZ COHEN", "AND SAMUEL V. KORTCHMAR"};
+		for(int i = 0; i < titles.length; i++ ) {
+			JLabel label = new JLabel(titles[i], JLabel.CENTER);
+			label.setForeground(Constants.GLOW_IN_THE_DARK);
+			if (i == 0)
+				label.setFont(new Font(Font.MONOSPACED, Font.BOLD|Font.ITALIC, 16));
+			else
+				label.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
+			boilerPlate.add(label);
+		}
+
+		loadingScreen = new LoadingPane();
+		frame.setCursor(busyCursor);
+		JPanel loadingPanel = new JPanel(new BorderLayout());
+		loadingPanel.setOpaque(false);
+		loadingPanel.add(loadingScreen);
+		loadingPanel.add(boilerPlate, BorderLayout.NORTH);
+		frame.add(loadingPanel);
+		frame.pack();
+		frame.setVisible(true);
+		loadingPanel.grabFocus();
+		b.setLoadingScreen(loadingScreen);
+		b.initBackend();
+		this.b = b;
+		frame.remove(loadingPanel);
+		frame.setCursor(defaultCursor);
+		initMainScreen();
+	}
+	
+	void initMainScreen() {
 		
 		//pwRequester handles requests to the backend for shortest path searches.
 		pwRequester = new PathWayRequester(b);		
@@ -147,9 +174,8 @@ public class Frontend implements ActionListener {
 		//add panels to Frame
 		frame.add(sidePanel, BorderLayout.WEST);
 		frame.add(map, BorderLayout.CENTER);
-		frame.pack();
-		frame.setVisible(true);
-	}
+		frame.revalidate();
+		}
 	
 	/**
 	 * Handles the various buttons' actions from the GUI

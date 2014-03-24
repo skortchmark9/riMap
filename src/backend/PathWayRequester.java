@@ -36,7 +36,6 @@ public class PathWayRequester {
 		return way;
 	}
 
-
 	class CallableWays implements Callable<List<Way>> {
 
 		Node start, end;

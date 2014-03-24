@@ -11,7 +11,6 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import backend.Backend;
-import backend.Backend.BackendType;
 
 public class AutoCorrectDemo {
 	public static void main(String[] args) {
@@ -37,14 +36,13 @@ public class AutoCorrectDemo {
 				frame.setLocationRelativeTo(null);
 				frame.setLayout(new FlowLayout());
 				Backend b = null;
-				try {
+
+				//TODO
+				//init resources
 					String arg1 = "./data/mapsfiles/ways.tsv";
 					String arg2	= "./data/mapsfiles/nodes.tsv";
 					String arg3 = "./data/mapsfiles/index.tsv";
-					b = new Backend(new String[] {arg1, arg2, arg3}, BackendType.AC);
-	           } catch (IOException e) {
-					e.printStackTrace();
-				}
+					b = new Backend();
 				frame.add(new SearchAutoFillPane(b, "!!!!"), BorderLayout.NORTH);
 				frame.pack();
 				frame.setVisible(true);

@@ -4,9 +4,14 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import cli.MapsCLI;
+import javax.swing.SwingUtilities;
+
 import backend.Backend;
+import backend.Resources;
+import backend.Util;
+import cli.MapsCLI;
 import frontend.Frontend;
+import frontend.LoadingPane;
 
 public class Main {
 
@@ -36,16 +41,19 @@ public class Main {
 				}
 			}
 		}
-			Backend b = null;
-			try {
-				b = new Backend(WNI.toArray(new String[3]));
-			} catch (IOException e) {
-				System.out.println("ERROR: Could not instantiate backend");
-				System.exit(1);
-			}
-			if (gui)
-				new Frontend(b);
-			else
-				new MapsCLI(b);
+		try {
+			new Resources(WNI.get(0), WNI.get(1), WNI.get(2));
+		} catch (IOException e) {
+			Util.err("ERROR: Could not generate Resources");
+			System.exit(1);
 		}
+		Backend b = new Backend();
+		if (gui) {
+			new Frontend(b);
+		}
+		else {
+			b.initBackend();
+			new MapsCLI(b);
+		}
+	}
 }

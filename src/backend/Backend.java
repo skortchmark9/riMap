@@ -1,5 +1,6 @@
 package backend;
 
+import frontend.LoadingPane;
 import graph.Edge;
 import graph.PathFinder;
 
@@ -32,58 +33,32 @@ public class Backend {
 
 	KDTree<Node> kd = null; //the KDTree!
 	Engine autoCorrectEngine = null;
-	public enum BackendType {KD, AC};
 	boolean done;
-	
+	LoadingPane l = null;
+
+	/**
+	 * Main constructor for the backend.
+	 */
 	public Backend() {
 		done = false;
 	}
 	
-	/**
-	 * Main constructor for the backend.
-	 * Init's the ways / nodes / index files by creating a new Resources(),
-	 * BackendType is an enum used for testing. 
-	 * @param args - an array containing the filepaths of the resource files (ways.tsv / nodes.tsv / index.tsv)
-	 * @param ts - the Backend type. used for testing.
-	 * @throws IOException if the files are invalid and Resources could not be instantiated properly. 
-	 */
-	public Backend(String[] args, BackendType...ts) throws IOException {
-		this();
-		initBackend(args, ts);
+	public void setLoadingScreen(LoadingPane l) {
+		this.l = l;
 	}
 	
-	public void initBackend(String[] args, BackendType...ts) throws IOException {
-		if (args.length != 3) {
-			Util.err("ERROR: Incorrect number of resources");
-			throw new IOException();
-		}
-		try {
-			new Resources(args[0], args[1], args[2]);
-		} catch (IOException e) {
-			Util.err("ERROR: Could not generate Resources");
-			throw e;
-		}
-		List<BackendType> options = Arrays.asList(ts);
-		if (options.size() == 0) {
-			initAutoCorrect();
-			initKDTree();
-			initBoundaries();
-		} else {
-			if (options.contains(BackendType.KD)) {
-				initKDTree();			
-				initBoundaries();
-			}
-			if (options.contains(BackendType.AC)) {
-				initAutoCorrect();
-			}
-		}
+	public void initBackend() {
+		new BackendInitializer().run();
 		done = true;
 	}
-	
+		
 	public boolean isDone() {
 		return done;
 	}
-
+	
+	LoadingPane getLoadingScreen() {
+		return l;
+	}
 	
 	/**
 	 * Initializes a new KDTree by querying MapFactory
@@ -97,7 +72,7 @@ public class Backend {
 		}
 		
 		try {
-			kd = MapFactory.createKDTree();
+			kd = MapFactory.createKDTree(l);
 		} catch (IOException e) {
 			Util.err("ERROR: Loading KDTree from nodes file failed");
 			System.exit(1);
@@ -113,6 +88,13 @@ public class Backend {
 	void initBoundaries() {
 		if (kd == null) {
 			Util.err("ERROR: Could not load boundaries because KD Tree is not initialized");
+		}
+		if (l != null) {
+			l.updateProgress("Initializing boundaries", 95);
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
 		}
 		Constants.MAXIMUM_LATITUDE = kd.getMax(0);
 		Constants.MINIMUM_LATITUDE = kd.getMin(0);
@@ -133,7 +115,7 @@ public class Backend {
 
 		RadixTree rt; //we store our words in a RadixTree rather than a Trie.
 		try {
-			rt = MapFactory.createRadixTree();
+			rt = MapFactory.createRadixTree(l);
 			if (rt.isEmpty()) {
 				Util.err("ERROR: Could not instantiate AutoCorrectEngine");
 				return;
@@ -188,5 +170,24 @@ public class Backend {
 			Util.err("ERROR: KD TREE NOT INITIALIZED");
 			return null;
 		}
-	}	
+	}
+	
+	private class BackendInitializer implements Runnable {
+		BackendInitializer() {
+		}
+		
+		@Override
+		public void run() {
+			if (l != null) {
+			l.updateProgress("Creating Backend", 0);
+			}
+			initAutoCorrect();
+			initKDTree();
+			initBoundaries();
+			if (l != null) {
+			l.updateProgress("Done!", 100);
+			}
+		}
+	}
 }
+

@@ -16,6 +16,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import backend.Backend;
 import backend.Constants;
+import backend.Resources;
 import backend.Util;
 
 public class MapDemo {
@@ -46,8 +47,9 @@ public class MapDemo {
 						Util.out("Constructing backend");
 						Util.memLog();
 					}
-					b = new Backend(new String[] {arg1, arg2, arg3});
-					
+					new Resources(arg1, arg2, arg3);
+					b = new Backend();
+					b.initBackend();
 					if (Constants.DEBUG_MODE) {
 						Util.out("backend done.");
 					}

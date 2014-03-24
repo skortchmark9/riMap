@@ -19,6 +19,7 @@ import backend.BinarySearchFile.SearchType;
 import backend.Constants;
 import backend.Resources;
 import backend.Util;
+import frontend.LoadingPane;
 /**
  * 
  * @author emc3 / skortchm
@@ -203,12 +204,20 @@ public class MapFactory {
 		return null;
 	}
 
-	/** Attempts to create a KDTree from the nodes file we have. */
+	
 	public static KDTree<Node> createKDTree() throws IOException {
+		return createKDTree(null);
+	}
+
+	/** Attempts to create a KDTree from the nodes file we have. */
+	public static KDTree<Node> createKDTree(LoadingPane l) throws IOException {
 		long start = 0; //XXX: FOR DEBUGGING
 		if (Constants.DEBUG_MODE) {
 			Util.out("Reading node data from file to List (System Calls):");
 			start = Util.resetClock();
+		}
+		if (l != null) {
+			l.updateProgress("Reading node data from file", 20);
 		}
 		List<List<String>> nodes = Resources.nodesFile.readChunks("id", "latitude", "longitude", "ways");
 		if (Constants.DEBUG_MODE) {
@@ -217,7 +226,9 @@ public class MapFactory {
 			Util.out("Creating Node objects from node data:");
 			start = Util.resetClock();
 		}
-
+		if (l != null) {
+			l.updateProgress("Creating nodes from node data", 50);
+		}
 		List<Node> nodeList = new LinkedList<>();
 		//Iterators here because we are parsing a lot of data and we want to make the best use of our
 		//underlying data structure. The wrapper list is a LinkedList and the underlying one is an arrayList.
@@ -231,6 +242,9 @@ public class MapFactory {
 				}
 			}
 		}
+		if (l != null) {
+			l.updateProgress("Creating KDTree from nodes", 70);
+		}
 
 		if (Constants.DEBUG_MODE) {
 			Util.out("Finished Nodes creation", "(Elapsed:", Util.timeSince(start) + ")");
@@ -238,19 +252,33 @@ public class MapFactory {
 			Util.out("Creating KDTree from Nodes List:");
 			Util.resetClock();
 		}
+		if (l != null) {
+			l.updateProgress("Done with KDTree", 90);
+		}
+
 
 		return new KDTree<Node>(nodeList);
 	}
-
+	
 	public static RadixTree createRadixTree() throws IOException {
+		return createRadixTree(null);
+	}
+
+	public static RadixTree createRadixTree(LoadingPane l) throws IOException {
 		long start = 0; //XXX: FOR DEBUGGING
 		if (Constants.DEBUG_MODE) {
 			Util.out("Reading index file for names:");
 			Util.memLog();
 			start = Util.resetClock();
+		} else if (l != null) {
+			l.updateProgress("Reading index file for names", 2);
 		}
 
 		List<List<String>> names = Resources.indexFile.readChunks("name");
+		if (l!= null) {
+			l.updateProgress("Done reading words to list.", 10);
+			l.updateProgress("Creating tree from list.", 11);
+		}
 
 		if (Constants.DEBUG_MODE) {
 			Util.out("Done reading names to list.", "(Elapsed:", Util.timeSince(start) + ")");
@@ -270,7 +298,9 @@ public class MapFactory {
 				}
 			}
 		}
-
+		if ( l!= null) {
+			l.updateProgress("Done creating Radix Tree", 20);
+		}
 		if (Constants.DEBUG_MODE) {
 			Util.out("Done inserting names from list to Radix Tree.", "(Elapsed:", Util.timeSince(start) + ")");
 		}

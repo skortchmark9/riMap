@@ -467,7 +467,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			//get all new ways for the render list
 			
 			
-			Util.out("hmmm: ", executor.shutdownNow());
+			executor.shutdownNow();
 			executor = Executors.newSingleThreadExecutor();
 			executor.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
 			//new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]).start();
@@ -700,6 +700,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				Util.out("Starting WayGetter!");
 			}
 			numberID = threadCount.incrementAndGet();
+			if (b == null) {
+				Util.out("HERE");
+			}
 			List<Way> temp = b.getWaysInRange(this.minLat, this.maxLat, this.minLon, this.maxLon);
 			
 			if (threadCount.get() == numberID) {
