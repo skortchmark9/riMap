@@ -713,6 +713,9 @@ public class BinarySearchFile implements AutoCloseable {
 	 * @return - an int 
 	 */
 	static int jCompare(byte[] a, byte[] b, int bIndex) {
+		if (bIndex > b.length) {
+			Util.out("HERE");
+		}
 		for(int i = 0; i < a.length; i++) {
 			//If the arrays are different lengths, bIndex finds the start place in
 			//array b.
@@ -727,7 +730,7 @@ public class BinarySearchFile implements AutoCloseable {
 				}
 				else {
 					//If only one byte is special, we want to HIGHER number to be first.
-					return b[i] - a[relativeIndex];
+					return b[relativeIndex] - a[i];
 				}
 			}
 		}
