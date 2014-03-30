@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
 import javax.swing.BorderFactory;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
@@ -35,7 +34,6 @@ public class SearchAutoFillPane extends JPanel {
 	private JTextField searchField = null;
 	private JPopupMenu popup = null;
 	private Backend b;
-	private JLabel name;
 
 	private JTable searchTable = null;
 	private TableRowSorter<DefaultTableModel> rowSorter = null;
@@ -43,8 +41,6 @@ public class SearchAutoFillPane extends JPanel {
 
 	public SearchAutoFillPane(Backend b, String paneName) {
 		
-		name = new JLabel(paneName);
-		this.add(name, BorderLayout.NORTH);
 		this.b = b;
 		searchTableModel = new DefaultTableModel();
 		searchField = new JTextField(10);

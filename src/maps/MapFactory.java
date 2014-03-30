@@ -358,7 +358,6 @@ public class MapFactory {
 		}
 
 		List<Way> ways = new LinkedList<>();
-		long start = Util.resetClock();
 		for(double i = minLat; i <= maxLat + 0.01; i+=0.01) {
 			for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
 				String searchCode = "/w/" + Util.getFirst4Digits(i) + "." + Util.getFirst4Digits(j); //lAT/LNG

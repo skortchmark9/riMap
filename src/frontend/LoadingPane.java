@@ -1,21 +1,18 @@
 package frontend;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 
 import backend.Constants;
-
-import com.sun.java.swing.plaf.windows.WindowsBorders.ProgressBarBorder;
-
-import java.beans.*;
-import java.util.Random;
  
 public class LoadingPane extends JPanel {
  
-    private JProgressBar progressBar;
-    private JButton startButton;
+	private static final long serialVersionUID = 1L;
+	private JProgressBar progressBar;
     private JLabel taskOutput;
  
  

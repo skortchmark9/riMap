@@ -11,6 +11,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import backend.Backend;
+import backend.Resources;
+import backend.Util;
 
 public class AutoCorrectDemo {
 	public static void main(String[] args) {
@@ -37,23 +39,23 @@ public class AutoCorrectDemo {
 				frame.setLayout(new FlowLayout());
 				Backend b = null;
 
-				//TODO
-				//init resources
-					String arg1 = "./data/mapsfiles/ways.tsv";
-					String arg2	= "./data/mapsfiles/nodes.tsv";
-					String arg3 = "./data/mapsfiles/index.tsv";
-					b = new Backend();
+				String arg1 = "./data/mapsfiles/ways.tsv";
+				String arg2	= "./data/mapsfiles/nodes.tsv";
+				String arg3 = "./data/mapsfiles/index.tsv";
+				try {
+					new Resources(arg1, arg2, arg3);
+				} catch (IOException e) {
+					Util.err("ERROR: Could not load resource files");
+				}
+				b = new Backend();
 				frame.add(new SearchAutoFillPane(b, "!!!!"), BorderLayout.NORTH);
 				frame.pack();
 				frame.setVisible(true);
 				SwingUtilities.invokeLater(new Runnable() {
-
 					@Override
 					public void run() {
 					}
-
 				});
-
 			}
 		});
 	}

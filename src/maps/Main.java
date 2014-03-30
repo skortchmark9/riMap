@@ -4,14 +4,11 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.SwingUtilities;
-
 import backend.Backend;
 import backend.Resources;
 import backend.Util;
 import cli.MapsCLI;
 import frontend.Frontend;
-import frontend.LoadingPane;
 
 public class Main {
 

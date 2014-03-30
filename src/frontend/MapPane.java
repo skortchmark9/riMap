@@ -25,7 +25,6 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import kdtree.KDStub;
-import maps.MapFactory;
 import maps.Node;
 import maps.Way;
 import backend.Backend;

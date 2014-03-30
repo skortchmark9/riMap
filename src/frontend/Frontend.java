@@ -167,12 +167,14 @@ public class Frontend implements ActionListener {
 		
 		sidePanel.setBackground(Color.BLACK);
 		sidePanel.setOpaque(true);
+		sidePanel.setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100));
 		
 		//Create a new map!
 		map = new MapPane(b);
+		map.setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100));
 		
 		//add panels to Frame
-		frame.add(sidePanel, BorderLayout.WEST);
+		frame.add(sidePanel, BorderLayout.SOUTH);
 		frame.add(map, BorderLayout.CENTER);
 		frame.revalidate();
 		}

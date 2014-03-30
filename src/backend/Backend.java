@@ -1,11 +1,6 @@
 package backend;
 
-import frontend.LoadingPane;
-import graph.Edge;
-import graph.PathFinder;
-
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,6 +12,9 @@ import maps.PathNodeWrapper;
 import maps.Way;
 import autocorrect.Engine;
 import autocorrect.RadixTree;
+import frontend.LoadingPane;
+import graph.Edge;
+import graph.PathFinder;
 
 
 /**
