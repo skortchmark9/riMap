@@ -1,13 +1,11 @@
-CS032_Maps
-==========
+Maps
+=========
 
-Maps Project for CS
+This project is handles real-world map data and provides path information. You can pan around and click points on the map, or you can use the input fields to input cross-streets and find paths between them. The project is backed by a few interesting data structures.
 
+1.) KD Tree, which handles the nodes in the map. It has a custom constructor which reduces construction time to k*nlogn. The KD Tree also allows us to specify the boundaries of the map.<br>
+2.) Radix Tree, which provides autocompletion results for each street. Faster and more efficient than a typical trie, it also creates suggestions based on levenshtein distance, possible whitespace errors, and bigram frequency.<br>
+3.) Binary Search File - a custom wrapper for Java's Random Access File - this class has numerous optimizations that allow for quick retrieval of information from the Random Access File with minimal system calls.
+<br><br>
 
-I've uploaded my autocorrect to here - it uses a prefix tree instead of a trie, which makes it really fast.
-
-We should probably compare bacons - mine was pretty shitty and I'm not sure why - maybe my binary search was bad. I've been trying to do some profiling and I can't figure it out.
-
-
-Sam -- I've added some code from my Stars implementation. I didn't include the actual stars program or anything, just what we need for this project. I have a generic KDTree whose nodes can hold any java type which implements KDimensionable (an interface I wrote as part of this package). Take a look if you're interested.
-
+The project uses multiple threads to ensure that the frontend GUI remains responsive no matter what kind of requests are being made to the backend.
