@@ -125,6 +125,10 @@ public class Suggestion {
 		return (this.word.compareTo(s.word));
 	}
 	
+	boolean isPrefixSuggestion() {
+		return !(this.rtDistance == Integer.MAX_VALUE);
+	}
+	
 	/**
 	 * A special comparator for maps.
 	 * @param s
@@ -139,6 +143,13 @@ public class Suggestion {
 		//If the previous word is the empty string, it's the first word in the street name - so check
 		//unigram frequency first, THEN levenshtein distance
 		if (previousWord.length() == 0) {
+			if (!(s.isPrefixSuggestion() == this.isPrefixSuggestion())) {
+				if (this.rtDistance < s.rtDistance) {
+					return -1;
+				} else if (this.rtDistance > s.rtDistance) {
+					return 1;
+				}
+			}
 			int freqDiff = s.freq - this.freq;
 			if (freqDiff != 0) {
 				return freqDiff;
