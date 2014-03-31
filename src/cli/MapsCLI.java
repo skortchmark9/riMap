@@ -34,6 +34,7 @@ public class MapsCLI implements Runnable{
 	 * The app will exit when the user enters "exit", "quit", "EOF", or 
 	 * simple the empty string, which is usually sent with CTRL+D. 
 	 */
+	@Override
 	public void run() {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		String userInput = "";
