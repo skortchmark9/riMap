@@ -428,6 +428,7 @@ public class KDTree<KDType extends KDimensionable> {
 	 * @param kd
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	private KDNode find(KDType kd) {
 		if(_root == null || _k < 1){
 			System.err.println("ERROR: KDTree.find(): Tree is not defined.");
@@ -715,6 +716,7 @@ public class KDTree<KDType extends KDimensionable> {
 		/**
 		 * @return the number of neighbors currently in the list
 		 */
+		@SuppressWarnings("unused")
 		private int size() {
 			return _neighbors.size();
 		}
