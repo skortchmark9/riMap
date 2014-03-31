@@ -6,6 +6,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingConstants;
 
 import backend.Constants;
  
@@ -36,7 +37,7 @@ public class LoadingPane extends JPanel {
         progressBar.setValue(0);
         progressBar.setStringPainted(true);
  
-        taskOutput = new JLabel(String.format("Please Wait: %s", "Loading"), JLabel.CENTER);
+        taskOutput = new JLabel(String.format("Please Wait: %s", "Loading"), SwingConstants.CENTER);
         taskOutput.setForeground(Constants.GLOW_IN_THE_DARK);
  
  
