@@ -35,16 +35,19 @@ public class Way implements Edge<Node> {
 	 * 
 	 */
 //	@Override
+	@Override
 	public Node getTarget() {
 		return target;
 	}
 
 //	@Override
+	@Override
 	public String getName() {
 		return uniqueID;
 	}	
 
 //	@Override
+	@Override
 	public double getWeight() {
 		return start.distanceTo(target);
 	}

@@ -19,8 +19,10 @@ public interface PathNode<T extends KDimensionable> extends Comparable<PathNode<
 	void setAStarDistance(Double d);
 	PathNode<T> getPrevious();
 	void setPrevious(PathNode<T> n);
+	@Override
 	int hashCode();
 	String getName();
 	double getDistanceTo(PathNode<T> n2);
+	@Override
 	int compareTo(PathNode<T> other);
 }
