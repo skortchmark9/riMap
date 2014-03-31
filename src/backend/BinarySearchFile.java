@@ -208,7 +208,7 @@ public class BinarySearchFile implements AutoCloseable {
 	 * The name is a little misleading - it jumps backwards but then scans
 	 * forward. The effect is the same as scanning backwards, but faster.
 	 * @param searchCodeBytes - the word in question
-	 * @param start - an instance of the word in the file.
+	 * @param start - the newline preceding an instance of the word in the file.
 	 * @param s - the type of search: DEFAULT looks for exact matches, and
 	 * WILDCARD finds all words which start with the given word.
 	 * @return - the newline holding the first occurrence of the word.
@@ -298,7 +298,7 @@ public class BinarySearchFile implements AutoCloseable {
 	 * The name is a little misleading - it jumps forwards but then scans
 	 * backward. The effect is the same as scanning forward, but faster.
 	 * @param searchCodeBytes - the word in question
-	 * @param start - an instance of the word in the file.
+	 * @param start - the newline following the word in the file.
 	 * @param s - the type of search: DEFAULT looks for exact matches, and
 	 * WILDCARD finds all words which start with the given word.
 	 * @return - the newline holding the last occurrence of the word.
@@ -345,7 +345,7 @@ public class BinarySearchFile implements AutoCloseable {
 					}
 					int wordStart = i + tabLocation + 1;
 					long wordEnd = wordStart + searchCodeBytes.length;
-					long diff = wordEnd - arrayToSearch.length;
+					long diff = wordEnd - arrayToSearch.length + 1;
 					if (diff > 0) {
 						byte[] extraArray = new byte[(int) diff];
 						raf.seek(start + arrayToSearch.length);
