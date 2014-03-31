@@ -42,6 +42,8 @@ public class Constants {
 	public static double MINIMUM_LONGITUDE = 0;
 	public static double MAXIMUM_LONGITUDE =  0;
 	
+	public static final int DEFAULT_REQUEST_TIMEOUT = 5;
+	
 	public static final int BufferLength = 520;
 	public static final int TabBufferLength = 256;
 
