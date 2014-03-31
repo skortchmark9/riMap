@@ -1,55 +1,50 @@
 package frontend;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.PatternSyntaxException;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
-import javax.swing.JPanel;
+import javax.swing.InputMap;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
-import javax.swing.RowFilter;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableRowSorter;
 
 import backend.Backend;
 import backend.Util;
 
-public class SearchAutoFillPane extends JPanel {
+@SuppressWarnings("serial")
+public class AutoFillField extends JTextField {
 
-	private static final long serialVersionUID = 1L;
-	private JTextField searchField = null;
-	private JPopupMenu popup = null;
+	private JPopupMenu popup;
 	private Backend b;
+	private JTable searchTable;
+	private DefaultTableModel searchTableModel;
+	private String initialText;
+	boolean popped = false;
 
-	private JTable searchTable = null;
-	private TableRowSorter<DefaultTableModel> rowSorter = null;
-	private DefaultTableModel searchTableModel = null;
-
-	public SearchAutoFillPane(Backend b, String paneName) {
-		
+	public AutoFillField(Backend b, String startField) {
+		super(10);
 		this.b = b;
+		initialText = startField;
+		setForeground(Color.DARK_GRAY);
+		setText(initialText);
+		setOpaque(false);
+		
 		searchTableModel = new DefaultTableModel();
-		searchField = new JTextField(10);
-		searchField.getInputMap().put(KeyStroke.getKeyStroke("pressed UP"), "nothing");
-		searchField.getInputMap().put(KeyStroke.getKeyStroke("pressed DOWN"), "nothing");
-
-		rowSorter = new TableRowSorter<DefaultTableModel>(searchTableModel);
 		searchTable = new JTable(searchTableModel);
-		searchTable.setPreferredSize(new Dimension(searchField.getPreferredSize().width - 8, 80));
 		searchTable.setFillsViewportHeight(true);
 		searchTable.getColumnModel().setColumnSelectionAllowed(false);
 		searchTable.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
@@ -57,172 +52,167 @@ public class SearchAutoFillPane extends JPanel {
 		searchTable.setGridColor(Color.WHITE);
 		searchTable.setEnabled(false);
 
-
-		searchField.addFocusListener(new FocusListener() {
-		    @Override
-		    public void focusGained(FocusEvent e) {
-		    	int end = searchField.getDocument().getLength();
-		    	searchField.setCaretPosition(end);
-		    }
-
-		    @Override
-		    public void focusLost(FocusEvent e) {
-		        searchField.getHighlighter().removeAllHighlights();
-		    }
-			
-		});
 		
+		popup = new JPopupMenu();
+		popup.add(searchTable);
+		popup.setVisible(false);
+		popup.setBorder(BorderFactory.createEmptyBorder());
 
-		searchField.getDocument().addDocumentListener(new DocumentListener() {
+
+
+		//We need this because of the focus juggling we do, we don't want to 
+		//highlight the text field every time we accept a selection. It would
+		//be awesome if we could deactivate the default focus behavior of the
+		//text field, but I don't think we can.
+		addFocusListener(new FocusListener() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				if (popped) {
+					int end = getDocument().getLength();
+					setCaretPosition(end);
+				} else {
+					selectAll();
+					setForeground(Color.BLACK);
+					popped = true;
+				}
+			}
+			@Override
+			public void focusLost(FocusEvent e) {
+				getHighlighter().removeAllHighlights();
+			}
+		});
+
+		//We show the popup on user input.
+		getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void changedUpdate(DocumentEvent e) {
 				showPopup(e);
 			}
-
 			@Override
 			public void insertUpdate(DocumentEvent e) {
 				showPopup(e);
 			}
-
 			@Override
 			public void removeUpdate(DocumentEvent e) {
 				showPopup(e);
 			}
 		});
 
-		searchField.addKeyListener(new KeyListener() {
-			@Override
-			public void keyTyped(KeyEvent e) {
 
-			}
+		//Key Bindings For Field
+		String cycleUp = "cycle up";
+		String cycleDown = "cycle down";
+		String esc = "escape";
+		String acceptSpace = "accept with space";
+		String acceptEnter = "accept with enter";
 
+		InputMap inputMap = getInputMap();
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), cycleUp);
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), cycleDown);
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), esc);
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), esc);
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), acceptSpace);
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), acceptEnter);
+
+		ActionMap actionMap = getActionMap();
+		actionMap.put(cycleUp, new AbstractAction() {
 			@Override
-			public void keyReleased(KeyEvent e) {
-				int code = e.getKeyCode();
-				switch(code)
-				{
-				case KeyEvent.VK_UP:
-				{
-					if (popup.isVisible()) {
+			public void actionPerformed(ActionEvent e) {
+				//If the popup isn't visible, the user is probably trying to
+				//use the normal behavior of the text box
+				if (popup.isVisible()) 
 					cycleTableSelectionUp();
-					} else {
-						searchField.setCaretPosition(0);
-					}
-					break;
-				}
-
-				case KeyEvent.VK_DOWN:
-				{
-					if (popup.isVisible()) {
-					cycleTableSelectionDown();
-					} else {
-						searchField.setCaretPosition(searchField.getDocument().getLength());
-					}
-					break;
-				}
-
-				case KeyEvent.VK_LEFT:
-				{
-					//Do whatever you want here
-					break;
-				}
-
-				case KeyEvent.VK_RIGHT:
-				{
-					//Do whatever you want here
-					break;
-				}
-				
-				case KeyEvent.VK_TAB:
-				{
-					if (popup.isVisible()) {
-						hidePopup();
-					}
-				}
-
-				case KeyEvent.VK_ENTER:
-				{
-					if (popup.isVisible()) {
-						int selectedRow = searchTable.getSelectedRow();
-						if (selectedRow >= 0) {
-						String suggestion = (String) searchTable.getValueAt(selectedRow, 0);
-						System.out.println(suggestion);
-						searchField.setText(suggestion);
-						int end = searchField.getSelectionEnd();
-						searchField.setSelectionStart(end);
-						searchField.setSelectionEnd(end);
-						hidePopup();
-						} else {
-							hidePopup();
-						}
-					}
-					break;
-				}
-				case KeyEvent.VK_ESCAPE:
-					hidePopup();
-				}
+				else
+					setCaretPosition(0);
 			}
-
+		});
+		actionMap.put(cycleDown, new AbstractAction() {
 			@Override
-			public void keyPressed(KeyEvent e) {
-
+			public void actionPerformed(ActionEvent e) {
+				//Same deal here.
+				if (popup.isVisible())
+					cycleTableSelectionDown();
+				else
+					setCaretPosition(getDocument().getLength());
+				
 			}
 		});
 
-		popup = new JPopupMenu();
-		popup.add(searchTable);
-		popup.setVisible(false);
-		popup.setBorder(BorderFactory.createEmptyBorder());
+		actionMap.put(esc, new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				hidePopup();
+			}
+		});
 
-		this.add(searchField, BorderLayout.CENTER);
+		actionMap.put(acceptSpace, new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// We accept the selection, but add a space to the end so the
+				// user can continue typing, as was probably her intention.
+				if (popup.isVisible()) {
+					int selectedRow = searchTable.getSelectedRow();
+					if (selectedRow >= 0) {
+						String suggestion = (String) searchTable.getValueAt(selectedRow, 0);
+						setText(suggestion + " ");
+						int end = getSelectionEnd();
+						setSelectionStart(end);
+						setSelectionEnd(end);
+					}
+					hidePopup();
+				}
+			}
+		});
 
+		actionMap.put(acceptEnter, new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (popup.isVisible()) {
+					int selectedRow = searchTable.getSelectedRow();
+					if (selectedRow >= 0) {
+						String suggestion = (String) searchTable.getValueAt(selectedRow, 0);
+						setText(suggestion);
+						int end = getSelectionEnd();
+						setSelectionStart(end);
+						setSelectionEnd(end);
+					}
+					hidePopup();
+				}
+			}
+		});
 	}
-	
-	public String getText() {
-		return searchField.getText();
-	}
 
-	private final void newFilter() {
-		RowFilter<DefaultTableModel, Object> rf = null;
-
-		try {
-			rf = RowFilter.regexFilter(getFilterText(), 0);
-		}
-		catch(PatternSyntaxException e) {
-			return;
-		}
-		rowSorter.setRowFilter(rf);
-	}
-
-	private final String getFilterText() {
-		String orig = searchField.getText();
-		return "("+orig.toLowerCase()+")|("+orig.toUpperCase()+")";
-	}
-
+	/**
+	 * Hides the autosuggestions.
+	 */
 	private void hidePopup() {
 		if (popup.isVisible()) {
 			popup.setVisible(false);
 		}
 	}
 
+	/**
+	 * The popup contains the table of suggestions, so this will reveal them.
+	 * @param e - we don't want to suggest on the empty string, so we check.
+	 */
 	private void showPopup(DocumentEvent e) {
 		if(e.getDocument().getLength() > 0) {
 			initTableModel();
 			if(!popup.isVisible()) { 
-				Rectangle r = searchField.getBounds();
-				
-				popup.show(searchField, 0 + 4, (r.y+16));
+				popup.show(this, 4, (getHeight() - 4));
 				popup.setVisible(true);
 			}
-
-			newFilter();
-			searchField.requestFocusInWindow();
+			//We need to juggle focus a little to select the appropriate row.
+			requestFocusInWindow();
 		}
 		else {
 			popup.setVisible(false);
 		}
 	}
 
+	/**
+	 * Moves up to the previous search result.
+	 */
 	private void cycleTableSelectionUp() {
 		ListSelectionModel selModel = searchTable.getSelectionModel();
 		int index0 = selModel.getMinSelectionIndex();
@@ -230,7 +220,10 @@ public class SearchAutoFillPane extends JPanel {
 			selModel.setSelectionInterval(index0-1, index0-1);
 		}
 	}
-
+	
+	/**
+	 * Moves down to the next search result.
+	 */
 	private void cycleTableSelectionDown() {
 		ListSelectionModel selModel = searchTable.getSelectionModel();
 		int index0 = selModel.getMinSelectionIndex();
@@ -242,12 +235,23 @@ public class SearchAutoFillPane extends JPanel {
 		}
 	}
 
+	
+	/**
+	 * Initializes the table model - filling the table rows with suggestions
+	 * from the backend.
+	 */
 	private void initTableModel() {
-		String input = searchField.getText();
+		//The table determines the size of the autocompletion suggestions,
+		//so we wait until the text field has its size assigned by the gui
+		//manager.
+		searchTable.setPreferredSize(new Dimension(getWidth() - 8, 80));
+		String input = getText();
 		String[] columns = new String[] {input};
 		List<String> suggestions = b.getAutoCorrections(input);
 		List<String> cappedSuggestions = new LinkedList<>();
 		int length = suggestions.size();
+		//We lowercase all text entering the prefix tree, so here we need
+		//to capitalize it again. Thankfully, all street names are proper nouns.
 		for(String s : suggestions) {
 			cappedSuggestions.add(Util.capitalizeAll(s));
 		}
