@@ -14,8 +14,12 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.AbstractAction;
@@ -46,7 +50,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private Backend b;
 	private boolean clickSwitch = true;
 	private AtomicInteger threadCount;
-	private ExecutorService executor;
+	//private ExecutorService executor;
+	private Executor wayGetterPool;
 	
 	/**
 	 * Construct a MapPane linked to the given backend.
@@ -72,7 +77,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		}
 		
 		initInteraction(); //initializes all interactions for the map view.
-		
 		//new synchronous list for all ways in viewport (ways we need to render)
 		//renderedWays = Collections.synchronizedList(MapFactory.getWaysInRange(0, 0, 0, 0));
 		source = null;
@@ -80,8 +84,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		renderedWays = new LinkedList<>();
 		threadCount = new AtomicInteger(0);
 		//new thread!
-		executor = Executors.newSingleThreadExecutor();
-		executor.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
+		//executor = Executors.newSingleThreadExecutor();
+		wayGetterPool = new ThreadPoolExecutor(Constants.WG_CORE_SIZE, Constants.WG_MAX_SIZE, Constants.WG_TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+		wayGetterPool.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
 		calculatedRoute = new LinkedList<>();
 		if (Constants.DEBUG_MODE) {
 			Util.out("Finished - Got All Ways in range", "(Elapsed:", Util.lap() +")");
@@ -324,8 +329,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				target.recalibrate();
 			
 			//get all new ways in new range
-			executor = Executors.newSingleThreadExecutor();
-			executor.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
+			//executor = Executors.newSingleThreadExecutor();
+			wayGetterPool.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
 			this.repaint();
 		}
 	}
@@ -413,10 +418,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			this.repaint(); // repaint for responsiveness
 			
 			//get all new ways in new range
-			executor.shutdownNow();
-			executor = Executors.newSingleThreadExecutor();
-			executor.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
-			//new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]).start();
+			//executor.shutdownNow();
+			//executor = Executors.newSingleThreadExecutor();
+			wayGetterPool.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
 			//repaint this component
 			this.repaint();
 		}
@@ -466,10 +470,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			//get all new ways for the render list
 			
 			
-			executor.shutdownNow();
-			executor = Executors.newSingleThreadExecutor();
-			executor.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
-			//new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]).start();
+			//executor.shutdownNow();
+			//executor = Executors.newSingleThreadExecutor();
+			wayGetterPool.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
 			repaint();
 		}
 		
