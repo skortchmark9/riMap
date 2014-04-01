@@ -19,7 +19,7 @@ public class Main {
 	 * <p>
 	 * &lt;wayz&gt; &lt;nodez&gt; &lt;indecks&gt;
 	 * <p>
-	 * If the --gui flag is set, a new FrontEnd() is created
+	 * If the --gui flag is set, a new {@link FrontEnd} is created
 	 * otherwise the program will run simpleton in the command line. 
 	 * @param args
 	 */
