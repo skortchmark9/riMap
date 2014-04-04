@@ -51,7 +51,6 @@ public class AutoFillField extends JTextField {
 		searchTable.getTableHeader().setReorderingAllowed(false);
 		searchTable.setGridColor(Color.WHITE);
 		searchTable.setEnabled(false);
-
 		
 		popup = new JPopupMenu();
 		popup.add(searchTable);
@@ -97,7 +96,6 @@ public class AutoFillField extends JTextField {
 				showPopup(e);
 			}
 		});
-
 
 		//Key Bindings For Field
 		String cycleUp = "cycle up";

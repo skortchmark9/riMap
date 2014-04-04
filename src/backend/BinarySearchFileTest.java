@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -21,6 +22,8 @@ public class BinarySearchFileTest {
 	//Applied for multiple rows
 	String ways = "./data/mapsfiles/ways.tsv";
 
+	
+	
 	@Test
 	public void searchForWeirdWay2() {
 		try (BinarySearchFile b = new BinarySearchFile(ways, "id", "id", "name", "start", "end")) {

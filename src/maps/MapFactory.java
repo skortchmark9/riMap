@@ -30,6 +30,7 @@ public class MapFactory {
 	private static Map<String, Node> nodes = new HashMap<>(65000);
 	private static Map<String, Way> ways = new HashMap<>(35000);
 	private static Map<String, List<String>> wayArray;
+	private static Map<String, Integer> trafficMap = new HashMap<>();
 
 	/**
 	 * Creates a way from the wayID. Attempts to find a cached way if one
@@ -389,5 +390,26 @@ public class MapFactory {
 			}
 		}
 		return ways;
+	}
+	
+	/**
+	 *
+	 * @param wayID
+	 * @return
+	 */
+	public static int getTrafficValue(String wayID) {
+		Way way = createWay(wayID);
+		String streetName;
+		if (way != null) {
+			streetName = way.getName();
+			Integer val = trafficMap.get(streetName);
+			return (val == null) ? 1 : val;
+		}
+		Util.err("Could not find way?");
+		return 1;
+	}
+	
+	public static void putTrafficValue(String street, int i) {
+		trafficMap.put(street, i);
 	}
 }
