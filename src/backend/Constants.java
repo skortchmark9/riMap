@@ -46,9 +46,14 @@ public class Constants {
 	
 	public static final int BufferLength = 520;
 	public static final int TabBufferLength = 256;
-
+	
 	/**
 	 * For threaded file reading into KD Tree
 	 */
 	public static final int numThreads = 10;
+	
+	//For threading "Waygetters" (executor pool) in MapPane
+	public static final int WG_CORE_SIZE = 4;
+	public static final int WG_MAX_SIZE = 4;
+	public static final long WG_TIMEOUT = 5L; //time threads will wait for new work before suicide (seconds)
 }
