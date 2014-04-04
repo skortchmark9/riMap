@@ -49,7 +49,7 @@ public class Way implements Edge<Node> {
 //	@Override
 	@Override
 	public double getWeight() {
-		return start.distanceTo(target);
+		return start.distanceTo(target) * MapFactory.getTrafficValue(uniqueID);
 	}
 	
 	@Override
