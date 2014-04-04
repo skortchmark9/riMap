@@ -10,35 +10,21 @@ import javax.swing.SwingConstants;
 
 import backend.Constants;
  
-public class LoadingPane extends JPanel {
+public class SimpleLoadingPane extends JPanel {
  
 	private static final long serialVersionUID = 1L;
 	private JProgressBar progressBar;
     private JLabel taskOutput;
  
-    public void updateProgress(String s, int progress) {
-    	try {
-			Thread.sleep(5);
-		} catch (InterruptedException e) {
-		}
-    	taskOutput.setText(String.format("Please Wait: %s", s));
-    	progressBar.setValue(progress);
-    	if (progress >= 100) {
-    		setCursor(null);
-    	}
-    }
- 
-    public LoadingPane() {
+    public SimpleLoadingPane() {
         super(new BorderLayout());
         super.setOpaque(false);
         
         progressBar = new JProgressBar(0, 100);
-        progressBar.setValue(0);
-        progressBar.setStringPainted(true);
+        progressBar.setIndeterminate(true);
  
         taskOutput = new JLabel(String.format("Please Wait: %s", "Loading"), SwingConstants.CENTER);
         taskOutput.setForeground(Constants.GLOW_IN_THE_DARK);
- 
  
         add(progressBar, BorderLayout.NORTH);
         add(taskOutput, BorderLayout.CENTER);

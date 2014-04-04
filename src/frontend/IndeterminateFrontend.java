@@ -45,7 +45,7 @@ import backend.Util;
  * 
  * @author skortchm / emc3
  */
-public class Frontend implements ActionListener {
+public class IndeterminateFrontend implements ActionListener {
 	AutoFillField box1, box2, box3, box4;
 	JButton getDirections, clearPoints;
 	JTextArea msgBox;
@@ -56,7 +56,7 @@ public class Frontend implements ActionListener {
 	final Cursor busyCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 	
 	PathWayFinder pwRequester;
-	LoadingPane loadingScreen;
+	SimpleLoadingPane loadingScreen;
 	private JLabel lblTimeouts;
 	private JSpinner timeOutSpinner;
 
@@ -65,7 +65,7 @@ public class Frontend implements ActionListener {
 	 * Creates a new JFrame and initializes the map inside of that.
 	 * Also puts a few buttons on the screen.
 	 */	
-	public Frontend(Backend b) {
+	public IndeterminateFrontend(Backend b) {
 		
 		//Setting up the frame.
 		frame = new JFrame("MAPS");
@@ -95,9 +95,8 @@ public class Frontend implements ActionListener {
 			boilerPlate.add(label);
 		}
 		
-		
 		//Creating the loading screen.
-		loadingScreen = new LoadingPane();
+		loadingScreen = new SimpleLoadingPane();
 		JPanel loadingPanel = new JPanel(new BorderLayout());
 		loadingPanel.setOpaque(false);
 		loadingPanel.add(loadingScreen);
@@ -108,12 +107,14 @@ public class Frontend implements ActionListener {
 		frame.pack();
 		frame.setVisible(true);
 		loadingPanel.requestFocusInWindow();
-	
-		//Preparing the backend to send messages to the loading screen.
-		this.b = b;
+		
 		while(!b.isDone()) {
 		}
-		
+		//Preparing the backend to send messages to the loading screen.
+		//Initializing the backend.
+
+		//Finished loading, removing the loading screen.
+		this.b = b;
 		frame.remove(loadingPanel);
 		frame.setCursor(defaultCursor);
 		//Initializing the rest of the Frontend.
