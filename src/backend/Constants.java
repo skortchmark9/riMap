@@ -56,4 +56,8 @@ public class Constants {
 	public static final int WG_CORE_SIZE = 4;
 	public static final int WG_MAX_SIZE = 4;
 	public static final long WG_TIMEOUT = 5L; //time threads will wait for new work before suicide (seconds)
+	
+	/* Port numbers -- Change if they are in use */
+	public static final int DEFAULT_SERVER_PORT = 9885;
+	public static final int DEFAULT_TRAFFIC_PORT = 9888;
 }
