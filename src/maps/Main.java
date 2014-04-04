@@ -8,7 +8,7 @@ import backend.Backend;
 import backend.Resources;
 import backend.Util;
 import cli.MapsCLI;
-import frontend.Frontend;
+import frontend.IndeterminateFrontend;
 
 public class Main {
 
@@ -45,8 +45,9 @@ public class Main {
 			System.exit(1);
 		}
 		Backend b = new Backend();
+		b.initBackend();
 		if (gui) {
-			new Frontend(b);
+			new IndeterminateFrontend(b);
 		}
 		else {
 			b.initBackend();

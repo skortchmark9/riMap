@@ -31,7 +31,7 @@ public class Backend {
 
 	KDTree<Node> kd = null; //the KDTree!
 	Engine autoCorrectEngine = null;
-	boolean done;
+	volatile boolean done;
 	LoadingPane l = null;
 
 	/**
@@ -46,8 +46,7 @@ public class Backend {
 	}
 	
 	public void initBackend() {
-		new BackendInitializer().run();
-		done = true;
+		new BackendInitializer().start();;
 	}
 		
 	public boolean isDone() {
@@ -170,9 +169,7 @@ public class Backend {
 		}
 	}
 	
-	private class BackendInitializer implements Runnable {
-		BackendInitializer() {
-		}
+	public class BackendInitializer extends Thread {
 		
 		@Override
 		public void run() {
@@ -185,6 +182,7 @@ public class Backend {
 			if (l != null) {
 			l.updateProgress("Done!", 100);
 			}
+			done = true;
 		}
 	}
 }

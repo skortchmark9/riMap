@@ -41,7 +41,7 @@ public class AutoFillField extends JTextField {
 		initialText = startField;
 		setForeground(Color.DARK_GRAY);
 		setText(initialText);
-		setOpaque(false);
+		setOpaque(true);
 		
 		searchTableModel = new DefaultTableModel();
 		searchTable = new JTable(searchTableModel);
