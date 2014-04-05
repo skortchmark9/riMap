@@ -171,10 +171,10 @@ public class IndeterminateFrontend implements ActionListener {
 		sidePanel.add(searchButtonsPanel);
 
 		//Initializing the autofill boxes.
-		box1 = new AutoFillField(b, "Cross Street 1");
-		box2 = new AutoFillField(b, "Cross Street 2");
-		box3 = new AutoFillField(b, "Cross Street 1");
-		box4 = new AutoFillField(b, "Cross Street 2");
+		box1 = new AutoFillField(client, "Cross Street 1");
+		box2 = new AutoFillField(client, "Cross Street 2");
+		box3 = new AutoFillField(client, "Cross Street 1");
+		box4 = new AutoFillField(client, "Cross Street 2");
 
 		//These are buttons for finding and removing paths
 		getDirections = new JButton("Get Directions");
