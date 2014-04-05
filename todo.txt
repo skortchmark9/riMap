@@ -1,0 +1,23 @@
+reposition coords on gui.
+SAVE NEWLINES IN BINARY SEARCH FILE.
+CLOSING FILE in SearchMUltipleWorker
+Changing the wayCacheing to an array instead of a hashmap
+
+CURRENT:
+validate autocorrect results
+
+Writing street names
+Turn-by-turn directions
+
+JInternal frame.setMaxWidth.
+
+STERILIZE INPUT FROM TRAFFIC SERVER
+
+1.) Create server
+2.) Create trafficsocket
+3.) pass Socket to backend
+4.) while(true) accept clients
+
+WAYGETTER
+WILL GET TRAFFICWAYS WHICH CONTAIN THEIR traffic ints.
+ALSO CHECKS TO MAKE SURE THEIR DISTANCE IS LESS THAN A PIXEL.
