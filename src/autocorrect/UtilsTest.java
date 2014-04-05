@@ -12,7 +12,7 @@ public class UtilsTest {
         String[] results = {"hi", "sam", "whoa", "this", "keyboard", "is", "cray"};
         boolean outcome = true;
         for(int i =0; i < results.length; i++ ) {
-            if(!results[i].equals(Utils.lineParse(bad)[i])) {
+            if(!results[i].equals(AutoCorrectUtils.lineParse(bad)[i])) {
                 outcome = false;
                 System.out.println(results[i]);
             }
@@ -22,12 +22,12 @@ public class UtilsTest {
     
     @Test
     public void breakpointTest() {
-    assertTrue(Utils.findBreakPoint("cat", "catastrophe") == 3);
+    assertTrue(AutoCorrectUtils.findBreakPoint("cat", "catastrophe") == 3);
     }
     
     @Test
     public void arrayParseTest() {
         String[] results = {"hi", "sam", "whoa", "this", "keyboard", "is", "cray"};
-        assertTrue(Utils.arrayParse(results).equals("hi sam whoa this keyboard is cray"));
+        assertTrue(AutoCorrectUtils.arrayParse(results).equals("hi sam whoa this keyboard is cray"));
     }
 }

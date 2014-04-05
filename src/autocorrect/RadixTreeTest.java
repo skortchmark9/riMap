@@ -55,7 +55,7 @@ public class RadixTreeTest {
 	public void lineParseTest() {
 		String test = " yes and many others all of the'm but you here is mrs brandley i ll\n say no more \n \n";
 		String[] result = {"yes", "and", "many", "others", "all", "of", "the", "m", "but", "you", "here", "is", "mrs", "brandley", "i", "ll", "say", "no", "more"};
-		assertTrue(Arrays.equals(result, Utils.lineParse(test)));
+		assertTrue(Arrays.equals(result, AutoCorrectUtils.lineParse(test)));
 	}
 	@Test
 	public void rtDictionaryTest() {
@@ -124,7 +124,7 @@ public class RadixTreeTest {
 		rt.populateRadixTree(dictionary);
 		boolean outcome = true;
 		for (Suggestion s : rt.levenshtein("cat", 2)) {
-			if (Utils.computeLevenshteinDistance(s.getWord(), "cat") != s.getLED())
+			if (AutoCorrectUtils.computeLevenshteinDistance(s.getWord(), "cat") != s.getLED())
 				outcome = false;
 		}
 		assertTrue(outcome);
@@ -137,7 +137,7 @@ public class RadixTreeTest {
 		rt.populateRadixTree(dickens);
 		boolean outcome = true;
 		for (Suggestion s : rt.levenshtein("bird", 5)) {
-			if (Utils.computeLevenshteinDistance(s.getWord(), "bird") != s.getLED())
+			if (AutoCorrectUtils.computeLevenshteinDistance(s.getWord(), "bird") != s.getLED())
 				outcome = false;
 		}
 		assertTrue(outcome);

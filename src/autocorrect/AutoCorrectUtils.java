@@ -1,6 +1,6 @@
 package autocorrect;
 
-public class Utils {
+public class AutoCorrectUtils {
 	/** Contains some useful generic stuff for testing as well as the parser we use everywhere.. */
 	
 	public static int computeLevenshteinDistance(String str,String rootWord) {
@@ -21,7 +21,6 @@ public class Utils {
 						distance[i - 1][j - 1]+ 
 						((str.charAt(i - 1) == rootWord.charAt(j - 1)) ? 0 : 1));
 		
-//		System.out.println(Arrays.deepToString(distance));
 		return distance[str.length()][rootWord.length()];
 	}
 

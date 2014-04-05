@@ -18,11 +18,7 @@ import org.junit.Test;
 
 public class BinarySearchFileTest {
 	String films = "./data/baconfiles/films.tsv";
-	// Figure this out with TAs
-	//Applied for multiple rows
 	String ways = "./data/mapsfiles/ways.tsv";
-
-	
 	
 	@Test
 	public void searchForWeirdWay2() {
@@ -48,9 +44,6 @@ public class BinarySearchFileTest {
 		}
 	}
 
-
-
-
 	@Test
 	public void testSearchSingleMultiple() {
 		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
@@ -63,7 +56,6 @@ public class BinarySearchFileTest {
 		}
 	}
 
-
 	@Test
 	public void wildCardMultipleTest() {
 		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
@@ -74,7 +66,6 @@ public class BinarySearchFileTest {
 			assertTrue(false);
 		}
 	}
-
 
 	@Test
 	public void searchForWeirdWay() {
@@ -324,13 +315,4 @@ public class BinarySearchFileTest {
 		assertTrue(Resources.waysFile.getXsByY("/m/02x3lt7", "name")[0].equals("Hannah Montana: The Movie"));
 		Resources.closeResources();
 	}
-	/*
-	@Test //Ant didn't like this test for some reason. It works though.
-	public void fileNotFound() {
-		boolean failed = true;
-		try(BinarySearchFile b = new BinarySearchFile("./data/lolnotafile")) {
-			failed = false;
-		}
-	}
-	 */
 }

@@ -37,7 +37,7 @@ public class Engine {
 	}
 	
 	public List<String> suggest(String userInput) {
-		String[] input =  Utils.lineParse(userInput);
+		String[] input =  AutoCorrectUtils.lineParse(userInput);
 		String currentWord = input[input.length - 1];
 		String previousWord = "";
 		if (input.length > 1)
@@ -58,7 +58,7 @@ public class Engine {
 		List<String> results = new LinkedList<>();
 		for(Suggestion s : topSuggestions) {
 			input[input.length - 1] = s.toString();
-			results.add(Utils.arrayParse(input));
+			results.add(AutoCorrectUtils.arrayParse(input));
 		}
 		return results;
 	}

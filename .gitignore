@@ -4,3 +4,4 @@
 /data/mapsfiles/
 /data/*.tsv
 /**/.DS_Store
+/build
