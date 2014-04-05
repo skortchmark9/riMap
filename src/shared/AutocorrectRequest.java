@@ -1,7 +1,7 @@
 package shared;
 
 public class AutocorrectRequest implements Request {
-	String input;
+	public final String input;
 	
 	public AutocorrectRequest(String input) {
 		this.input = input;

@@ -3,12 +3,18 @@
  */
 package server;
 
+<<<<<<< HEAD
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 import backend.Backend;
 import backend.Util;
+=======
+import java.net.ServerSocket;
+
+import backend.Backend;
+>>>>>>> 5d89343550c9f22561ebe10dbb79986b0fa5371c
 
 /**
  * @author emc3
@@ -41,7 +47,7 @@ public class Server extends Thread {
 		try {
 		while(_running) {
 			Socket clientConn = _socket.accept(); //blocks waiting for connections
-			new ClientHandler(_clientPool, clientConn, _backend);
+			new ClientHandler(_clientPool, clientConn);
 			Util.out("--New client connection");
 			
 		}
