@@ -4,6 +4,7 @@
 package server;
 
 import java.io.IOException;
+import java.util.Scanner;
 
 import backend.Backend;
 import backend.Constants;
@@ -19,7 +20,7 @@ public class Main {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		if(args.length != 6) {
 			Util.err("ERROR: incorrect number of arguments.\n", "Usage: trafficServer <ways> <nodes> <index> <hostname> <trafficport> <serverport>" );
 			return;
@@ -58,8 +59,22 @@ public class Main {
 		b.initBackend();
 		
 		//create a new Server using the backend we just made:
+		Server server = new Server(serverPort, b);
+		server.start();
 		
-		
+		//Listen for "exit" or empty line to quit server
+		Scanner scanner = new Scanner(System.in);
+		String line = null;
+		while (scanner.hasNextLine()) {
+			line = scanner.nextLine();
+			if (line.length() == 0 || line.equalsIgnoreCase("exit")) {
+				break;
+			}
+			Util.out("Enter blank line or \'exit\' to quit server.");
+		}
+		server.kill();
+		scanner.close();
 	}
 
+	
 }
