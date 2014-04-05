@@ -8,6 +8,7 @@ public interface Response extends Serializable {
 		NEAREST_NEIGHBORS,
 		WAYS,
 		PATH,
+		SERVER_STATUS
 	}
 	ResponseType getType();
 }

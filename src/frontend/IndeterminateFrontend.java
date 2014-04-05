@@ -36,6 +36,7 @@ import backend.Backend;
 import backend.Constants;
 import backend.PathWayFinder;
 import backend.Util;
+import client.Client;
 
 /**
  * A Class representing the Front-end of the maps program.
@@ -51,7 +52,7 @@ public class IndeterminateFrontend implements ActionListener {
 	JTextArea msgBox;
 	JFrame frame;
 	MapPane map;
-	Backend b;
+	Client client;
 	final Cursor defaultCursor = Cursor.getDefaultCursor();
 	final Cursor busyCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 	
@@ -65,8 +66,10 @@ public class IndeterminateFrontend implements ActionListener {
 	 * Creates a new JFrame and initializes the map inside of that.
 	 * Also puts a few buttons on the screen.
 	 */	
-	public IndeterminateFrontend(Backend b) {
+	public IndeterminateFrontend(Client client) {
 		
+		this.client = client;
+
 		//Setting up the frame.
 		frame = new JFrame("MAPS");
 		frame.setTitle("MAPS - By Samuel Kortchmar and Eli Martinez Cohen");
@@ -108,13 +111,12 @@ public class IndeterminateFrontend implements ActionListener {
 		frame.setVisible(true);
 		loadingPanel.requestFocusInWindow();
 		
-		while(!b.isDone()) {
+		while(!client.isReady()) {
 		}
 		//Preparing the backend to send messages to the loading screen.
 		//Initializing the backend.
 
 		//Finished loading, removing the loading screen.
-		this.b = b;
 		frame.remove(loadingPanel);
 		frame.setCursor(defaultCursor);
 		//Initializing the rest of the Frontend.
@@ -133,7 +135,7 @@ public class IndeterminateFrontend implements ActionListener {
 
 		//Creates the map pane. Wrapping it in backgroundPanel allows us to use
 		//a layoutManager to center it, even though JDesktopPane does not support one.
-		map = new MapPane(b);
+		map = new MapPane(client);
 		map.setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100));
 		JPanel backgroundPanel = new JPanel(new GridBagLayout());
 		backgroundPanel.setBackground(Color.BLACK);
@@ -141,8 +143,7 @@ public class IndeterminateFrontend implements ActionListener {
 		backgroundPanel.setBounds(0, 0, frame.getWidth(), frame.getHeight());
 
 		//pwRequester handles requests to the backend for shortest path searches.
-		//TODO: THIS ISN'T ACTUALLY MULTITHREADED.
-		pwRequester = new PathWayFinder(b, map);		
+		pwRequester = new PathWayFinder(client, map);		
 
 		
 		//Adds the controlPanel and Map/BackgroundPanel to the desktop.
