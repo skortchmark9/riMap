@@ -160,7 +160,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		
 		//render boundaries if in range
 		if (Util.boundariesInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1])) {
-			Util.out("Painting Boundaries");
+			
+			if (Constants.DEBUG_MODE)
+				Util.out("Painting Boundaries");
+			
 			int topLeft[] = geo2pixel(new double[]{Constants.MAXIMUM_LATITUDE, Constants.MINIMUM_LONGITUDE}); //top left boundary corner
 			int topRight[] = geo2pixel(new double[]{Constants.MAXIMUM_LATITUDE, Constants.MAXIMUM_LONGITUDE}); //top right boundary corner
 			int bottomRight[] = geo2pixel(new double[]{Constants.MINIMUM_LATITUDE, Constants.MAXIMUM_LONGITUDE});
