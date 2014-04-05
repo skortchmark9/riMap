@@ -15,8 +15,6 @@ import java.awt.event.MouseWheelListener;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -31,9 +29,9 @@ import javax.swing.KeyStroke;
 import kdtree.KDStub;
 import maps.Node;
 import maps.Way;
-import backend.Backend;
 import backend.Constants;
 import backend.Util;
+import client.Client;
 
 public class MapPane extends JPanel implements MouseWheelListener {
 
@@ -47,7 +45,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private List<Way> renderedWays, calculatedRoute;
 	private ClickNeighbor source;
 	private ClickNeighbor target;
-	private Backend b;
+	private Client client;
 	private boolean clickSwitch = true;
 	private AtomicInteger threadCount;
 	//private ExecutorService executor;
@@ -59,8 +57,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * well as zooming / panning over the map.
 	 * @param b - the backend to link to this MapPane.
 	 */
-	MapPane(Backend b)   {
-		this.b = b;
+	MapPane(Client client)   {
+		this.client = client;
 		this.setBackground(Constants.MIDNIGHT);
 		this.setPreferredSize(new Dimension(PIXEL_WIDTH, PIXEL_HEIGHT));
 		this.setMaximumSize(getPreferredSize());
@@ -702,10 +700,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				Util.out("Starting WayGetter!");
 			}
 			numberID = threadCount.incrementAndGet();
-			if (b == null) {
+			if (client == null) {
 				Util.out("HERE");
 			}
-			List<Way> temp = b.getWaysInRange(this.minLat, this.maxLat, this.minLon, this.maxLon);
+			List<Way> temp = client.getWaysInRange(this.minLat, this.maxLat, this.minLon, this.maxLon);
 			
 			if (threadCount.get() == numberID) {
 				renderedWays = temp;

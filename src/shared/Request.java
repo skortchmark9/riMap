@@ -9,6 +9,7 @@ public interface Request extends Serializable {
 		NEAREST_NEIGHBORS,
 		WAYS,
 		PATH,
+		EXIT
 	}
 	RequestType getType();
 }

@@ -10,6 +10,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import client.Client;
 import frontend.MapPane;
 import maps.Node;
 import maps.Way;
@@ -22,11 +23,11 @@ import maps.Way;
 public class PathWayFinder {
 
 	ExecutorService executor;
-	Backend b;
+	Client client;
 	MapPane map;
 	
-	public PathWayFinder(Backend b, MapPane map) {
-		this.b = b;
+	public PathWayFinder(Client client, MapPane map) {
+		this.client = client;
 		this.map = map;
 		executor = Executors.newFixedThreadPool(5);
 	}
@@ -79,7 +80,7 @@ public class PathWayFinder {
 
 		@Override
 		public List<Way> call() {
-			return b.getPath(start, end);
+			return client.getPath(start, end);
 		}
 	}
 
