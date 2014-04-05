@@ -38,7 +38,8 @@ public class Main {
 			Util.err("WARNING: Invalid argument for server port. setting to default port #:", serverPort);
 		}
 		
-		
+		TrafficSocket trafficSocket = new TrafficSocket(trafficPort);
+		trafficSocket.start();
 		
 	}
 
