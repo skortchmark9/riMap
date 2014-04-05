@@ -34,7 +34,7 @@ import maps.MapFactory;
 import maps.Node;
 import backend.Backend;
 import backend.Constants;
-import backend.PathWayFinder;
+import backend.PathWayRunnable;
 import backend.Util;
 import client.Client;
 
@@ -56,7 +56,7 @@ public class IndeterminateFrontend implements ActionListener {
 	final Cursor defaultCursor = Cursor.getDefaultCursor();
 	final Cursor busyCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 	
-	PathWayFinder pwRequester;
+	PathWayRunnable pwRequester;
 	SimpleLoadingPane loadingScreen;
 	private JLabel lblTimeouts;
 	private JSpinner timeOutSpinner;
@@ -143,7 +143,7 @@ public class IndeterminateFrontend implements ActionListener {
 		backgroundPanel.setBounds(0, 0, frame.getWidth(), frame.getHeight());
 
 		//pwRequester handles requests to the backend for shortest path searches.
-		pwRequester = new PathWayFinder(client, map);		
+		pwRequester = new PathWayRunnable(client, map);		
 
 		
 		//Adds the controlPanel and Map/BackgroundPanel to the desktop.

@@ -4,11 +4,18 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import kdtree.KDimensionable;
+import maps.Node;
+import maps.Way;
 import shared.Request;
 import shared.Request.RequestType;
 import shared.Response;
+import shared.Response.ResponseType;
 
 /**
  * A Client Class that sends and receives messages from and to the server.
@@ -23,12 +30,15 @@ public class Client {
 	private ReceiveThread _thread;
 	private String IP;
 	private List<Response> responses;
+	ExecutorService executor;
+
 
 	/**
 	 * Constructs a Client with the given port.
 	 * @param port the port number the client will connect to
 	 */
 	public Client(String IPAddress, int port) {
+		executor = Executors.newFixedThreadPool(5);
 		_port = port;
 		IP = IPAddress;
 	}
@@ -51,8 +61,6 @@ public class Client {
 			err("ERROR: Can't connect to server");
 		}
 	}
-	
-
 
 	/**
 	 * A method that sends a message to the server.
@@ -86,27 +94,29 @@ public class Client {
 		}
 	}
 	
+	public List<String> getAutoCorrections(String input) {
+		return null;
+	}
+	
+	public List<Node> getNearestNeighbors(int i, KDimensionable kd) {
+		return null;
+	}
+	
+	public List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+		return null;
+	}
+	
+	public void removeAllResponses(ResponseType type) {
+		Iterator<Response>  itr = responses.iterator();
+		while(itr.hasNext()) {
+			if (itr.next().getType() == type)
+				itr.remove();
+		}
+	}
+	
 	public boolean isReady() {
 		return _running;
 	}
-		/*
-		 *         			ResponseType type = received.getType();
-        			switch (type) {
-					case AUTO_CORRECTIONS:
-						break;
-					case NEAREST_NEIGHBORS:
-						break;
-					case PATH:
-						break;
-					case WAYS:
-						break;
-					case SERVER_STATUS:
-						break;
-					default:
-						break;
-        			}
-		 */
-
 
 	/**
 	 * A thread that will receive the messages sent by the server to
