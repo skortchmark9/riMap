@@ -3,7 +3,11 @@
  */
 package server;
 
+import java.io.IOException;
+
+import backend.Backend;
 import backend.Constants;
+import backend.Resources;
 import backend.Util;
 
 /**
@@ -40,6 +44,21 @@ public class Main {
 		
 		TrafficSocket trafficSocket = new TrafficSocket(trafficPort);
 		trafficSocket.start();
+		
+		//initialize resource files
+		try {
+			new Resources(args[0], args[1], args[2]);
+		} catch (IOException e) {
+			Util.err("ERROR trying to generate Resources");
+			return;
+		}
+		
+		//initialize backend
+		Backend b = new Backend();
+		b.initBackend();
+		
+		//create a new Server using the backend we just made:
+		
 		
 	}
 
