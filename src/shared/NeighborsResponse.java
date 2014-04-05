@@ -6,10 +6,10 @@ import maps.Node;
 
 public class NeighborsResponse implements Response {
 	
-	List<Node> neighbors;
+	List<Node> _neighbors;
 	
-	public NeighborsResponse() {
-		// TODO fill out this constructor.
+	public NeighborsResponse(List<Node> neighbors) {
+		_neighbors = neighbors;
 	}
 
 	@Override
@@ -18,6 +18,6 @@ public class NeighborsResponse implements Response {
 	}
 	
 	List<Node> getNeighbors() {
-		return neighbors;
+		return _neighbors;
 	}
 }

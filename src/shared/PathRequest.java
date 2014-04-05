@@ -3,11 +3,11 @@ package shared;
 import maps.Node;
 
 public class PathRequest implements Request {
-	Node start, end;
+	public final Node _source, _dest;
 	
-	PathRequest(Node start, Node end) {
-		this.start = start;
-		this.end = end;
+	PathRequest(Node source, Node dest) {
+		_source = source;
+		_dest = dest;
 	}
 	@Override
 	public RequestType getType() {

@@ -2,14 +2,14 @@ package shared;
 
 public class WayRequest implements Request {
 	
-	private double minLat, maxLat, minLong, maxLong = -1;
+	public final double _minLat, _maxLat, _minLon, _maxLon;
 	boolean filled = false;
 	
 	WayRequest(double minLat, double maxLat, double minLong, double maxLong) {
-		this.minLat = minLat;
-		this.maxLat = maxLat;
-		this.minLong = minLong;
-		this.maxLong = maxLong;
+		_minLat = minLat;
+		_maxLat = maxLat;
+		_minLon = minLong;
+		_maxLon = maxLong;
 	}
 
 	@Override
@@ -17,16 +17,4 @@ public class WayRequest implements Request {
 		return RequestType.WAYS;
 	}
 
-	double getMinLat() {
-		return minLat;
-	}
-	double getMaxLat() {
-		return maxLat;
-	}
-	double getMinLong() {
-		return minLong;
-	}
-	double getMaxLong() {
-		return minLong;
-	}
 }

@@ -6,7 +6,11 @@ import maps.Way;
 
 public class WayResponse implements Response {
 	
-	List<Way> ways;
+	List<Way> _ways;
+	
+	public WayResponse(List<Way> ways) {
+		_ways = ways;
+	}
 
 	@Override
 	public ResponseType getType() {
@@ -14,7 +18,7 @@ public class WayResponse implements Response {
 	}
 	
 	List<Way> getWays() {
-		return ways;
+		return _ways;
 	}
 	
 }
