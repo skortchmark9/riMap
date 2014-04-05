@@ -634,7 +634,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		private ClickNeighbor(int x, int y) {
 			double[] geoCoords = pixel2geo(x,y);
 			KDStub p = new KDStub(geoCoords[0], geoCoords[1]);
-			node = b.getNearestNeighbors(1, p).get(0);
+			node = client.getNearestNeighbors(1, p).get(0);
 			screenCoords = geo2pixel(node.getCoordinates());
 		}
 		

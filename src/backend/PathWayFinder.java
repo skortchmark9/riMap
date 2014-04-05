@@ -25,7 +25,7 @@ public class PathWayFinder {
 	ExecutorService executor;
 	Client client;
 	MapPane map;
-	
+
 	public PathWayFinder(Client client, MapPane map) {
 		this.client = client;
 		this.map = map;
@@ -36,39 +36,39 @@ public class PathWayFinder {
 		Runnable worker = new FinderThread(seconds);
 		executor.execute(worker);
 	}
-	
+
 	private class FinderThread implements Runnable {
 
-	private int timeout;
-	
-	FinderThread(int s) {
-		timeout = s;
-	}
-	
-	@Override
-	public void run() {
-		Future<List<Way>> future = executor.submit(new CallableWays(map.getStart(), map.getEnd()));
-		List<Way> wayList = new LinkedList<>();
-		try {
-			wayList = future.get(timeout, TimeUnit.SECONDS);
-		} catch (InterruptedException e1) {
-			return;
-		} catch (ExecutionException e1) {
-		} catch (TimeoutException e1) {
-			Util.guiMessage("ERROR: the search timed out - try again with more time.");
+		private int timeout;
+
+		FinderThread(int s) {
+			timeout = s;
 		}
-		if (wayList.isEmpty()) {
-			Util.guiMessage("Could not find a path between these points");
+
+		@Override
+		public void run() {
+			Future<List<Way>> future = executor.submit(new CallableWays(map.getStart(), map.getEnd()));
+			List<Way> wayList = new LinkedList<>();
+			try {
+				wayList = future.get(timeout, TimeUnit.SECONDS);
+			} catch (InterruptedException e1) {
+				return;
+			} catch (ExecutionException e1) {
+			} catch (TimeoutException e1) {
+				Util.guiMessage("ERROR: the search timed out - try again with more time.");
+			}
+			if (wayList.isEmpty()) {
+				Util.guiMessage("Could not find a path between these points");
+			}
+			map.clearRoute();
+			if (Constants.DEBUG_MODE) {
+				Util.out("WAYS FOUND:", wayList);
+			}
+			map.setCalculatedRoute(wayList);
+			map.repaint();
 		}
-		map.clearRoute();
-		if (Constants.DEBUG_MODE) {
-			Util.out("WAYS FOUND:", wayList);
-		}
-		map.setCalculatedRoute(wayList);
-		map.repaint();
 	}
-	}
-	
+
 	class CallableWays implements Callable<List<Way>> {
 
 		Node start, end;

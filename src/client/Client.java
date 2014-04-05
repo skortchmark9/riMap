@@ -5,12 +5,10 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.List;
-import java.util.concurrent.Future;
 
 import shared.Request;
 import shared.Request.RequestType;
 import shared.Response;
-import shared.Response.ResponseType;
 
 /**
  * A Client Class that sends and receives messages from and to the server.
@@ -53,6 +51,7 @@ public class Client {
 			err("ERROR: Can't connect to server");
 		}
 	}
+	
 
 
 	/**
@@ -86,9 +85,10 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
-
+	
 	public boolean isReady() {
 		return _running;
+	}
 		/*
 		 *         			ResponseType type = received.getType();
         			switch (type) {
@@ -106,7 +106,6 @@ public class Client {
 						break;
         			}
 		 */
-	}
 
 
 	/**
