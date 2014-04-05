@@ -22,22 +22,22 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 
-import backend.Backend;
 import backend.Util;
+import client.Client;
 
 @SuppressWarnings("serial")
 public class AutoFillField extends JTextField {
 
 	private JPopupMenu popup;
-	private Backend b;
+	private Client client;
 	private JTable searchTable;
 	private DefaultTableModel searchTableModel;
 	private String initialText;
 	boolean popped = false;
 
-	public AutoFillField(Backend b, String startField) {
+	public AutoFillField(Client c, String startField) {
 		super(10);
-		this.b = b;
+		this.client = client;
 		initialText = startField;
 		setForeground(Color.DARK_GRAY);
 		setText(initialText);
@@ -245,7 +245,7 @@ public class AutoFillField extends JTextField {
 		searchTable.setPreferredSize(new Dimension(getWidth() - 8, 80));
 		String input = getText();
 		String[] columns = new String[] {input};
-		List<String> suggestions = b.getAutoCorrections(input);
+		List<String> suggestions = client.getAutoCorrections(input);
 		List<String> cappedSuggestions = new LinkedList<>();
 		int length = suggestions.size();
 		//We lowercase all text entering the prefix tree, so here we need
