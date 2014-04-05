@@ -130,7 +130,7 @@ public class RadixTree {
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			
 			while((line = bufferedReader.readLine()) !=null) { //Loops while bufferedReader can find a next line
-				for(String word : Utils.lineParse(line)) { //passes parsing to lineParse
+				for(String word : AutoCorrectUtils.lineParse(line)) { //passes parsing to lineParse
 					if (word.length() > 0)	{ //We really don't want any empty strings.
 						this.insert(word, lastWord);
 						lastWord = word;
@@ -177,7 +177,7 @@ public class RadixTree {
 				child.addBigramNeighbor(lastWord);
 			} else {
 				//need to do some manipulation of tree structure:
-				int breakPoint = Utils.findBreakPoint(child.key, word); //find index at which 'word' and the key diverge
+				int breakPoint = AutoCorrectUtils.findBreakPoint(child.key, word); //find index at which 'word' and the key diverge
 				String childPrefix = child.key.substring(0, breakPoint);
 				String childSuffix = child.key.substring(breakPoint);
 				String wordSuffix  = word.substring(breakPoint);
@@ -234,7 +234,7 @@ public class RadixTree {
 				if (currentNode.key.length() > word.length())
 					return 0;
 				else
-					return (currentNode.getFreq(word.substring(Utils.findBreakPoint(word, currentNode.key), word.length())));
+					return (currentNode.getFreq(word.substring(AutoCorrectUtils.findBreakPoint(word, currentNode.key), word.length())));
 			}
 		}
 	}
@@ -267,7 +267,7 @@ public class RadixTree {
 				if (currentNode.key.length() > word.length())
 					return defaultMap;
 				else
-					return (currentNode.getBigramNeighbors(word.substring(Utils.findBreakPoint(word, currentNode.key), word.length())));
+					return (currentNode.getBigramNeighbors(word.substring(AutoCorrectUtils.findBreakPoint(word, currentNode.key), word.length())));
 			}
 		}
 	}
@@ -288,7 +288,7 @@ public class RadixTree {
 			FileReader fileReader = new FileReader(fileName); //Attempts to read the given file
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			while((line = bufferedReader.readLine()) !=null) { //Loops while bufferedReader can find a next line
-				for(String word : Utils.lineParse(line)) {
+				for(String word : AutoCorrectUtils.lineParse(line)) {
 					if (!word.equals("") && !this.search(word)) {
 //						System.out.println("word not found: " + word);
 						outcome = false;
@@ -360,7 +360,7 @@ public class RadixTree {
 					//However, suffixes might exist. If 'potentialWord' is a suffix of fw, then their breakpoint will be where fw ends.
 					// If that is the case, we'll want potentialWord, and also its children.
 					//			System.out.println("branch3: " + this.toString() + " carriedString: " + carriedString + " Current Node: " + followingNode.toString());
-					if (Utils.findBreakPoint(potentialWord, fullWord) == fwLength) { //
+					if (AutoCorrectUtils.findBreakPoint(potentialWord, fullWord) == fwLength) { //
 						results.addAll(followingNode.findAllSuffixes(fullWord, 1, maxDistance));
 						results.addFirst(new Suggestion(potentialWord, followingNode.getFreq(), 0, followingNode.bigramNeighbors));
 					}
@@ -454,7 +454,7 @@ public class RadixTree {
 		int[] currentRow = new int[rootWord.length() + 1];
 		currentRow[0] = previousRow[0] + 1; //Remember - the first column is deletion to the empty string.
 		for (int j = 0; j < rootWord.length(); j++) {
-			currentRow[j + 1] = Utils.minimum(
+			currentRow[j + 1] = AutoCorrectUtils.minimum(
 					previousRow[j + 1] + 1,    //cost of deletion
 					currentRow[j] + 1, //cost of insertion
 					previousRow[j] +   //cost of replacement

@@ -3,7 +3,6 @@ package backend;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import kdtree.KDTree;
 import kdtree.KDimensionable;
@@ -26,7 +25,6 @@ import graph.PathFinder;
  * the backend is sort of used like an interface between the FrontEnd or CLI and
  * the MapFactory and various other classes that actually do the hard work of the program.
  * @author emc3 / skortchm
- *
  */
 public class Backend {
 
@@ -132,7 +130,6 @@ public class Backend {
 	}
 	
 	/**
-	 * 
 	 * @param name
 	 * @return
 	 */
@@ -169,8 +166,6 @@ public class Backend {
 			return null;
 		}
 	}
-	
-	
 	
 	public class BackendInitializer extends Thread {
 		
