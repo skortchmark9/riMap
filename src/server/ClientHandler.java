@@ -112,33 +112,35 @@ public class ClientHandler extends Thread {
 	 * @return
 	 * A response containing the data received from the backend.
 	 */
-	private Response processRequest(Request req) {
+	private void processRequest(Request req) {
 		switch (req.getType()) {
 		case AUTO_CORRECTIONS:
 			AutocorrectRequest aReq = (AutocorrectRequest) req;
-			
-			//submit a new suggestion getter to the thread pool
+			//submit a new suggestion getter to its pool
 			_requestHandlerPool.execute(new SuggestionGetter(aReq.getInput(), aReq.getBoxNo()));
-		
+			break;
+			
 		case NEAREST_NEIGHBORS:
 			NeighborsRequest nReq = (NeighborsRequest) req;
-			//get nearest neighbors from backend and wrap the 
-			//returned list of neighbors in a NeighborsResponse object.
-			return new NeighborsResponse(_b.getNearestNeighbors(nReq.getNumNeighbors(), nReq.getLocation()));
-		
+			//submit a new nearest-neighbors getter to its pool
+			_requestHandlerPool.execute(new NeighborGetter(nReq.getNumNeighbors(), nReq.getLocation()));
+			break;
+			
 		case WAYS:
 			WayRequest wReq = (WayRequest) req;
-			//get ways in range from backend and wrap the
-			//returned list of ways in a response object.
-			return new WayResponse(_b.getWaysInRange(wReq.getMinLat(), wReq.getMaxLat(), wReq.getMinLon(), wReq.getMaxLon()));
+			//submit a new way getter to the its pool
+			_requestHandlerPool.execute(new WayGetter(wReq.getMinLat(), wReq.getMaxLat(), wReq.getMinLon(), wReq.getMaxLon()));
+			break;
+			
 		case PATH:
 			PathRequest pReq = (PathRequest) req;
-			//get shortest path from backend and wrap the
-			//returned list of ways in a response object.
-			return new PathResponse(_b.getPath(pReq.getSource(), pReq.getDest()), "success!");
+			new PathResponse(_b.getPath(pReq.getSource(), pReq.getDest()), "success!");
+			break;
+			
 		default:
 			//not much we can do with an invalid request
 			throw new IllegalArgumentException("Unsupported request type");
+			break;
 		}
 	}
 	
@@ -163,8 +165,8 @@ public class ClientHandler extends Thread {
 	
 	
 	private class SuggestionGetter implements Runnable {
-		int _threadID, _boxNum;
-		String _input;
+		private int _threadID, _boxNum;
+		private String _input;
 		
 		private SuggestionGetter(String input, int boxNum) {
 			_input = input;
@@ -184,8 +186,8 @@ public class ClientHandler extends Thread {
 	
 	
 	private class NeighborGetter implements Runnable {
-		int _threadID, _numNeighbors;
-		KDimensionable _location;
+		private int _threadID, _numNeighbors;
+		private KDimensionable _location;
 		
 		private NeighborGetter(int numNeighbors, KDimensionable location) {
 			_numNeighbors = numNeighbors;
@@ -194,25 +196,39 @@ public class ClientHandler extends Thread {
 		
 		@Override
 		public void run() {
-			// TODO Auto-generated method stub
-			
+			_threadID = _neighborThreadCount.incrementAndGet();
+			Response resp = new NeighborsResponse(_b.getNearestNeighbors(_numNeighbors, _location));
+			if (_threadID == _neighborThreadCount.get()) {
+				_responseQueue.add(resp);
+			}
 		}
 		
 	}
 	
 	private class WayGetter implements Runnable {
-		int threadID;
+		private int _threadID;
+		private double _minLat, _maxLat, _minLon, _maxLon; 
 		
+		public WayGetter(double minLat, double maxLat, double minLon, double maxLon) {
+			_minLat = minLat;
+			_maxLat = maxLat;
+			_minLon = minLon;
+			_maxLon = maxLon;
+		}
+
 		@Override
 		public void run() {
-			// TODO Auto-generated method stub
-			
+			_threadID = _wayGetThreadCount.incrementAndGet();
+			Response resp = new WayResponse(_b.getWaysInRange(_minLat, _maxLat, _minLon, _maxLon));
+			if (_threadID == _wayGetThreadCount.get()) {
+				_responseQueue.add(resp);
+			}
 		}
 		
 	}
 	
 	private class PathGetter implements Runnable {
-		int threadID;
+		int _threadID;
 		
 		@Override
 		public void run() {
