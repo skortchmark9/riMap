@@ -143,6 +143,7 @@ public class IndeterminateFrontend implements ActionListener {
 		backgroundPanel.setBounds(0, 0, frame.getWidth(), frame.getHeight());
 
 		//pwRequester handles requests to the backend for shortest path searches.
+		//TODO: part of client?
 		pwRequester = new PathWayRunnable(client, map);		
 
 		

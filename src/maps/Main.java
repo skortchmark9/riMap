@@ -47,7 +47,7 @@ public class Main {
 		Backend b = new Backend();
 		b.initBackend();
 		if (gui) {
-			new IndeterminateFrontend(b);
+			new IndeterminateFrontend(b); //TODO: use client instead of backend 
 		}
 		else {
 			b.initBackend();
