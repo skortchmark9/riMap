@@ -85,7 +85,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		threadCount = new AtomicInteger(0);
 		//new thread!
 		//executor = Executors.newSingleThreadExecutor();
-		wayGetterPool = new ThreadPoolExecutor(Constants.WG_CORE_SIZE, Constants.WG_MAX_SIZE, Constants.WG_TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+		wayGetterPool = new ThreadPoolExecutor(Constants.THREADPOOL_CORE_SIZE, Constants.THREADPOOL_MAX_SIZE, Constants.THREADPOOL_TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 		wayGetterPool.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
 		calculatedRoute = new LinkedList<>();
 		if (Constants.DEBUG_MODE) {
@@ -791,9 +791,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				Util.out("Starting WayGetter!");
 			}
 			numberID = threadCount.incrementAndGet();
-			if (client == null) {
-				Util.out("HERE");
-			}
 			List<Way> temp = client.requestWaysInRange(this.minLat, this.maxLat, this.minLon, this.maxLon);
 			
 			if (threadCount.get() == numberID) {

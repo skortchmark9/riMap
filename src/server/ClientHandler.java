@@ -8,6 +8,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import shared.AutocorrectRequest;
 import shared.AutocorrectResponse;
@@ -21,6 +26,7 @@ import shared.Response;
 import shared.WayRequest;
 import shared.WayResponse;
 import backend.Backend;
+import backend.Constants;
 import backend.Util;
 
 /**
@@ -33,7 +39,11 @@ public class ClientHandler extends Thread {
 	private ObjectOutputStream _output;
 	private ClientPool _pool;
 	private Backend _b;
+	
+	//stuff for threading requests:
+	private Executor _requestHandlerPool;
 	private ConcurrentLinkedQueue<Response> _responseQueue;
+	private AtomicInteger _autocThreadCount, _neighborThreadCount, _wayGetThreadCount, _pathGetThreadCount;
 	
 	/**
 	 * Default constructor.
@@ -55,6 +65,15 @@ public class ClientHandler extends Thread {
 		
 		_input = new ObjectInputStream(_client.getInputStream());
 		_output = new ObjectOutputStream(_client.getOutputStream());
+		
+		//We need atomic int's for each type of request/response 
+		_autocThreadCount = new AtomicInteger(0);
+		_neighborThreadCount = new AtomicInteger(0);
+		_wayGetThreadCount = new AtomicInteger(0);
+		_pathGetThreadCount = new AtomicInteger(0);
+
+		//XXX: I'm making the max size 8 instead of 4
+		_requestHandlerPool = new ThreadPoolExecutor(Constants.THREADPOOL_CORE_SIZE, 8, Constants.THREADPOOL_TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 		
 		_pool.add(this);
 	}
@@ -96,9 +115,10 @@ public class ClientHandler extends Thread {
 		switch (req.getType()) {
 		case AUTO_CORRECTIONS:
 			AutocorrectRequest aReq = (AutocorrectRequest) req;
-			//get corrections from the backend and wrap the
-			//returned list of corrections in a response object.
-			return new AutocorrectResponse(_b.getAutoCorrections(aReq.getInput()), aReq.getBoxNo());
+			
+			//submit a new suggestion getter to the thread pool
+			
+			new SuggestionGetter(aReq.getInput(), aReq.getBoxNo());
 		
 		case NEAREST_NEIGHBORS:
 			NeighborsRequest nReq = (NeighborsRequest) req;
@@ -138,6 +158,62 @@ public class ClientHandler extends Thread {
 		} catch (IOException e) {
 			Util.err("ERROR killing client handler.\n", e.getMessage());	
 		}
+	}
+	
+	
+	
+	
+	private class SuggestionGetter implements Runnable {
+		int _threadID, _boxNum;
+		String _input;
+		
+		private SuggestionGetter(String input, int boxNum) {
+			_input = input;
+			_boxNum = boxNum;
+		}
+
+		@Override
+		public void run() {
+			_threadID = _autocThreadCount.incrementAndGet();
+			Response resp = new AutocorrectResponse(_b.getAutoCorrections(_input), _boxNum);
+			if (_threadID == _autocThreadCount.get()) {
+				_responseQueue.add(resp);
+			}
+		}
+		
+	}
+	
+	private class NeighborGetter implements Runnable {
+		int threadID;
+		
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
+	
+	private class WayGetter implements Runnable {
+		int threadID;
+		
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
+	
+	private class PathGetter implements Runnable {
+		int threadID;
+		
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			
+		}
+		
 	}
 
 }
