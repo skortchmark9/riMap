@@ -1,0 +1,76 @@
+#!/usr/bin/python
+
+import socket
+import sys
+from random import uniform, choice
+from threading import Lock, Thread
+from time import sleep
+
+sockets = []
+ways = []
+lock = Lock()
+run = True
+
+class Sender:
+  def __call__(self):
+    print "Starting sender thread"
+    while run:
+      dead_socks = []
+      sleep(uniform(0, 3))
+      data = "{0}\t{1}\n".format(choice(ways),uniform(1,5))
+      with lock:
+        for s,addr in sockets:
+          try:
+            s.send(data)
+            print "Sent to socket at",addr
+          except:
+            dead_socks.append((s,addr))
+            print "Could not send to socket at",addr
+        for s,addr in dead_socks:
+          print "Removing socket at",addr
+          sockets.remove((s,addr))
+    with lock:
+      for s,addr in sockets:
+        s.close()
+
+if len(sys.argv) != 3:
+  print "usage:",sys.argv[0],"<port> <index>"
+  sys.exit(1)
+
+HOST,PORT = "",int(sys.argv[1])
+with open(sys.argv[2],"r") as f:
+  header = True
+  name_field = -1
+  for line in f:
+    if header:
+      try:
+        name_field = line.strip("\n").split("\t").index("name")
+      except:
+        print "Malformed TSV"
+        sys.exit(1)
+      header = False
+    else:
+      ways.append(line.strip("\n").split("\t")[name_field])
+
+try:
+  s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+  s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+  print "Made socket"
+  s.bind((HOST, PORT))
+  print "Bound to port",PORT,"with hostname",HOST
+
+  Thread(target=Sender()).start()
+
+  s.listen(3)
+  while run:
+    conn, addr = s.accept()
+    print "Connection from", addr
+    with lock:
+      sockets.append((conn,addr))
+except socket.error, msg:
+  print msg
+except KeyboardInterrupt:
+  print "Quitting gracefully..."
+finally:
+  run = False
+  s.close()
