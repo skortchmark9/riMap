@@ -1,4 +1,4 @@
-package backend;
+package server;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -12,7 +12,6 @@ import java.util.concurrent.TimeoutException;
 
 import maps.Node;
 import maps.Way;
-import server.ClientHandler;
 import shared.PathResponse;
 
 /**
@@ -24,6 +23,7 @@ public class PathWayGetter {
 
 	ExecutorService _executor;
 	ClientHandler _owner;
+	
 	public PathWayGetter(ClientHandler owner) {
 		_owner = owner;
 		_executor = Executors.newFixedThreadPool(5);
@@ -49,16 +49,17 @@ public class PathWayGetter {
 		public void run() {
 			Future<List<Way>> future = _executor.submit(new CallableWays(_start, _end));
 			List<Way> wayList = new LinkedList<>();
+			PathResponse pr;
 			try {
 				wayList = future.get(_timeout, TimeUnit.SECONDS);
 			} catch (InterruptedException e1) {
 				return;
 			} catch (ExecutionException e1) {
 			} catch (TimeoutException e1) {
-				new PathResponse("The search timed out");
+				pr = new PathResponse("The search timed out"));
 			}
 			if (wayList.isEmpty()) {
-				new PathResponse("Sorry, could not find a path");
+				pr = new PathResponse("Sorry, could not find a path");
 			}
 		}
 	}
@@ -74,8 +75,7 @@ public class PathWayGetter {
 
 		@Override
 		public List<Way> call() {
-			return getPath(start, end);
+			return _owner.getBackend().getPath(start, end);
 		}
 	}
-
 }

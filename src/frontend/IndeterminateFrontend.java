@@ -31,10 +31,10 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.text.DefaultCaret;
 
+import server.PathWayGetter;
 import maps.MapFactory;
 import maps.Node;
 import backend.Constants;
-import backend.PathWayGetter;
 import backend.Util;
 import client.Client;
 

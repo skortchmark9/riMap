@@ -14,7 +14,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import kdtree.KDimensionable;
 import shared.AutocorrectRequest;
 import shared.AutocorrectResponse;
 import shared.ExitRequest;
@@ -39,11 +38,11 @@ public class ClientHandler extends Thread {
 	private ObjectInputStream _input;
 	private ObjectOutputStream _output;
 	private ClientPool _pool;
-	private Backend _b;
+	Backend _b;
 	
 	//stuff for threading requests:
 	private Executor _requestHandlerPool;
-	private ConcurrentLinkedQueue<Response> _responseQueue;
+	ConcurrentLinkedQueue<Response> _responseQueue;
 	private AtomicInteger _autocThreadCount, _neighborThreadCount, _wayGetThreadCount, _pathGetThreadCount;
 	
 	/**
@@ -118,7 +117,8 @@ public class ClientHandler extends Thread {
 			AutocorrectRequest aReq = (AutocorrectRequest) req;
 			
 			//submit a new suggestion getter to the thread pool
-			_requestHandlerPool.execute(new SuggestionGetter(aReq.getInput(), aReq.getBoxNo()));
+			
+			new SuggestionGetter(aReq.getInput(), aReq.getBoxNo());
 		
 		case NEAREST_NEIGHBORS:
 			NeighborsRequest nReq = (NeighborsRequest) req;
@@ -141,7 +141,7 @@ public class ClientHandler extends Thread {
 			throw new IllegalArgumentException("Unsupported request type");
 		}
 	}
-	
+		
 	/**
 	 * Kills this handler and cleans up its additional resources.
 	 * 
@@ -182,15 +182,8 @@ public class ClientHandler extends Thread {
 		
 	}
 	
-	
 	private class NeighborGetter implements Runnable {
-		int _threadID, _numNeighbors;
-		KDimensionable _location;
-		
-		private NeighborGetter(int numNeighbors, KDimensionable location) {
-			_numNeighbors = numNeighbors;
-			_location = location;
-		}
+		int threadID;
 		
 		@Override
 		public void run() {
