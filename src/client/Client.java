@@ -5,23 +5,25 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import backend.Util;
 import kdtree.KDimensionable;
 import maps.Node;
-import maps.Way;
+import shared.AutocorrectRequest;
 import shared.AutocorrectResponse;
+import shared.NeighborsRequest;
 import shared.NeighborsResponse;
+import shared.PathRequest;
 import shared.PathResponse;
 import shared.Request;
 import shared.Request.RequestType;
 import shared.Response;
 import shared.ServerStatus;
+import shared.WayRequest;
 import shared.WayResponse;
+import backend.Util;
 import frontend.IndeterminateFrontend;
 
 /**
@@ -85,18 +87,6 @@ public class Client {
 		}
 	}
 
-	/**
-	 * A method that sends a message to the server.
-	 * @param message that will be sent to the server for broadcasting.
-	 * @throws IOException 
-	 */
-	public void request(Request r) {
-		if (r.getType() == RequestType.EXIT) {
-			this.kill();
-		} else {
-			_requests.add(r);
-		}
-	}
 
 	/**
 	 * Shuts down the client closing all the connections.
@@ -116,16 +106,33 @@ public class Client {
 		}
 	}
 	
-	public List<String> getAutoCorrections(String input) {
-		return null;
+	/**
+	 * A method that sends a message to the server.
+	 * @param message that will be sent to the server for broadcasting.
+	 * @throws IOException 
+	 */
+	public void request(Request r) {
+		if (r.getType() == RequestType.EXIT) {
+			this.kill();
+		} else {
+			_requests.add(r);
+		}
+	}
+
+	public void requestAutocorrections(String input, int boxNo) {
+		request(new AutocorrectRequest(input, boxNo));
 	}
 	
-	public List<Node> getNearestNeighbors(int i, KDimensionable kd) {
-		return null;
+	public void requestNearestNeighbors(int i, KDimensionable kd) {
+		request(new NeighborsRequest(i, kd));
 	}
 	
-	public List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
-		return null;
+	public void requestWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+		request(new WayRequest(minLat, maxLat, minLon, maxLon));
+	}
+	
+	public void requestPath(Node start, Node end, int timeout) {
+		request(new PathRequest(start, end, timeout));
 	}
 /*	
 	public void removeAllResponses(ResponseType type) {

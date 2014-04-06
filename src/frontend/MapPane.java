@@ -639,7 +639,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		private ClickNeighbor(int x, int y) {
 			double[] geoCoords = pixel2geo(x,y);
 			KDStub p = new KDStub(geoCoords[0], geoCoords[1]);
-			node = client.getNearestNeighbors(1, p).get(0);
+			node = client.requestNearestNeighbors(1, p).get(0);
 			List<String> wayIDs = node.getWayIDs();
 			
 			_front.updateInputFields(wayIDs, clickSwitch); //update front end to include names of ways
@@ -712,7 +712,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			if (client == null) {
 				Util.out("HERE");
 			}
-			List<Way> temp = client.getWaysInRange(this.minLat, this.maxLat, this.minLon, this.maxLon);
+			List<Way> temp = client.requestWaysInRange(this.minLat, this.maxLat, this.minLon, this.maxLon);
 			
 			if (threadCount.get() == numberID) {
 				renderedWays = temp;

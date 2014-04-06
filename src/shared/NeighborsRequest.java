@@ -7,7 +7,7 @@ public class NeighborsRequest implements Request {
 	private final int numNeighbors;
 	private final KDimensionable location;
 	
-	NeighborsRequest(int numNeighbors, KDimensionable location) {
+	public NeighborsRequest(int numNeighbors, KDimensionable location) {
 		this.numNeighbors = numNeighbors;
 		this.location = location;
 	}

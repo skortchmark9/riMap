@@ -34,12 +34,14 @@ public class AutoFillField extends JTextField {
 	private DefaultTableModel searchTableModel;
 	private String initialText;
 	private List<String> suggestions;
-	boolean popped = false;
+	private int boxNo;
+	private boolean popped = false;
 
-	public AutoFillField(Client client, String startField) {
+	public AutoFillField(Client client, String startField, int boxNo) {
 		super(10);
 		this.client = client;
 		initialText = startField;
+		this.boxNo = boxNo;
 		setForeground(Color.DARK_GRAY);
 		setText(initialText);
 		setOpaque(true);
@@ -250,18 +252,14 @@ public class AutoFillField extends JTextField {
 		searchTable.setPreferredSize(new Dimension(getWidth() - 8, 80));
 		String input = getText();
 		String[] columns = new String[] {input};
-		suggestions = client.getAutoCorrections(input);
-		List<String> cappedSuggestions = new LinkedList<>();
-		int length = suggestions.size();
-		//We lowercase all text entering the prefix tree, so here we need
-		//to capitalize it again. Thankfully, all street names are proper nouns.
-		for(String s : suggestions) {
-			cappedSuggestions.add(Util.capitalizeAll(s));
-		}
-
-		String[][] data = new String[length][];
-		for(int i = 0; i < length; i++) {
-			data[i] = new String[] {cappedSuggestions.remove(0)};
+		client.requestAutocorrections(input, boxNo);
+		//XXX
+		//Probably should do this.wait() here.
+		String[][] data = new String[suggestions.size()][];
+		for(int i = 0; i < data.length; i++) {
+			//We lowercase all text entering the prefix tree, so here we need
+			//to capitalize it again. Thankfully, all street names are proper nouns.
+			data[i] = new String[] {Util.capitalizeAll(suggestions.get(i))};
 		}
 		searchTableModel.setDataVector(data, columns);
 	}
