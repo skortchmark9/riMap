@@ -9,9 +9,9 @@ public class PathResponse implements Response {
 	List<Way> _path;
 	String _msg;
 	
-	public PathResponse(List<Way> path, String msg) {
+	public PathResponse(List<Way> path) {
 		_path = path;
-		_msg = msg;
+		_msg = "success!";
 	}
 	
 	public PathResponse(String msg) {
