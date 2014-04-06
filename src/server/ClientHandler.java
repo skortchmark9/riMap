@@ -14,6 +14,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import kdtree.KDimensionable;
 import shared.AutocorrectRequest;
 import shared.AutocorrectResponse;
 import shared.ExitRequest;
@@ -184,7 +185,13 @@ public class ClientHandler extends Thread {
 	}
 	
 	private class NeighborGetter implements Runnable {
-		int threadID;
+		int _threadID, _numNeighbors;
+		KDimensionable _location;
+		
+		private NeighborGetter(int numNeighbors, KDimensionable location) {
+			_numNeighbors = numNeighbors;
+			_location = location;
+		}
 		
 		@Override
 		public void run() {
