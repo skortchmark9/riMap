@@ -50,7 +50,6 @@ public class Main {
 			new IndeterminateFrontend(b); //TODO: use client instead of backend 
 		}
 		else {
-			b.initBackend();
 			new MapsCLI(b);
 		}
 	}

@@ -47,7 +47,7 @@ import client.Client;
  * @author skortchm / emc3
  */
 public class IndeterminateFrontend implements ActionListener {
-	AutoFillField box1, box2, box3, box4;
+	private AutoFillField box1, box2, box3, box4;
 	JButton getDirections, clearPoints;
 	JTextArea msgBox;
 	JFrame frame;
@@ -56,7 +56,6 @@ public class IndeterminateFrontend implements ActionListener {
 	final Cursor defaultCursor = Cursor.getDefaultCursor();
 	final Cursor busyCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 	
-	PathWayRunnable pwRequester;
 	SimpleLoadingPane loadingScreen;
 	private JLabel lblTimeouts;
 	private JSpinner timeOutSpinner;
@@ -110,11 +109,9 @@ public class IndeterminateFrontend implements ActionListener {
 		frame.pack();
 		frame.setVisible(true);
 		loadingPanel.requestFocusInWindow();
-		
-		while(!client.isReady()) {
-		}
-		//Preparing the backend to send messages to the loading screen.
-		//Initializing the backend.
+
+		//Waiting for the backend to be done/server connection to be made.
+		while(!client.isReady()) {}
 
 		//Finished loading, removing the loading screen.
 		frame.remove(loadingPanel);
@@ -142,10 +139,6 @@ public class IndeterminateFrontend implements ActionListener {
 		backgroundPanel.add(map);
 		backgroundPanel.setBounds(0, 0, frame.getWidth(), frame.getHeight());
 
-		//pwRequester handles requests to the backend for shortest path searches.
-		//TODO: part of client?
-		pwRequester = new PathWayRunnable(client, map);		
-
 		
 		//Adds the controlPanel and Map/BackgroundPanel to the desktop.
 		desktop.add(controlPanel);
@@ -155,12 +148,8 @@ public class IndeterminateFrontend implements ActionListener {
 			controlPanel.setSelected(true);
 		} catch (PropertyVetoException e) {
 		}
-		frame.revalidate();
-		
-		//XXX not really sure the diff
+		frame.revalidate();		
 		box1.requestFocusInWindow();
-		box1.requestFocus();
-		
 	}
 	
 	private JInternalFrame createControlPanel() {
@@ -177,10 +166,10 @@ public class IndeterminateFrontend implements ActionListener {
 		sidePanel.add(searchButtonsPanel);
 
 		//Initializing the autofill boxes.
-		box1 = new AutoFillField(client, "Cross Street 1");
-		box2 = new AutoFillField(client, "Cross Street 2");
-		box3 = new AutoFillField(client, "Cross Street 1");
-		box4 = new AutoFillField(client, "Cross Street 2");
+		box1 = new AutoFillField(client, "Cross Street 1", 1);
+		box2 = new AutoFillField(client, "Cross Street 2", 2);
+		box3 = new AutoFillField(client, "Cross Street 1", 3);
+		box4 = new AutoFillField(client, "Cross Street 2", 4);
 
 		//These are buttons for finding and removing paths
 		getDirections = new JButton("Get Directions");
@@ -285,7 +274,16 @@ public class IndeterminateFrontend implements ActionListener {
 			box3.setText(street1);
 			box4.setText(street2);
 		}
-		
+	}
+	
+	public AutoFillField getBox(int num) {
+		switch (num) {
+		case 1: return box1;
+		case 2: return box2;
+		case 3: return box3;
+		case 4: return box4;
+		default: return null;
+		}
 	}
 
 	/**
@@ -322,7 +320,7 @@ public class IndeterminateFrontend implements ActionListener {
 				timeOut = (int) timeOutSpinner.getValue();
 			} catch (ParseException e1) {
 			}
-			pwRequester.findPath(timeOut);
+			client.requestPath(start, end, timeOut);
 
 		} else if (e.getSource() == clearPoints) {
 			map.clearClickPoints();

@@ -93,30 +93,30 @@ public class ClientHandler extends Thread {
 	 * A response containing the data received from the backend.
 	 */
 	private Response processRequest(Request req) {
-		Response resp;
 		switch (req.getType()) {
 		case AUTO_CORRECTIONS:
 			AutocorrectRequest aReq = (AutocorrectRequest) req;
 			//get corrections from the backend and wrap the
 			//returned list of corrections in a response object.
-			return new AutocorrectResponse(_b.getAutoCorrections(aReq.input));
+			return new AutocorrectResponse(_b.getAutoCorrections(aReq.getInput()), aReq.getBoxNo());
 		
 		case NEAREST_NEIGHBORS:
 			NeighborsRequest nReq = (NeighborsRequest) req;
 			//get nearest neighbors from backend and wrap the 
 			//returned list of neighbors in a NeighborsResponse object.
-			return new NeighborsResponse(_b.getNearestNeighbors(nReq.numNeighbors, nReq.location));
+			return new NeighborsResponse(_b.getNearestNeighbors(nReq.getNumNeighbors(), nReq.getLocation()));
 		
 		case WAYS:
 			WayRequest wReq = (WayRequest) req;
 			//get ways in range from backend and wrap the
 			//returned list of ways in a response object.
-			return new WayResponse(_b.getWaysInRange(wReq._minLat, wReq._maxLat, wReq._minLon, wReq._maxLon));
+			return new WayResponse(_b.getWaysInRange(wReq.getMinLat(), wReq.getMaxLat(), wReq.getMinLon(), wReq.getMaxLon()));
 		case PATH:
 			PathRequest pReq = (PathRequest) req;
 			//get shortest path from backend and wrap the
 			//returned list of ways in a response object.
-			return new PathResponse(_b.getPath(pReq._source, pReq._dest));
+			//FIXME: backend should have its own path finder executor service to support timeouts.
+			return new PathResponse(_b.getPath(pReq.getSource(), pReq.getDest()), "success!");
 		default:
 			//not much we can do with an invalid request
 			throw new IllegalArgumentException("Unsupported request type");

@@ -3,11 +3,25 @@ package shared;
 import maps.Node;
 
 public class PathRequest implements Request {
-	public final Node _source, _dest;
+	private final Node _source, _dest;
+	private final int _timeout;
 	
-	PathRequest(Node source, Node dest) {
+	public PathRequest(Node source, Node dest, int timeout) {
 		_source = source;
 		_dest = dest;
+		_timeout = timeout;
+	}
+	
+	public Node getSource() {
+		return _source;
+	}
+	
+	public Node getDest() {
+		return _dest;
+	}
+	
+	public int getTimeout() {
+		return _timeout;
 	}
 	@Override
 	public RequestType getType() {

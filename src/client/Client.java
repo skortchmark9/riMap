@@ -4,18 +4,27 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import kdtree.KDimensionable;
 import maps.Node;
-import maps.Way;
+import shared.AutocorrectRequest;
+import shared.AutocorrectResponse;
+import shared.NeighborsRequest;
+import shared.NeighborsResponse;
+import shared.PathRequest;
+import shared.PathResponse;
 import shared.Request;
 import shared.Request.RequestType;
 import shared.Response;
-import shared.Response.ResponseType;
+import shared.ServerStatus;
+import shared.WayRequest;
+import shared.WayResponse;
+import backend.Util;
+import frontend.IndeterminateFrontend;
 
 /**
  * A Client Class that sends and receives messages from and to the server.
@@ -28,19 +37,19 @@ public class Client {
 	private ObjectOutputStream _output;
 	private ObjectInputStream _input;
 	private ReceiveThread _thread;
-	private String IP;
-	private List<Response> responses;
-	ExecutorService executor;
-
+	private String _IP;
+	private Queue<Request> _requests;
+	ExecutorService _executor;
+	IndeterminateFrontend _frontend;
 
 	/**
 	 * Constructs a Client with the given port.
 	 * @param port the port number the client will connect to
 	 */
 	public Client(String IPAddress, int port) {
-		executor = Executors.newFixedThreadPool(5);
+		_executor = Executors.newFixedThreadPool(5);
 		_port = port;
-		IP = IPAddress;
+		_IP = IPAddress;
 	}
 
 	/**
@@ -50,31 +59,34 @@ public class Client {
 	 */
 	public void start() {
 		try {
-			_socket = new Socket((IP.equals("localhost")) ? InetAddress.getLocalHost(): InetAddress.getByName(IP), _port);
+			_frontend = new IndeterminateFrontend(this);
+			_socket = new Socket((_IP.equals("localhost")) ? InetAddress.getLocalHost(): InetAddress.getByName(_IP), _port);
 			_input = new ObjectInputStream(_socket.getInputStream());
 			_output = new ObjectOutputStream(_socket.getOutputStream());
 			_running = true;
 			_thread = new ReceiveThread();
 			_thread.start();
+			_requests = new LinkedList<>();
+			run();
 		}
 		catch (IOException ex) {
 			err("ERROR: Can't connect to server");
 		}
 	}
-
-	/**
-	 * A method that sends a message to the server.
-	 * @param message that will be sent to the server for broadcasting.
-	 * @throws IOException 
-	 */
-	public void request(Request r) throws IOException {
-		if (r.getType() == RequestType.EXIT) {
-			this.kill();
-		} else {
-			_output.writeObject(r);
-			_output.flush();
+	
+	public void run() {
+		while (_running && !_socket.isClosed()) {
+			if (!_requests.isEmpty()) {
+				try {
+					_output.writeObject(_requests.poll());
+					_output.flush();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
+
 
 	/**
 	 * Shuts down the client closing all the connections.
@@ -94,28 +106,89 @@ public class Client {
 		}
 	}
 	
-	public List<String> getAutoCorrections(String input) {
-		return null;
+	/**
+	 * A method that sends a message to the server.
+	 * @param message that will be sent to the server for broadcasting.
+	 * @throws IOException 
+	 */
+	public void request(Request r) {
+		if (r.getType() == RequestType.EXIT) {
+			this.kill();
+		} else {
+			_requests.add(r);
+		}
+	}
+
+	public void requestAutocorrections(String input, int boxNo) {
+		request(new AutocorrectRequest(input, boxNo));
 	}
 	
-	public List<Node> getNearestNeighbors(int i, KDimensionable kd) {
-		return null;
+	public void requestNearestNeighbors(int i, KDimensionable kd) {
+		request(new NeighborsRequest(i, kd));
 	}
 	
-	public List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
-		return null;
+	public void requestWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+		request(new WayRequest(minLat, maxLat, minLon, maxLon));
 	}
 	
+	public void requestPath(Node start, Node end, int timeout) {
+		request(new PathRequest(start, end, timeout));
+	}
+/*	
 	public void removeAllResponses(ResponseType type) {
-		Iterator<Response>  itr = responses.iterator();
+		Iterator<Response>  itr = _responses.iterator();
 		while(itr.hasNext()) {
 			if (itr.next().getType() == type)
 				itr.remove();
 		}
-	}
+	}*/
 	
 	public boolean isReady() {
 		return _running;
+	}
+	
+	/**
+	 * Process a response from the queue. Figures out which kind of response it
+	 * is and then acts accordingly.
+	 * @param r - the response to be processed
+	 */
+	public void processResponse(Response r) {
+		switch (r.getType()) {
+		case AUTO_CORRECTIONS:
+			//If the response is an autocorrection, we'll send the list of
+			//suggestions to the appropriate text box.
+			AutocorrectResponse acR = (AutocorrectResponse) r;
+			_frontend.getBox(acR.getBoxNo()).setSuggestions(
+					acR.getAutocorrections());
+			break;
+		case NEAREST_NEIGHBORS:
+			//If the response is a neighbors list, then we'll send the list
+			//XXX: not yet implemented.
+			NeighborsResponse nR = (NeighborsResponse) r;
+//			mapPane.send(nR.getNeighbors());
+			break;
+		case PATH:
+			//If the response is a path of ways, we'll send it to the mapPane.
+			PathResponse pR = (PathResponse) r;
+//			mapPane.setRenderedWays(pR.getPath());
+			break;
+		case SERVER_STATUS:
+			//If the response is a server status, we'll print the message to the
+			//console or the loading screen, whichever is currently being used
+			//to display messages to the user.
+			ServerStatus sR = (ServerStatus) r;
+		//	_frontend.message(sR.getMsg())
+			break;
+		case WAYS:
+			//If the response is ways, we'll set the mapPane to display them
+			WayResponse wR = (WayResponse) r;
+//			mapPane.setWays(wR.getWays());
+			break;
+		default:
+			//We should never get here.
+			Util.err("WHOA, we shouldn't be here");
+			break;
+		}
 	}
 
 	/**
@@ -127,7 +200,7 @@ public class Client {
 			while(_running) {
 				try {
 					Response received = (Response) _input.readObject();
-					responses.add(received);
+					processResponse(received);
 				} catch (IOException e) {
 					if (_running == false) {
 						err("Error message:", e.getMessage());

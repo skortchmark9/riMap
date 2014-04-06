@@ -6,7 +6,7 @@ import maps.Node;
 
 public class NeighborsResponse implements Response {
 	
-	List<Node> _neighbors;
+	private List<Node> _neighbors;
 	
 	public NeighborsResponse(List<Node> neighbors) {
 		_neighbors = neighbors;
@@ -16,8 +16,8 @@ public class NeighborsResponse implements Response {
 	public ResponseType getType() {
 		return ResponseType.NEAREST_NEIGHBORS;
 	}
-	
-	List<Node> getNeighbors() {
+
+	public List<Node> getNeighbors() {
 		return _neighbors;
 	}
 }
