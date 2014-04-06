@@ -17,7 +17,6 @@ public class PathFinder<K extends PathNode<T>, T extends KDimensionable> {
 	K source;
 	K dest;
 	HashMap<String, K> consideredNodes;
-//!!!!!
 	public PathFinder(K source, K dest) {
 		this.source = source;
 		this.dest = dest;

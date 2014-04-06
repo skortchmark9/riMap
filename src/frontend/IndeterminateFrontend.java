@@ -34,7 +34,7 @@ import javax.swing.text.DefaultCaret;
 import maps.MapFactory;
 import maps.Node;
 import backend.Constants;
-import backend.PathWayRunnable;
+import backend.PathWayGetter;
 import backend.Util;
 import client.Client;
 
