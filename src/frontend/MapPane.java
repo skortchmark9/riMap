@@ -43,8 +43,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private static final int PIXEL_WIDTH = 700;
 	private static final int PIXEL_HEIGHT = 700;
 	private List<Way> renderedWays, calculatedRoute;
-	private ClickNeighbor source;
-	private ClickNeighbor target;
+	private ClickNeighbor _source;
+	private ClickNeighbor _dest;
 	private Client client;
 	private boolean clickSwitch = true;
 	private AtomicInteger threadCount;
@@ -79,13 +79,13 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		initInteraction(); //initializes all interactions for the map view.
 		//new synchronous list for all ways in viewport (ways we need to render)
 		//renderedWays = Collections.synchronizedList(MapFactory.getWaysInRange(0, 0, 0, 0));
-		source = null;
-		target = null;
+		_source = null;
+		_dest = null;
 		renderedWays = new LinkedList<>();
 		threadCount = new AtomicInteger(0);
 		//new thread!
 		//executor = Executors.newSingleThreadExecutor();
-		wayGetterPool = new ThreadPoolExecutor(Constants.WG_CORE_SIZE, Constants.WG_MAX_SIZE, Constants.WG_TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+		wayGetterPool = new ThreadPoolExecutor(Constants.THREADPOOL_CORE_SIZE, Constants.THREADPOOL_MAX_SIZE, Constants.THREADPOOL_TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 		wayGetterPool.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
 		calculatedRoute = new LinkedList<>();
 		if (Constants.DEBUG_MODE) {
@@ -105,7 +105,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
 		
+		//===================================
 		//Render Ways
+		//===================================
 		g2d.setColor(Constants.FG_COLOR);
 		g2d.setStroke(new BasicStroke(1));
 		for (Way way : renderedWays) {
@@ -113,10 +115,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				int[] start = geo2pixel(way.getStart().getCoordinates());
 				int[] end = geo2pixel(way.getTarget().getCoordinates());
 				
-				if (Constants.DEBUG_MODE) {
-					//Util.out("Start point:", "("+start[0]+",", start[1]+")");
-					//Util.out("End point:", "("+end[0]+",", end[1]+")");
-				}
+				//If the road is less than Constants.MIN_RENDER_LENGTH, don't paint it.
+				if (Point.distance(start[0], start[1], end[0], end[1]) < Constants.MIN_RENDER_LENGTH)
+					continue;
 				
 				g2d.drawLine(start[0], start[1], end[0], end[1]);
 			}
@@ -139,25 +140,25 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		}
 		
 		//Render Click Points
-		if (source != null) {
+		if (_source != null) {
 			
 			if (Constants.DEBUG_MODE) {
 				//Util.out("Source pixel coords:", "("+source.screenCoords[0]+",", source.screenCoords[1]+")");
-				Util.out("Source Node:", source.node.toString());
+				Util.out("Source Node:", _source.node.toString());
 			}
 			g2d.setStroke(new BasicStroke(1));		
 			g2d.setColor(Color.GREEN);
-			g2d.drawOval(source.screenCoords[0] - 5, source.screenCoords[1] - 5, 10, 10);
+			g2d.drawOval(_source.screenCoords[0] - 5, _source.screenCoords[1] - 5, 10, 10);
 		}
-		if (target != null) {
+		if (_dest != null) {
 			
 			if (Constants.DEBUG_MODE) {
 				//Util.out("Target pixel coords:", "("+target.screenCoords[0]+",", target.screenCoords[1]+")");
-				Util.out("Target Node", target.node.toString());
+				Util.out("Target Node", _dest.node.toString());
 			}
 			g2d.setStroke(new BasicStroke(1));		
 			g2d.setColor(Color.RED);
-			g2d.drawOval(target.screenCoords[0] - 5, target.screenCoords[1] - 5, 10, 10);
+			g2d.drawOval(_dest.screenCoords[0] - 5, _dest.screenCoords[1] - 5, 10, 10);
 		}
 		
 		//render boundaries if in range
@@ -271,6 +272,12 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), "plus");
 		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "minus");
 		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.SHIFT_DOWN_MASK), "minus");
+		
+		//directional arrow inputs:
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "up");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "right");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "down");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "left");
 
 		//key binding for zoom in
 		am.put("plus", new AbstractAction() {
@@ -294,6 +301,78 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				if (Constants.DEBUG_MODE)
 					Util.out("Minus handler executing");
 				zoomOut();
+			}
+		});
+		
+		//key binding to move map upwards
+		am.put("up", new AbstractAction() {
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (Constants.DEBUG_MODE)
+					Util.out("key up handler executing");
+				
+				//move map up
+				double newLat = Corners.topLeft[0] + 0.04; //TODO: 0.04 as a constant?
+				recalibrateMap(newLat, Corners.topLeft[1]);
+				//get new ways in range
+				wayGetterPool.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
+				repaint();
+			}
+		});
+		
+		//key binding to move map right
+		am.put("right", new AbstractAction() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (Constants.DEBUG_MODE)
+					Util.out("key right handler executing");
+
+				//move map up
+				double newLon = Corners.topLeft[1] + 0.04; //TODO: 0.04 as a constant?
+				recalibrateMap(Corners.topLeft[0], newLon);
+				//get new ways in range
+				wayGetterPool.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
+				repaint();
+			}
+		});
+		
+		//key binding to move map downwards
+		am.put("down", new AbstractAction() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (Constants.DEBUG_MODE)
+					Util.out("key down handler executing");
+
+				//move map up
+				double newLat = Corners.topLeft[0] - 0.04; //TODO: 0.04 as a constant?
+				recalibrateMap(newLat, Corners.topLeft[1]);
+				//get new ways in range
+				wayGetterPool.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
+				repaint();
+			}
+		});
+		
+		//key binding to move map left
+		am.put("left", new AbstractAction() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (Constants.DEBUG_MODE)
+					Util.out("key left handler executing");
+
+				//move map up
+				double newLon = Corners.topLeft[1] - 0.04; //TODO: 0.04 as a constant?
+				recalibrateMap(Corners.topLeft[0], newLon);
+				//get new ways in range
+				wayGetterPool.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
+				repaint();
 			}
 		});
 		
@@ -323,16 +402,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			//calculate new anchor point (top left lat/lon)
 			double newLat = Corners.topLeft[0] + viewDiff; 
 			double newLon = Corners.topLeft[1] - viewDiff; 
-			Corners.reposition(newLat, newLon); //reposition all corners with new coords
-			
-			//re-calibrate click points
-			if (source != null)
-				source.recalibrate();
-			if (target != null)
-				target.recalibrate();
+			recalibrateMap(newLat, newLon); //reposition all corners with new coords
 			
 			//get all new ways in new range
-			//executor = Executors.newSingleThreadExecutor();
 			wayGetterPool.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
 			this.repaint();
 		}
@@ -354,17 +426,27 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			//calculate new anchor point (top left lat/lon)
 			double newLat = Corners.topLeft[0] - viewDiff; 
 			double newLon = Corners.topLeft[1] + viewDiff; 
-			Corners.reposition(newLat, newLon); //reposition all corners with new coords
-			
-			//re-calibrate clickPoints
-			if (source != null)
-				source.recalibrate();
-			if (target != null)
-				target.recalibrate();
-			
+			recalibrateMap(newLat, newLon); //reposition all corners with new coords
 			//no new ways to get
 			this.repaint(); 
 		}
+	}
+	
+	/**
+	 * Reposition the corners of the map and recalibrate the _source and _dest
+	 * 
+	 * @param newLat - new position of top left corner of map
+	 * @param newLon - new position of top left corner of map
+	 */
+	private void recalibrateMap(double newLat, double newLon) {
+		//reposition all corners with new coords
+		Corners.reposition(newLat, newLon);
+		
+		//re-calibrate clickPoints
+		if (_source != null)
+			_source.recalibrate();
+		if (_dest != null)
+			_dest.recalibrate();
 	}
 	
 	/**
@@ -386,10 +468,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			Corners.reposition(newAnchor[0], newAnchor[1]); //reposition all corners with new coords
 
 			//re-calibrate clickPoints
-			if (source != null)
-				source.recalibrate();
-			if (target != null)
-				target.recalibrate();
+			if (_source != null)
+				_source.recalibrate();
+			if (_dest != null)
+				_dest.recalibrate();
 
 			//no new ways to get
 			this.repaint(); 
@@ -413,10 +495,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			Corners.reposition(newAnchor[0], newAnchor[1]); //reposition all corners with new coords
 			
 			//re-calibrate clickPoints
-			if (source != null)
-				source.recalibrate();
-			if (target != null)
-				target.recalibrate();
+			if (_source != null)
+				_source.recalibrate();
+			if (_dest != null)
+				_dest.recalibrate();
 			
 			this.repaint(); // repaint for responsiveness
 			
@@ -466,10 +548,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			startP = e.getPoint(); //re-define start p
 			
 			//re-calibrate click points
-			if (source != null)
-				source.recalibrate();
-			if (target != null)
-				target.recalibrate();
+			if (_source != null)
+				_source.recalibrate();
+			if (_dest != null)
+				_dest.recalibrate();
 			//get all new ways for the render list
 			
 			
@@ -484,10 +566,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			if (Constants.DEBUG_MODE)
 				Util.out("Click registered!");
 			if (clickSwitch) {
-				source = new ClickNeighbor(e.getX(), e.getY());
+				_source = new ClickNeighbor(e.getX(), e.getY());
 				clickSwitch = false;
 			} else {
-				target = new ClickNeighbor(e.getX(), e.getY());
+				_dest = new ClickNeighbor(e.getX(), e.getY());
 				clickSwitch = true;
 			}
 			clearRoute();
@@ -504,7 +586,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * been created for the start node (i.e. if the start node was cleared).
 	 */
 	public Node getStart() {
-		return source.node;
+		return _source.node;
 	}
 	
 	/**
@@ -515,7 +597,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * been created for the start node (i.e. if the start node was cleared).
 	 */
 	public Node getEnd() {
-		return target.node;
+		return _dest.node;
 	}
 	
 	/**
@@ -524,7 +606,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * been created by clicking, this method returns true. false otherwise.
 	 */
 	public boolean hasPoints() {
-		return source != null && target != null;
+		return _source != null && _dest != null;
 	}
 	
 	/**
@@ -533,8 +615,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * @param end - the end node to paint (red circle)
 	 */
 	public void setPoints(Node start, Node end) {
-		source = new ClickNeighbor(start);
-		target = new ClickNeighbor(end);
+		_source = new ClickNeighbor(start);
+		_dest = new ClickNeighbor(end);
 		repaint();
 	}
 
@@ -608,8 +690,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * the route (if it's painted)
 	 */
 	void clearClickPoints() {
-		source = null;
-		target = null;
+		_source = null;
+		_dest = null;
 		clickSwitch = true;
 		clearRoute();
 		this.repaint();
@@ -672,7 +754,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * @author emc3
 	 *
 	 */
-	private class WayGetter extends Thread {
+	private class WayGetter implements Runnable {
 		double minLat, maxLat, minLon, maxLon; //the range to search in  for ways
 		int numberID; //the ID of this thread
 		
@@ -709,9 +791,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				Util.out("Starting WayGetter!");
 			}
 			numberID = threadCount.incrementAndGet();
-			if (client == null) {
-				Util.out("HERE");
-			}
 			List<Way> temp = client.requestWaysInRange(this.minLat, this.maxLat, this.minLon, this.maxLon);
 			
 			if (threadCount.get() == numberID) {
