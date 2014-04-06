@@ -754,7 +754,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * @author emc3
 	 *
 	 */
-	private class WayGetter extends Thread {
+	private class WayGetter implements Runnable {
 		double minLat, maxLat, minLon, maxLon; //the range to search in  for ways
 		int numberID; //the ID of this thread
 		

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import shared.AutocorrectRequest;
 import shared.AutocorrectResponse;
@@ -32,6 +33,7 @@ public class ClientHandler extends Thread {
 	private ObjectOutputStream _output;
 	private ClientPool _pool;
 	private Backend _b;
+	private ConcurrentLinkedQueue<Response> _responseQueue;
 	
 	/**
 	 * Default constructor.
@@ -66,9 +68,11 @@ public class ClientHandler extends Thread {
 		try {
 			Request req;
 			while ((req = (Request)_input.readObject()) != null) {
-				Response resp = processRequest(req);
-				_output.writeObject(resp);
-				_output.flush();
+				processRequest(req);
+				while (!_responseQueue.isEmpty()) {
+					_output.writeObject(_responseQueue.poll());
+					_output.flush();
+				}
 			}
 			Util.out("Nulled request. Terminating client handler");
 		} catch(IOException | ClassNotFoundException e) {
