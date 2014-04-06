@@ -34,6 +34,8 @@ public class Constants {
 	public static final double MAX_ZOOM = 12.0;
 	public static final Color MIDNIGHT = new Color(60, 62, 67);
 	public static final Color GLOW_IN_THE_DARK = new Color(236, 240, 230);
+	public static final Color BG_COLOR = new Color(0,17,21);
+	public static final Color FG_COLOR = new Color(252, 251, 248);
 	
 	//Boundary lines on map
 	//To be set by initBoundaries() in backend.
