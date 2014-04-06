@@ -6,7 +6,7 @@ public class PathRequest implements Request {
 	private final Node _source, _dest;
 	private final int _timeout;
 	
-	PathRequest(Node source, Node dest, int timeout) {
+	public PathRequest(Node source, Node dest, int timeout) {
 		_source = source;
 		_dest = dest;
 		_timeout = timeout;

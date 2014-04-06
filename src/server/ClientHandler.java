@@ -111,7 +111,8 @@ public class ClientHandler extends Thread {
 			PathRequest pReq = (PathRequest) req;
 			//get shortest path from backend and wrap the
 			//returned list of ways in a response object.
-			return new PathResponse(_b.getPath(pReq.getSource(), pReq.getDest()));
+			//FIXME: backend should have its own path finder executor service to support timeouts.
+			return new PathResponse(_b.getPath(pReq.getSource(), pReq.getDest()), "success!");
 		default:
 			//not much we can do with an invalid request
 			throw new IllegalArgumentException("Unsupported request type");

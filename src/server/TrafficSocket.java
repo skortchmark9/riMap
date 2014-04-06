@@ -57,8 +57,7 @@ public class TrafficSocket extends Thread {
 				}
 				kill(); //kill this socket when done with reading
 			} catch (IOException e) {
-				if(e instanceof IOException) 
-					Util.err("ERROR IO exception (prob bad read of traffic info from server).");
+				Util.err("ERROR IO exception (prob bad read of traffic info from server).");
 			}
 		}
 	}
