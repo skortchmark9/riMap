@@ -155,6 +155,11 @@ public class IndeterminateFrontend implements ActionListener {
 		} catch (PropertyVetoException e) {
 		}
 		frame.revalidate();
+		
+		//XXX not really sure the diff
+		box1.requestFocusInWindow();
+		box1.requestFocus();
+		
 	}
 	
 	private JInternalFrame createControlPanel() {
