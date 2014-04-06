@@ -30,8 +30,11 @@ public class Constants {
 	public static final double INITIAL_LAT = 41.842678; //Home Depot
 	public static final double INITIAL_LON = -71.417541;
 	public static final double GEO_DIMENSION_FACTOR = 0.02;
-	public static final double MIN_ZOOM = 0.01; //x10 times zoom out from original submission
+	public static final double MIN_ZOOM = 0.01; //x10 times more zoom out (from original submission)
 	public static final double MAX_ZOOM = 12.0;
+	public static final double MIN_RENDER_LENGTH = 3;
+	
+	//Some colors
 	public static final Color MIDNIGHT = new Color(60, 62, 67);
 	public static final Color GLOW_IN_THE_DARK = new Color(236, 240, 230);
 	public static final Color BG_COLOR = new Color(0,17,21);
@@ -62,4 +65,5 @@ public class Constants {
 	/* Port numbers -- Change if they are in use */
 	public static final int DEFAULT_SERVER_PORT = 9885;
 	public static final int DEFAULT_TRAFFIC_PORT = 9888;
+
 }
