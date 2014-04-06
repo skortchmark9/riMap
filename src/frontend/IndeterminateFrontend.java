@@ -47,7 +47,7 @@ import client.Client;
  * @author skortchm / emc3
  */
 public class IndeterminateFrontend implements ActionListener {
-	AutoFillField box1, box2, box3, box4;
+	private AutoFillField box1, box2, box3, box4;
 	JButton getDirections, clearPoints;
 	JTextArea msgBox;
 	JFrame frame;
@@ -285,7 +285,16 @@ public class IndeterminateFrontend implements ActionListener {
 			box3.setText(street1);
 			box4.setText(street2);
 		}
-		
+	}
+	
+	public AutoFillField getBox(int num) {
+		switch (num) {
+		case 1: return box1;
+		case 2: return box2;
+		case 3: return box3;
+		case 4: return box4;
+		default: return null;
+		}
 	}
 
 	/**

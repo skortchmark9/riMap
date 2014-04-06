@@ -33,9 +33,10 @@ public class AutoFillField extends JTextField {
 	private JTable searchTable;
 	private DefaultTableModel searchTableModel;
 	private String initialText;
+	private List<String> suggestions;
 	boolean popped = false;
 
-	public AutoFillField(Client c, String startField) {
+	public AutoFillField(Client client, String startField) {
 		super(10);
 		this.client = client;
 		initialText = startField;
@@ -188,6 +189,10 @@ public class AutoFillField extends JTextField {
 			popup.setVisible(false);
 		}
 	}
+	
+	public void setSuggestions(List<String> suggestions) {
+		this.suggestions = suggestions;
+	}
 
 	/**
 	 * The popup contains the table of suggestions, so this will reveal them.
@@ -245,7 +250,7 @@ public class AutoFillField extends JTextField {
 		searchTable.setPreferredSize(new Dimension(getWidth() - 8, 80));
 		String input = getText();
 		String[] columns = new String[] {input};
-		List<String> suggestions = client.getAutoCorrections(input);
+		suggestions = client.getAutoCorrections(input);
 		List<String> cappedSuggestions = new LinkedList<>();
 		int length = suggestions.size();
 		//We lowercase all text entering the prefix tree, so here we need

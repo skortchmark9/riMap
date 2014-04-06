@@ -1,10 +1,20 @@
 package shared;
 
 public class AutocorrectRequest implements Request {
-	public final String input;
+	private final String input;
+	private final int boxNo;
 	
-	public AutocorrectRequest(String input) {
+	public AutocorrectRequest(String input, int boxNo) {
 		this.input = input;
+		this.boxNo = boxNo;
+	}
+	
+	public String getInput() {
+		return input;
+	}
+	
+	public int getBoxNo() {
+		return boxNo;
 	}
 	
 	@Override

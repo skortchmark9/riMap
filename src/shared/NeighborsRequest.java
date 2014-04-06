@@ -4,12 +4,20 @@ import kdtree.KDimensionable;
 
 public class NeighborsRequest implements Request {
 	
-	public final int numNeighbors;
-	public final KDimensionable location;
+	private final int numNeighbors;
+	private final KDimensionable location;
 	
 	NeighborsRequest(int numNeighbors, KDimensionable location) {
 		this.numNeighbors = numNeighbors;
 		this.location = location;
+	}
+	
+	public int getNumNeighbors() {
+		return numNeighbors;
+	}
+	
+	public KDimensionable getLocation() {
+		return location;
 	}
 
 	@Override
