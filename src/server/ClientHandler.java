@@ -118,8 +118,7 @@ public class ClientHandler extends Thread {
 			AutocorrectRequest aReq = (AutocorrectRequest) req;
 			
 			//submit a new suggestion getter to the thread pool
-			
-			new SuggestionGetter(aReq.getInput(), aReq.getBoxNo());
+			_requestHandlerPool.execute(new SuggestionGetter(aReq.getInput(), aReq.getBoxNo()));
 		
 		case NEAREST_NEIGHBORS:
 			NeighborsRequest nReq = (NeighborsRequest) req;
@@ -182,6 +181,7 @@ public class ClientHandler extends Thread {
 		}
 		
 	}
+	
 	
 	private class NeighborGetter implements Runnable {
 		int _threadID, _numNeighbors;
