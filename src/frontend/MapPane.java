@@ -50,6 +50,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private AtomicInteger threadCount;
 	//private ExecutorService executor;
 	private Executor wayGetterPool;
+	private IndeterminateFrontend _front;
 	
 	/**
 	 * Construct a MapPane linked to the given backend.
@@ -57,9 +58,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * well as zooming / panning over the map.
 	 * @param b - the backend to link to this MapPane.
 	 */
-	MapPane(Client client)   {
+	MapPane(IndeterminateFrontend front, Client client)   {
 		this.client = client;
-		this.setBackground(Constants.MIDNIGHT);
+		_front = front; //need this for updated text fields on clicks, resizing map
+		this.setBackground(Constants.BG_COLOR);
 		this.setPreferredSize(new Dimension(PIXEL_WIDTH, PIXEL_HEIGHT));
 		this.setMaximumSize(getPreferredSize());
 		this.setFocusable(true);
@@ -104,7 +106,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		Graphics2D g2d = (Graphics2D) g;
 		
 		//Render Ways
-		g2d.setColor(Constants.GLOW_IN_THE_DARK);
+		g2d.setColor(Constants.FG_COLOR);
 		g2d.setStroke(new BasicStroke(1));
 		for (Way way : renderedWays) {
 			if (way != null) {
@@ -299,7 +301,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	    addMouseWheelListener(this);
 
 		//key binding for panning with click-n-drag.
-	    MouseAdapter handler = new MouseHandler();
+	    MouseAdapter handler = new MapMouseHandler();
 	    addMouseMotionListener(handler); //tell handler to track dragging
 	    addMouseListener(handler); //tell handler to track clicks
 	}
@@ -443,7 +445,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * Mouse handler class to handle click & drag events
 	 * @author emc3
 	 */
-	private class MouseHandler extends MouseAdapter {
+	private class MapMouseHandler extends MouseAdapter {
 		
 		private Point startP; //start point of dragging interactions
 		
@@ -638,6 +640,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			double[] geoCoords = pixel2geo(x,y);
 			KDStub p = new KDStub(geoCoords[0], geoCoords[1]);
 			node = client.getNearestNeighbors(1, p).get(0);
+			List<String> wayIDs = node.getWayIDs();
+			
+			_front.updateInputFields(wayIDs, clickSwitch); //update front end to include names of ways
+			
 			screenCoords = geo2pixel(node.getCoordinates());
 		}
 		

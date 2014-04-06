@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
 import java.text.ParseException;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -32,7 +33,6 @@ import javax.swing.text.DefaultCaret;
 
 import maps.MapFactory;
 import maps.Node;
-import backend.Backend;
 import backend.Constants;
 import backend.PathWayRunnable;
 import backend.Util;
@@ -135,7 +135,7 @@ public class IndeterminateFrontend implements ActionListener {
 
 		//Creates the map pane. Wrapping it in backgroundPanel allows us to use
 		//a layoutManager to center it, even though JDesktopPane does not support one.
-		map = new MapPane(client);
+		map = new MapPane(this, client);
 		map.setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100));
 		JPanel backgroundPanel = new JPanel(new GridBagLayout());
 		backgroundPanel.setBackground(Color.BLACK);
@@ -259,6 +259,27 @@ public class IndeterminateFrontend implements ActionListener {
 		controlPanel.pack();
 		controlPanel.setVisible(true);
 		return controlPanel;
+	}
+	
+	/**
+	 * Sets the text of the AutoCorrect boxes to contain the intersection
+	 * selected by clicking the map.
+	 * @param wayIDs - the way IDs stored at the node selected on the map
+	 * @param flag - the "clickSwitch": if true, update the first set of cross
+	 * streets but if false, update the second set of cross streets.
+	 */
+	public void updateInputFields(List<String> wayIDs, boolean flag) {
+		String street1 = MapFactory.createWay(wayIDs.get(0)).getName();
+		String street2 = MapFactory.createWay(wayIDs.get(1)).getName();
+		
+		if (flag) {
+			box1.setText(street1);
+			box2.setText(street2);
+		} else {
+			box3.setText(street1);
+			box4.setText(street2);
+		}
+		
 	}
 
 	/**
