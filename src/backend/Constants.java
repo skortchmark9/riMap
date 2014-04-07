@@ -33,6 +33,7 @@ public class Constants {
 	public static final double MIN_ZOOM = 0.01; //x10 times more zoom out (from original submission)
 	public static final double MAX_ZOOM = 12.0;
 	public static final double MIN_RENDER_LENGTH = 3;
+	public static final double ARROW_KEY_MOVEMENT = 0.04d;
 	
 	//Some colors
 	public static final Color MIDNIGHT = new Color(60, 62, 67);

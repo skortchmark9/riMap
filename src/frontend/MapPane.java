@@ -310,11 +310,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (Constants.DEBUG_MODE)
-					Util.out("key up handler executing");
+				Util.debug("key up handler executing");
 				
 				//move map up
-				double newLat = Corners.topLeft[0] + 0.04; //TODO: 0.04 as a constant?
+				double newLat = Corners.topLeft[0] + ((Constants.GEO_DIMENSION_FACTOR / scale) / 10) ; //TODO: 0.04 as a constant?
 				recalibrateMap(newLat, Corners.topLeft[1]);
 
 				//request new ways in range
@@ -333,7 +332,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 					Util.out("key right handler executing");
 
 				//move map up
-				double newLon = Corners.topLeft[1] + 0.04; //TODO: 0.04 as a constant?
+				double newLon = Corners.topLeft[1] + ((Constants.GEO_DIMENSION_FACTOR / scale) / 10); //TODO: 0.04 as a constant?
 				recalibrateMap(Corners.topLeft[0], newLon);
 				
 				//request new ways in range
@@ -352,7 +351,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 					Util.out("key down handler executing");
 
 				//move map up
-				double newLat = Corners.topLeft[0] - 0.04; //TODO: 0.04 as a constant?
+				double newLat = Corners.topLeft[0] - ((Constants.GEO_DIMENSION_FACTOR / scale) / 10); //TODO: 0.04 as a constant?
 				recalibrateMap(newLat, Corners.topLeft[1]);
 				//request new ways in range
 				_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
@@ -370,7 +369,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 					Util.out("key left handler executing");
 
 				//move map up
-				double newLon = Corners.topLeft[1] - 0.04; //TODO: 0.04 as a constant?
+				double newLon = Corners.topLeft[1] - ((Constants.GEO_DIMENSION_FACTOR / scale) / 10); //TODO: 0.04 as a constant?
 				recalibrateMap(Corners.topLeft[0], newLon);
 				//request new ways in range
 				_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
@@ -559,6 +558,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		
 		@Override
 		public void mouseClicked(MouseEvent e) {
+			requestFocusInWindow();
 			if (Constants.DEBUG_MODE)
 				Util.out("Click registered!");
 			if (clickSwitch) {
