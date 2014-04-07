@@ -19,13 +19,13 @@ import backend.Util;
  *
  */
 public class Server extends Thread {
-	
+
 	private int _port;
 	private ServerSocket _socket;
 	private ClientPool _clientPool;
 	private boolean _running;
 	Backend _backend;
-	
+
 	/**
 	 * 
 	 */
@@ -38,35 +38,36 @@ public class Server extends Thread {
 		_socket = new ServerSocket(_port);
 		_running = true;
 	}
-	
+
 	public void run() {
 		try {
-		while(_running) {
-			if (Constants.DEBUG_MODE)
-				Util.out("Waiting for new client connection...");
-			
-			Socket clientConn = _socket.accept(); //blocks waiting for connections
-			
-			if (Constants.DEBUG_MODE)
-				Util.out("-- NEW CONNECTION ACCEPTED --");
-			
-			new ClientHandler(_clientPool, clientConn, _backend).start();
-			Util.out("--New client connection!");
-		}
+			while(_running) {
+				Util.debug("Waiting for new client connection...");
+
+				Socket clientConn = _socket.accept(); //blocks waiting for connections
+
+				Util.debug("-- NEW CONNECTION ACCEPTED --");
+				new ClientHandler(_clientPool, clientConn, _backend).start();
+				Util.out("--New client connection!");
+			}
 		} catch (IOException e) {
 			//handle
 		}
 	}
-	
-	public void serverMessage(String s) {
-		_clientPool.broadcast(new ServerStatus(s));
+
+	public void serverOKMessage(String s) {
+		_clientPool.broadcast(new ServerStatus(true, s));
 	}
 	
+	public void serverDownMessage(String s) {
+		_clientPool.broadcast(new ServerStatus(false, s));
+	}
+
 	public void trafficUpdate(Map<String, Double> trafficMap) {
 		_clientPool.broadcast(new TrafficResponse(trafficMap));
 	}
-	
-	
+
+
 	/**
 	 * Stop waiting for connections, close all connected clients, and close
 	 * this server's {@link ServerSocket}.

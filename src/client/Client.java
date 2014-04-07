@@ -85,7 +85,7 @@ public class Client {
 
 	public void run() {
 		while (_running && !_socket.isClosed()) {
-			if (!_requests.isEmpty()) {
+			if (!_requests.isEmpty() && _serverReady) {
 				try {
 					Util.out("Sending Request");
 					_output.writeObject(_requests.poll());
@@ -196,10 +196,9 @@ public class Client {
 			//to display messages to the user.
 			ServerStatus statResp = (ServerStatus) resp;
 			Util.out(statResp.toString());
-			if (statResp.getMsg().equals("Done"))
-				_serverReady = true;
+			_serverReady = statResp.isServerUp();
 			if (_frontend != null)
-			_frontend.guiMessage(statResp.getMsg());
+				_frontend.guiMessage(statResp.getMsg());
 			break;
 		case WAYS:
 			//tell the front end to tell the map to render the new ways

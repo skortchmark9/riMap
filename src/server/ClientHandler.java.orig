@@ -14,7 +14,6 @@ import shared.NeighborsRequest;
 import shared.PathRequest;
 import shared.Request;
 import shared.Response;
-import shared.ServerStatus;
 import shared.WayRequest;
 import backend.Backend;
 import backend.Util;
@@ -29,17 +28,16 @@ public class ClientHandler extends Thread {
 	private ObjectOutputStream _output;
 	private ClientPool _pool;
 	Backend _b;
-
+	
 	//stuff for threading requests:
 	private PathWayGetter _pwGetter;
 	private SuggestionGetter _sugGetter;
 	private NeighborGetter _nbrGetter;
 	private WayGetter _wayGetter;
-
+	
 	//they all share this response queue
 	ConcurrentLinkedQueue<Response> _responseQueue;
-	private PushThread _pushThread;
-
+	
 	/**
 	 * Default constructor.
 	 * Sets up this handler to be ready to receive requests 
@@ -53,30 +51,35 @@ public class ClientHandler extends Thread {
 	public ClientHandler(ClientPool pool, Socket clientSocket, Backend backend) throws IOException {
 		if (pool == null || clientSocket == null)
 			throw new IllegalArgumentException("Cannot accept null arguments.");
-
+		
 		_client = clientSocket;
 		_pool = pool;
 		_b = backend;
 		_responseQueue = new ConcurrentLinkedQueue<>();
-
-		_output = new ObjectOutputStream(_client.getOutputStream());
-		_input = new ObjectInputStream(_client.getInputStream());
 		
 		_pushThread = new PushThread();
 		_pushThread.start();
 
-
+		
+		_output = new ObjectOutputStream(_client.getOutputStream());
+		_input = new ObjectInputStream(_client.getInputStream());
+		
 		_pwGetter = new PathWayGetter(this);
 		_pwGetter.start();
 		_sugGetter = new SuggestionGetter(this);
 		_nbrGetter = new NeighborGetter(this);
 		_wayGetter = new WayGetter(this);
-
-
+		
+		
+<<<<<<< HEAD
+=======
+		new PushThread().start();
+		
+>>>>>>> d73bc221aa61980ef3e88b807cf462f24fec9c2a
 		_pool.add(this);
 	}
-
-
+	
+	
 	/**
 	 * Process requests from the client and
 	 * respond with the data resulting from the request.
@@ -94,8 +97,8 @@ public class ClientHandler extends Thread {
 			kill();
 		}
 	}
-
-
+	
+	
 	/**
 	 * Processes the parametric request and query the backend for
 	 * some type of data based on the type of the request. 
@@ -113,13 +116,13 @@ public class ClientHandler extends Thread {
 			Util.out(aReq.toString());
 			_sugGetter.suggestFor(aReq.getInput(), aReq.getBoxNo()); //start a new thread for request box #
 			break;
-
+			
 		case NEAREST_NEIGHBORS:
 			NeighborsRequest nReq = (NeighborsRequest) req;
 			Util.out(nReq.toString());
 			_nbrGetter.getNeighbors(nReq.getNumNeighbors(), nReq.getLocation(), nReq.isSource()); //start a new worker thread in getter
 			break;
-
+			
 		case WAYS:
 			WayRequest wReq = (WayRequest) req;
 			Util.out(wReq.toString());
@@ -130,13 +133,13 @@ public class ClientHandler extends Thread {
 			Util.out(pReq.toString());
 			_pwGetter.findPath(pReq.getSource(), pReq.getDest(), pReq.getTimeout());
 			break;
-
+			
 		default:
 			//not much we can do with an invalid request
 			throw new IllegalArgumentException("Unsupported request type");
 		}
 	}
-
+	
 	/**
 	 * Kills this handler and cleans up its additional resources.
 	 * 
@@ -153,27 +156,23 @@ public class ClientHandler extends Thread {
 			Util.err("ERROR killing client handler.\n", e.getMessage());	
 		}
 	}
-
+	
 	private class PushThread extends Thread {
-
-		PushThread() {
-			super("Push Thread");
-		}
-
+		
+		
 		@Override
 		public void run() {
-			try {
-				_output.writeObject(new ServerStatus(_b.isDone()));
-				_output.flush();
-				while (true) {
+			while (true) {
+				try {
 					if (!_responseQueue.isEmpty()) {
 						_output.writeObject(_responseQueue.poll());
 						_output.flush();
 					}
+				} catch (IOException e) {
+					Util.err("ERROR writing response in push thread");
 				}
-			} catch (IOException e) {
-				Util.err("ERROR writing response in push thread");
 			}
 		}
+		
 	}
 }

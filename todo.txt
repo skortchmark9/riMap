@@ -13,7 +13,6 @@ MapFactory - should behave differently for client vs server.
 Used cached ways in client and save time on network calls
 Test traffic
 
-Make server start clients after it's set up.
 Make server cleanly disengage
 Fix bug with first click.
 think about traffic values.

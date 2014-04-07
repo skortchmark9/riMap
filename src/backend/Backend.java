@@ -47,7 +47,10 @@ public class Backend {
 
 	public void sendStatusMessage(String s) {
 		if (_server != null) {
-			_server.serverMessage(s);
+			if (done) 
+				_server.serverOKMessage(s);
+			else
+				_server.serverDownMessage(s);
 		}
 	}
 
@@ -181,8 +184,8 @@ public class Backend {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
 			}
-			sendStatusMessage("Done");
 			done = true;
+			sendStatusMessage("Done");
 		}
 	}
 }
