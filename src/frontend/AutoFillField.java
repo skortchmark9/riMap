@@ -194,6 +194,7 @@ public class AutoFillField extends JTextField {
 	
 	public void setSuggestions(List<String> suggestions) {
 		this.suggestions = suggestions;
+		initTableModel();
 	}
 
 	/**
@@ -202,7 +203,6 @@ public class AutoFillField extends JTextField {
 	 */
 	private void showPopup(DocumentEvent e) {
 		if(e.getDocument().getLength() > 0) {
-			initTableModel();
 			if(!popup.isVisible()) { 
 				popup.show(this, 4, (getHeight() - 4));
 				popup.setVisible(true);

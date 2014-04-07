@@ -52,7 +52,6 @@ public class Client {
 		_executor = Executors.newFixedThreadPool(5);
 		_port = port;
 		_IP = IPAddress;
-		_serverReady = true;
 	}
 
 	/**
@@ -76,7 +75,6 @@ public class Client {
 			_frontend.setVisible(true);
 			
 			Util.debug("Frontend done\n","Attempting to connect to server now");
-			
 			_frontend.setVisible(true);
 			
 			run();
