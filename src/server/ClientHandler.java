@@ -37,6 +37,7 @@ public class ClientHandler extends Thread {
 	
 	//they all share this response queue
 	ConcurrentLinkedQueue<Response> _responseQueue;
+	private PushThread _pushThread;
 	
 	/**
 	 * Default constructor.
@@ -64,6 +65,10 @@ public class ClientHandler extends Thread {
 		_nbrGetter = new NeighborGetter(this);
 		_wayGetter = new WayGetter(this);
 		
+		
+		_pushThread = new PushThread();
+		_pushThread.start();
+		
 		_pool.add(this);
 	}
 	
@@ -77,10 +82,6 @@ public class ClientHandler extends Thread {
 			Request req;
 			while ((req = (Request)_input.readObject()) != null) {
 				processRequest(req);
-				while (!_responseQueue.isEmpty()) {
-					_output.writeObject(_responseQueue.poll());
-					_output.flush();
-				}
 			}
 			Util.out("Nulled request. Terminating client handler");
 		} catch(IOException | ClassNotFoundException e) {
@@ -131,7 +132,7 @@ public class ClientHandler extends Thread {
 			throw new IllegalArgumentException("Unsupported request type");
 		}
 	}
-		
+	
 	/**
 	 * Kills this handler and cleans up its additional resources.
 	 * 
@@ -147,5 +148,21 @@ public class ClientHandler extends Thread {
 		} catch (IOException e) {
 			Util.err("ERROR killing client handler.\n", e.getMessage());	
 		}
+	}
+	
+	private class PushThread extends Thread {
+		
+		@Override
+		public void run() {
+			while (true) {
+				try {
+					_output.writeObject(_responseQueue.poll());
+					_output.flush();
+				} catch (IOException e) {
+					Util.err("ERROR writing response in push thread");
+				}
+			}
+		}
+		
 	}
 }
