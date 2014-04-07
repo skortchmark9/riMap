@@ -52,7 +52,11 @@ public class Way implements Edge<Node>, Serializable {
 //	@Override
 	@Override
 	public double getWeight() {
-		return start.distanceTo(target) * MapFactory.getTrafficValue(uniqueID);
+		return start.distanceTo(target) * getTraffic();
+	}
+	
+	public double getTraffic() {
+		return MapFactory.getTrafficValue(uniqueID);
 	}
 	
 	@Override

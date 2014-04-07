@@ -6,7 +6,10 @@ package server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Map;
 
+import shared.ServerStatus;
+import shared.TrafficResponse;
 import backend.Backend;
 import backend.Constants;
 import backend.Util;
@@ -22,7 +25,6 @@ public class Server extends Thread {
 	private ClientPool _clientPool;
 	private boolean _running;
 	Backend _backend;
-	
 	
 	/**
 	 * 
@@ -57,7 +59,11 @@ public class Server extends Thread {
 	}
 	
 	public void serverMessage(String s) {
-		_clientPool.broadcast(s);
+		_clientPool.broadcast(new ServerStatus(s));
+	}
+	
+	public void trafficUpdate(Map<String, Double> trafficMap) {
+		_clientPool.broadcast(new TrafficResponse(trafficMap));
 	}
 	
 	

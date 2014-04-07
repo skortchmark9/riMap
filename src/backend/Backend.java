@@ -174,9 +174,13 @@ public class Backend {
 		@Override
 		public void run() {
 			sendStatusMessage("Building backend");
-			initAutoCorrect();
 			initKDTree();
+			initAutoCorrect();
 			initBoundaries();
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+			}
 			sendStatusMessage("Done");
 			done = true;
 		}

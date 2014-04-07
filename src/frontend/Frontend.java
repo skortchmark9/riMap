@@ -47,7 +47,7 @@ import client.Client;
  * 
  * @author skortchm / emc3
  */
-public class Frontend extends JFrame implements ActionListener {
+public class Frontend extends JFrame implements ActionListener, Runnable {
 	private AutoFillField box1, box2, box3, box4;
 	JButton getDirections, clearPoints;
 	JTextArea msgBox;
@@ -57,8 +57,10 @@ public class Frontend extends JFrame implements ActionListener {
 	final Cursor busyCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 
 	SimpleLoadingPane loadingScreen;
+	private JPanel loadingPanel;
 	private JLabel lblTimeouts;
 	private JSpinner timeOutSpinner;
+	boolean loading = true;
 
 	/**
 	 * Main constructor.<br>
@@ -67,9 +69,7 @@ public class Frontend extends JFrame implements ActionListener {
 	 */	
 	public Frontend(Client client) {
 		super("MAPS");
-		
 		this.client = client;
-
 		//Setting up the frame.
 		this.setTitle("MAPS - By Samuel Kortchmar and Eli Martinez Cohen");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -99,7 +99,7 @@ public class Frontend extends JFrame implements ActionListener {
 
 		//Creating the loading screen.
 		loadingScreen = new SimpleLoadingPane();
-		JPanel loadingPanel = new JPanel(new BorderLayout());
+		loadingPanel = new JPanel(new BorderLayout());
 		loadingPanel.setOpaque(false);
 		loadingPanel.add(loadingScreen);
 		loadingPanel.add(boilerPlate, BorderLayout.NORTH);
@@ -109,11 +109,15 @@ public class Frontend extends JFrame implements ActionListener {
 		this.pack();
 		this.setVisible(true);
 		loadingPanel.requestFocusInWindow();
+	}
 
+	@Override
+	public void run() {
 		//Waiting for the backend to be done/server connection to be made.
 		while(!client.serverReady()) {}
 
 		//Finished loading, removing the loading screen.
+		loading = false;
 		this.remove(loadingPanel);
 		this.setCursor(defaultCursor);
 		//Initializing the rest of the Frontend.
@@ -144,7 +148,7 @@ public class Frontend extends JFrame implements ActionListener {
 		desktop.add(controlPanel);
 		desktop.add(backgroundPanel);
 		this.setContentPane(desktop);
-		
+
 		try {
 			controlPanel.setSelected(true);
 		} catch (PropertyVetoException e) {
@@ -268,7 +272,7 @@ public class Frontend extends JFrame implements ActionListener {
 		//set point on map
 		Node n = neighbors.get(0);
 		map.setPoint(n, isSource);
-		
+		/*		
 		//update search boxes
 		List<String> wayIDs = n.getWayIDs();
 		String street1 = MapFactory.createWay(wayIDs.get(0)).getName();
@@ -279,14 +283,14 @@ public class Frontend extends JFrame implements ActionListener {
 		} else {
 			box3.setText(street1);
 			box4.setText(street2);
-		}
+		}*/
 	}
-	
+
 	public void giveDirections(List<Way> path) {
 		map.setCalculatedRoute(path);
 		//TODO: turn-by-turn directions
 	}
-	
+
 	public void setWays(List<Way> ways) {
 		map.renderWays(ways);
 	}
@@ -301,7 +305,6 @@ public class Frontend extends JFrame implements ActionListener {
 		}
 	}
 
-
 	/**
 	 * Log a message about the GUI or the state of the program
 	 * to the user in the GUI. This could be, for example, whether
@@ -310,7 +313,7 @@ public class Frontend extends JFrame implements ActionListener {
 	 * @param str - the string (message) to display to the user.
 	 */
 	public void guiMessage(String str) {
-		if (loadingScreen.isVisible()) {
+		if (loading && loadingScreen != null) {
 			loadingScreen.updateProgress(str);
 		} else {
 			if (msgBox == null) return;

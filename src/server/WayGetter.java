@@ -19,7 +19,6 @@ class WayGetter {
 	private Executor _exec;
 	
 	/**
-	 * 
 	 * @param owner
 	 */
 	public WayGetter(ClientHandler owner) {

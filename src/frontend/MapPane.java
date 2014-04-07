@@ -105,7 +105,11 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			if (way != null) {
 				int[] start = geo2pixel(way.getStart().getCoordinates());
 				int[] end = geo2pixel(way.getTarget().getCoordinates());
-				
+				if (way.getTraffic() > 3)
+					g2d.setColor(Constants.HIGH_TRAFFIC);
+				else if (way.getTraffic() > 1 && way.getTraffic() < 3) {
+					g2d.setColor(Constants.LOW_TRAFFIC);
+				}
 				//If the road is less than Constants.MIN_RENDER_LENGTH, don't paint it.
 				if (Point.distance(start[0], start[1], end[0], end[1]) < Constants.MIN_RENDER_LENGTH)
 					continue;
@@ -212,7 +216,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		double lon = Corners.topLeft[1] + lonOffset;
 		return new double[]{lat,lon};
 	}
-	
 	
 	public void renderWays(List<Way> ways) {
 		renderedWays = ways;

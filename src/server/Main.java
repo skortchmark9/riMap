@@ -43,9 +43,6 @@ public class Main {
 			Util.err("WARNING: Invalid argument for server port. setting to default port #:", serverPort);
 		}
 		
-		TrafficSocket trafficSocket = new TrafficSocket(trafficPort);
-		trafficSocket.start();
-		
 		//initialize resource files
 		try {
 			new Resources(args[0], args[1], args[2]);
@@ -58,9 +55,13 @@ public class Main {
 		Backend b = new Backend();
 		//create a new Server using the backend we just made:
 		Server server = new Server(serverPort, b);
+		
 		b.setMessageDestination(server);
 		b.initBackend();
 		server.start();
+		
+		TrafficSocket trafficSocket = new TrafficSocket(trafficPort, server);
+		trafficSocket.start();
 		
 		//Listen for "exit" or empty line to quit server
 		Scanner scanner = new Scanner(System.in);

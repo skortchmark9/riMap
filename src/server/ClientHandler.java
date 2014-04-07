@@ -59,6 +59,10 @@ public class ClientHandler extends Thread {
 		_b = backend;
 		_responseQueue = new ConcurrentLinkedQueue<>();
 		
+		_pushThread = new PushThread();
+		_pushThread.start();
+
+		
 		_output = new ObjectOutputStream(_client.getOutputStream());
 		_input = new ObjectInputStream(_client.getInputStream());
 		
@@ -68,9 +72,6 @@ public class ClientHandler extends Thread {
 		_nbrGetter = new NeighborGetter(this);
 		_wayGetter = new WayGetter(this);
 		
-		
-		_pushThread = new PushThread();
-		_pushThread.start();
 		
 		_pool.add(this);
 	}

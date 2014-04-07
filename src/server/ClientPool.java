@@ -5,6 +5,7 @@ package server;
 
 import java.util.LinkedList;
 
+import shared.Response;
 import shared.ServerStatus;
 
 /**
@@ -41,10 +42,9 @@ public class ClientPool {
 		return _clients.remove(client);
 	}
 	
-	public synchronized void broadcast(String message) {
-		ServerStatus msg = new ServerStatus(message);
+	public synchronized void broadcast(Response r) {
 		for (ClientHandler client : _clients) {
-			client._responseQueue.add(msg);
+			client._responseQueue.add(r);
 		}
 	}
 

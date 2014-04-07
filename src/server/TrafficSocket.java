@@ -20,12 +20,14 @@ public class TrafficSocket extends Thread {
 	private Socket _socket;
 	private BufferedReader _input;
 	private boolean _connect = true;
+	private Server _server;
 	
 	/**
 	 * Default constructor
 	 */
-	public TrafficSocket(int port) {
+	public TrafficSocket(int port, Server server) {
 		try {
+			_server = server;
 			_port = port;
 			_socket = new Socket("localhost", _port);
 			_input = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
@@ -49,6 +51,7 @@ public class TrafficSocket extends Thread {
 						try {	
 							Double val = Double.parseDouble(respData[1]);
 							MapFactory.putTrafficValue(respData[0].toLowerCase(), val); //store the traffic info in map factory.
+							_server.trafficUpdate(MapFactory.getTrafficMap());
 						} catch(NumberFormatException e) {
 							if (Constants.DEBUG_MODE)
 								Util.err("Looks like server sent a funky value? (TrafficSocket.run())"); //notify but keep reading

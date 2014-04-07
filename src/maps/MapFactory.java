@@ -31,7 +31,6 @@ public class MapFactory {
 	private static Map<String, Way> ways = new HashMap<>(35000);
 	private static Map<String, List<String>> wayArray;
 	private static Map<String, Double> trafficMap = new HashMap<>();
-
 	/**
 	 * Creates a way from the wayID. Attempts to find a cached way if one
 	 * doesn't exist. If not, searches the waysFile.
@@ -43,7 +42,9 @@ public class MapFactory {
 		if (possibleWay != null) {
 			return possibleWay;
 		}
-		String[] wayInfo = Resources.waysFile.getXsByY(wayID, "name", "start", "end");
+		String[] wayInfo = null;
+		if (Resources.waysFile != null)
+			wayInfo = Resources.waysFile.getXsByY(wayID, "name", "start", "end");
 		if (wayInfo == null) {
 			return null;
 		}
@@ -54,6 +55,14 @@ public class MapFactory {
 		} else {
 			return createWay(wayID, wayInfo[0], startLoc, endLoc);
 		}
+	}
+	
+	public static void setTrafficMap(Map<String, Double> newMap) {
+		trafficMap = newMap;
+	}
+	
+	public static void cacheWay(Way way) {
+		ways.put(way.uniqueID, way);
 	}
 
 	/**
@@ -114,6 +123,10 @@ public class MapFactory {
 		if (Constants.DEBUG_MODE) {
 			Util.out("Num Nodes", nodes.size());
 		}
+	}
+	
+	public static Map<String, Double> getTrafficMap() {
+		return trafficMap;
 	}
 
 
@@ -389,10 +402,9 @@ public class MapFactory {
 			synchronized (trafficMap) {
 				val = trafficMap.get(streetName);
 			}
-			
 			return (val == null) ? 1.0 : val;
 		}
-		Util.err("Could not find way?");
+		Util.err("Could not find way: " + wayID);
 		return 1.0;
 	}
 	

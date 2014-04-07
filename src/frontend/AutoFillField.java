@@ -34,7 +34,7 @@ public class AutoFillField extends JTextField {
 	private DefaultTableModel searchTableModel;
 	private String initialText;
 	private List<String> suggestions;
-	private int boxNo;
+	private final int boxNo;
 	private boolean popped = false;
 
 	public AutoFillField(Client client, String startField, int boxNo) {
@@ -88,15 +88,15 @@ public class AutoFillField extends JTextField {
 		getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void changedUpdate(DocumentEvent e) {
-				showPopup(e);
+				requestAutocorrections();
 			}
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				showPopup(e);
+				requestAutocorrections();
 			}
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				showPopup(e);
+				requestAutocorrections();
 			}
 		});
 
@@ -194,7 +194,17 @@ public class AutoFillField extends JTextField {
 	
 	public void setSuggestions(List<String> suggestions) {
 		this.suggestions = suggestions;
+		showPopup();
+	}
+	
+	private void showPopup() {
 		initTableModel();
+		if(!popup.isVisible()) { 
+			popup.show(this, 4, (getHeight() - 4));
+			popup.setVisible(true);
+		}
+		//We need to juggle focus a little to select the appropriate row.
+		requestFocusInWindow();
 	}
 
 	/**
@@ -203,6 +213,7 @@ public class AutoFillField extends JTextField {
 	 */
 	private void showPopup(DocumentEvent e) {
 		if(e.getDocument().getLength() > 0) {
+			initTableModel();
 			if(!popup.isVisible()) { 
 				popup.show(this, 4, (getHeight() - 4));
 				popup.setVisible(true);
@@ -239,6 +250,10 @@ public class AutoFillField extends JTextField {
 			selModel.setSelectionInterval(index0+1, index0+1);
 		}
 	}
+	
+	private void requestAutocorrections() {
+		client.requestAutocorrections(this.getText(), boxNo);
+	}
 
 	
 	/**
@@ -252,7 +267,6 @@ public class AutoFillField extends JTextField {
 		searchTable.setPreferredSize(new Dimension(getWidth() - 8, 80));
 		String input = getText();
 		String[] columns = new String[] {input};
-		client.requestAutocorrections(input, boxNo);
 		if (suggestions == null)
 			return;
 		String[][] data = new String[suggestions.size()][];
