@@ -36,4 +36,9 @@ public class NeighborsRequest implements Request {
 	public RequestType getType() {
 		return RequestType.NEAREST_NEIGHBORS;
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("NeighborsReq: numNeighbors = %s, location = %s", numNeighbors, location);
+	}
 }

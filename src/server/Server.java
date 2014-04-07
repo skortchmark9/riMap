@@ -40,7 +40,6 @@ public class Server extends Thread {
 	public void run() {
 		try {
 		while(_running) {
-			
 			if (Constants.DEBUG_MODE)
 				Util.out("Waiting for new client connection...");
 			

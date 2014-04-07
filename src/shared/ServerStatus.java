@@ -10,10 +10,10 @@ package shared;
 public class ServerStatus implements Response {
 
 	private static final long serialVersionUID = 1L;
-	private String msg; //The status message to be conveyed.
+	private String _msg; //The status message to be conveyed.
 	
 	public ServerStatus(String msg) {
-		this.msg = msg;
+		_msg = msg;
 	}
 	@Override
 	public ResponseType getType() {
@@ -21,6 +21,12 @@ public class ServerStatus implements Response {
 	}
 	
 	public String getMsg() {
-		return msg;
+		return _msg;
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("ServerStatus msg = %s", _msg);
+	}
+
 }

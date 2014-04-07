@@ -32,5 +32,9 @@ public class WayRequest implements Request {
 	public RequestType getType() {
 		return RequestType.WAYS;
 	}
-
+	
+	@Override
+	public String toString() {
+		return String.format("WayReq - minLat = %s maxLat = %s minLon = %s maxLon = %s", _minLat, _maxLat, _minLon, _maxLon);
+	}
 }

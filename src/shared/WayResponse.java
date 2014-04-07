@@ -26,4 +26,8 @@ public class WayResponse implements Response {
 		return _ways;
 	}
 	
+	@Override
+	public String toString() {
+		return String.format("WayResponse - _ways = %s", _ways);
+	}
 }

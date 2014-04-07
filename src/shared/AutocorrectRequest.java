@@ -27,4 +27,9 @@ public class AutocorrectRequest implements Request {
 	public RequestType getType() {
 		return RequestType.AUTO_CORRECTIONS;
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("ACReq: input = %s boxNo = %s", getInput(), getBoxNo());
+	}
 }

@@ -37,4 +37,9 @@ public class PathResponse implements Response {
 	public ResponseType getType() {
 		return ResponseType.PATH;
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("PathResponse List<Way> = %s message = %s", _path, _msg);
+	}
 }

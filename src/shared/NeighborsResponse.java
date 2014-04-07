@@ -32,4 +32,10 @@ public class NeighborsResponse implements Response {
 	public boolean isSource() {
 		return _isSource;
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("NeighborsResponse _neighbors = %s, isSource = %s", _neighbors, _isSource);
+	}
+
 }
