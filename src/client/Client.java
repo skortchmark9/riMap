@@ -24,7 +24,7 @@ import shared.ServerStatus;
 import shared.WayRequest;
 import shared.WayResponse;
 import backend.Util;
-import frontend.IndeterminateFrontend;
+import frontend.Frontend;
 
 /**
  * A Client Class that sends and receives messages from and to the server.
@@ -40,7 +40,7 @@ public class Client {
 	private String _IP;
 	private Queue<Request> _requests;
 	ExecutorService _executor;
-	IndeterminateFrontend _frontend;
+	Frontend _frontend;
 
 	/**
 	 * Constructs a Client with the given port.
@@ -59,7 +59,7 @@ public class Client {
 	 */
 	public void start() {
 		try {
-			_frontend = new IndeterminateFrontend(this);
+			_frontend = new Frontend(this);
 			_socket = new Socket((_IP.equals("localhost")) ? InetAddress.getLocalHost(): InetAddress.getByName(_IP), _port);
 			_input = new ObjectInputStream(_socket.getInputStream());
 			_output = new ObjectOutputStream(_socket.getOutputStream());

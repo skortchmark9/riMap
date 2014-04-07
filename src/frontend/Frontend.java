@@ -46,7 +46,7 @@ import client.Client;
  * 
  * @author skortchm / emc3
  */
-public class IndeterminateFrontend implements ActionListener {
+public class Frontend implements ActionListener {
 	private AutoFillField box1, box2, box3, box4;
 	JButton getDirections, clearPoints;
 	JTextArea msgBox;
@@ -65,8 +65,8 @@ public class IndeterminateFrontend implements ActionListener {
 	 * Creates a new JFrame and initializes the map inside of that.
 	 * Also puts a few buttons on the screen.
 	 */	
-	public IndeterminateFrontend(Client client) {
-
+	public Frontend(Client client) {
+		
 		this.client = client;
 
 		//Setting up the frame.

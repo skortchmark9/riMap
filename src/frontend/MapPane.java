@@ -45,12 +45,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private List<Way> renderedWays, calculatedRoute;
 	private ClickNeighbor _source;
 	private ClickNeighbor _dest;
-	private Client client;
+	private Client _client;
 	private boolean clickSwitch = true;
-	private AtomicInteger threadCount;
 	//private ExecutorService executor;
-	private Executor wayGetterPool;
-	private IndeterminateFrontend _front;
+	private Frontend _front;
 	
 	/**
 	 * Construct a MapPane linked to the given backend.
@@ -58,8 +56,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * well as zooming / panning over the map.
 	 * @param b - the backend to link to this MapPane.
 	 */
-	MapPane(IndeterminateFrontend front, Client client)   {
-		this.client = client;
+	MapPane(Frontend front, Client client)   {
+		_client = client;
 		_front = front; //need this for updated text fields on clicks, resizing map
 		this.setBackground(Constants.BG_COLOR);
 		this.setPreferredSize(new Dimension(PIXEL_WIDTH, PIXEL_HEIGHT));
@@ -81,17 +79,12 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		//renderedWays = Collections.synchronizedList(MapFactory.getWaysInRange(0, 0, 0, 0));
 		_source = null;
 		_dest = null;
-		renderedWays = new LinkedList<>();
-		threadCount = new AtomicInteger(0);
-		//new thread!
-		//executor = Executors.newSingleThreadExecutor();
-		wayGetterPool = new ThreadPoolExecutor(Constants.THREADPOOL_CORE_SIZE, Constants.THREADPOOL_MAX_SIZE, Constants.THREADPOOL_TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
-		wayGetterPool.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
-		calculatedRoute = new LinkedList<>();
-		if (Constants.DEBUG_MODE) {
-			Util.out("Finished - Got All Ways in range", "(Elapsed:", Util.lap() +")");
-		}
 		
+		//set up & request new ways
+		renderedWays = new LinkedList<>();
+		_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
+		
+		calculatedRoute = new LinkedList<>();
 		
 		this.repaint(); //paint the initial set of ways
 		this.requestFocusInWindow();
@@ -316,8 +309,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				//move map up
 				double newLat = Corners.topLeft[0] + 0.04; //TODO: 0.04 as a constant?
 				recalibrateMap(newLat, Corners.topLeft[1]);
-				//get new ways in range
-				wayGetterPool.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
+
+				//request new ways in range
+				_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
 				repaint();
 			}
 		});
@@ -334,8 +328,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				//move map up
 				double newLon = Corners.topLeft[1] + 0.04; //TODO: 0.04 as a constant?
 				recalibrateMap(Corners.topLeft[0], newLon);
-				//get new ways in range
-				wayGetterPool.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
+				
+				//request new ways in range
+				_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
 				repaint();
 			}
 		});
@@ -352,8 +347,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				//move map up
 				double newLat = Corners.topLeft[0] - 0.04; //TODO: 0.04 as a constant?
 				recalibrateMap(newLat, Corners.topLeft[1]);
-				//get new ways in range
-				wayGetterPool.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
+				//request new ways in range
+				_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
 				repaint();
 			}
 		});
@@ -370,8 +365,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				//move map up
 				double newLon = Corners.topLeft[1] - 0.04; //TODO: 0.04 as a constant?
 				recalibrateMap(Corners.topLeft[0], newLon);
-				//get new ways in range
-				wayGetterPool.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
+				//request new ways in range
+				_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
 				repaint();
 			}
 		});
@@ -404,8 +399,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			double newLon = Corners.topLeft[1] - viewDiff; 
 			recalibrateMap(newLat, newLon); //reposition all corners with new coords
 			
-			//get all new ways in new range
-			wayGetterPool.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
+			//request all new ways in new range
+			_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
 			this.repaint();
 		}
 	}
@@ -502,11 +497,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			
 			this.repaint(); // repaint for responsiveness
 			
-			//get all new ways in new range
-			//executor.shutdownNow();
-			//executor = Executors.newSingleThreadExecutor();
-			wayGetterPool.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
-			//repaint this component
+			//request all new ways in new range
+			_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
 			this.repaint();
 		}
 	}
@@ -552,12 +544,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				_source.recalibrate();
 			if (_dest != null)
 				_dest.recalibrate();
-			//get all new ways for the render list
-			
-			
-			//executor.shutdownNow();
-			//executor = Executors.newSingleThreadExecutor();
-			wayGetterPool.execute(new WayGetter(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]));
+
+			//request new ways in view
+			_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
 			repaint();
 		}
 		
@@ -721,9 +710,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		private ClickNeighbor(int x, int y) {
 			double[] geoCoords = pixel2geo(x,y);
 			KDStub p = new KDStub(geoCoords[0], geoCoords[1]);
-			node = client.requestNearestNeighbors(1, p).get(0);
-			List<String> wayIDs = node.getWayIDs();
+			_client.requestNearestNeighbors(1, p);
 			
+			//TODO: move this stuff to the place where nearest neighbor response is received.
+			List<String> wayIDs = node.getWayIDs();
 			_front.updateInputFields(wayIDs, clickSwitch); //update front end to include names of ways
 			
 			screenCoords = geo2pixel(node.getCoordinates());
@@ -746,61 +736,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			screenCoords = geo2pixel(node.getCoordinates()); 
 		}
 		
-	}
-	
-	/**
-	 * Private class that extends thread
-	 * Basically queries the backend for ways in a given range.
-	 * @author emc3
-	 *
-	 */
-	private class WayGetter implements Runnable {
-		double minLat, maxLat, minLon, maxLon; //the range to search in  for ways
-		int numberID; //the ID of this thread
-		
-		/**
-		 * Default constructor.
-		 * Stores the range in which to search for ways 
-		 * (the backend is queried using this range in this class's run() method
-		 * 
-		 * @param minLat - minimum lat to search
-		 * @param maxLat - max lat to search
-		 * @param minLon - minimum lon to search
-		 * @param maxLon - max lon to search
-		 */
-		private WayGetter(double minLat, double maxLat, double minLon, double maxLon) {
-			this.minLat = minLat;
-			this.maxLat = maxLat;
-			this.minLon = minLon;
-			this.maxLon = maxLon;
-		}
-		
-		
-		/**
-		 * Queries the backend for ways within the given range.
-		 * The range is defined by the WayGetter() constructor's parameters.
-		 * This method also defines the object's number ID. This number
-		 * ID is used to ensure that only the most RECENTLY LAUNCHED THREAD
-		 * is used to defined the list of ways to render. This prevents the glitchy 
-		 * shit that happens when you have the render list being set to different
-		 * lists of ways in different ranges asynchronously. 
-		 */
-		@Override
-		public void run() {
-			if (Constants.DEBUG_MODE) {
-				Util.out("Starting WayGetter!");
-			}
-			numberID = threadCount.incrementAndGet();
-			List<Way> temp = client.requestWaysInRange(this.minLat, this.maxLat, this.minLon, this.maxLon);
-			
-			if (threadCount.get() == numberID) {
-				renderedWays = temp;
-				repaint();
-				if (Constants.DEBUG_MODE) {
-					Util.out("WayGetter accomplished:", "minLat:", minLat, "maxLat:", maxLat);
-				}
-			}
-		}
 	}
 }
 

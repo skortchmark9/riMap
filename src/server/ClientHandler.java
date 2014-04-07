@@ -62,6 +62,7 @@ public class ClientHandler extends Thread {
 		_pwGetter = new PathWayGetter(this);
 		_sugGetter = new SuggestionGetter(this);
 		_nbrGetter = new NeighborGetter(this);
+		_wayGetter = new WayGetter(this);
 		
 		_pool.add(this);
 	}
