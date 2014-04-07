@@ -148,7 +148,6 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		desktop.add(controlPanel);
 		desktop.add(backgroundPanel);
 		this.setContentPane(desktop);
-
 		try {
 			controlPanel.setSelected(true);
 		} catch (PropertyVetoException e) {

@@ -558,7 +558,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			requestFocusInWindow();
+			getFocus();
 			if (Constants.DEBUG_MODE)
 				Util.out("Click registered!");
 			if (clickSwitch) {
@@ -583,6 +583,11 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 */
 	public Node getStart() {
 		return _source.node;
+	}
+	
+	public void getFocus() {
+		grabFocus();
+
 	}
 	
 	/**
