@@ -60,11 +60,6 @@ public class Client {
 	 */
 	public void start() {
 		try {
-			_frontend = new Frontend(this);
-			
-			if (Constants.DEBUG_MODE)
-				Util.out("Attempting to connect to server now");
-			
 			_socket = new Socket((_IP.equals("localhost")) ? InetAddress.getLocalHost(): InetAddress.getByName(_IP), _port);
 			_input = new ObjectInputStream(_socket.getInputStream());
 			_output = new ObjectOutputStream(_socket.getOutputStream());
@@ -72,6 +67,13 @@ public class Client {
 			_thread = new ReceiveThread();
 			_thread.start();
 			_requests = new LinkedList<>();
+			
+			Util.debug("creating new frontend");
+			
+			_frontend = new Frontend(this);
+			
+			Util.debug("Frontend done\n","Attempting to connect to server now");
+			
 			run();
 		}
 		catch (IOException ex) {
@@ -149,7 +151,7 @@ public class Client {
 	}*/
 
 	public boolean serverReady() {
-		return _running;
+		return _serverReady;
 	}
 
 	/**

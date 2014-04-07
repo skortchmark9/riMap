@@ -23,12 +23,13 @@ public class Main {
 			port = Constants.DEFAULT_SERVER_PORT;
 			Util.err("WARNING: Invalid argument for server port. setting to default port #:", port);
 		}
-//		
-//		if (condition) {
-//			
-//		}
+		
+		Util.debug("Attempting to create new client.");
 		
 		Client client = new Client(args[0], port);
+		
+		Util.debug("client created.\n","attempting to start client");
+		
 		client.start();
 	}
 }

@@ -47,11 +47,10 @@ import client.Client;
  * 
  * @author skortchm / emc3
  */
-public class Frontend implements ActionListener {
+public class Frontend extends JFrame implements ActionListener {
 	private AutoFillField box1, box2, box3, box4;
 	JButton getDirections, clearPoints;
 	JTextArea msgBox;
-	JFrame frame;
 	MapPane map;
 	Client client;
 	final Cursor defaultCursor = Cursor.getDefaultCursor();
@@ -67,17 +66,17 @@ public class Frontend implements ActionListener {
 	 * Also puts a few buttons on the screen.
 	 */	
 	public Frontend(Client client) {
+		super("MAPS");
 		
 		this.client = client;
 
 		//Setting up the frame.
-		frame = new JFrame("MAPS");
-		frame.setTitle("MAPS - By Samuel Kortchmar and Eli Martinez Cohen");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-		frame.getContentPane().setLayout(new FlowLayout());
-		frame.getContentPane().setBackground(Color.BLACK);
-		frame.setCursor(busyCursor);
+		this.setTitle("MAPS - By Samuel Kortchmar and Eli Martinez Cohen");
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setExtendedState(Frame.MAXIMIZED_BOTH);
+		this.getContentPane().setLayout(new FlowLayout());
+		this.getContentPane().setBackground(Color.BLACK);
+		this.setCursor(busyCursor);
 
 		//Setting up the loading screen's info.
 		JPanel boilerPlate = new JPanel();
@@ -106,17 +105,17 @@ public class Frontend implements ActionListener {
 		loadingPanel.add(boilerPlate, BorderLayout.NORTH);
 
 		//Adding the loading screen to the frame.
-		frame.getContentPane().add(loadingPanel);
-		frame.pack();
-		frame.setVisible(true);
+		this.getContentPane().add(loadingPanel);
+		this.pack();
+		this.setVisible(true);
 		loadingPanel.requestFocusInWindow();
 
 		//Waiting for the backend to be done/server connection to be made.
 		while(!client.serverReady()) {}
 
 		//Finished loading, removing the loading screen.
-		frame.remove(loadingPanel);
-		frame.setCursor(defaultCursor);
+		this.remove(loadingPanel);
+		this.setCursor(defaultCursor);
 		//Initializing the rest of the Frontend.
 		initMainScreen();
 	}
@@ -138,18 +137,18 @@ public class Frontend implements ActionListener {
 		JPanel backgroundPanel = new JPanel(new GridBagLayout());
 		backgroundPanel.setBackground(Color.BLACK);
 		backgroundPanel.add(map);
-		backgroundPanel.setBounds(0, 0, frame.getWidth(), frame.getHeight());
+		backgroundPanel.setBounds(0, 0, this.getWidth(), this.getHeight());
 
 
 		//Adds the controlPanel and Map/BackgroundPanel to the desktop.
 		desktop.add(controlPanel);
 		desktop.add(backgroundPanel);
-		frame.setContentPane(desktop);
+		this.setContentPane(desktop);
 		try {
 			controlPanel.setSelected(true);
 		} catch (PropertyVetoException e) {
 		}
-		frame.revalidate();		
+		this.revalidate();		
 		box1.requestFocusInWindow();
 	}
 
