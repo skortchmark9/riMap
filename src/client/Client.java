@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -61,7 +62,13 @@ public class Client {
 	 */
 	public void start() {
 		try {
-			_socket = new Socket((_IP.equals("localhost")) ? InetAddress.getLocalHost(): InetAddress.getByName(_IP), _port);
+			//host is localhost or IP if an IP address is specified
+			InetAddress host = _IP.equals("localhost") ? InetAddress.getLocalHost() : InetAddress.getByName(_IP);
+			_socket = new Socket();
+			
+			//connect socket with a 1-second timeout
+			_socket.connect(new InetSocketAddress(host, _port), 1000);
+			
 			_output = new ObjectOutputStream(_socket.getOutputStream());
 			_input = new ObjectInputStream(_socket.getInputStream());
 			_running = true;
