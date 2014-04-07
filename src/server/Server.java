@@ -8,6 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import backend.Backend;
+import backend.Constants;
 import backend.Util;
 
 /**
@@ -39,9 +40,17 @@ public class Server extends Thread {
 	public void run() {
 		try {
 		while(_running) {
+			
+			if (Constants.DEBUG_MODE)
+				Util.out("Waiting for new client connection...");
+			
 			Socket clientConn = _socket.accept(); //blocks waiting for connections
+			
+			if (Constants.DEBUG_MODE)
+				Util.out("-- NEW CONNECTION ACCEPTED --");
+			
 			new ClientHandler(_clientPool, clientConn, _backend);
-			Util.out("--New client connection");
+			Util.out("--New client connection!");
 		}
 		} catch (IOException e) {
 			//handle

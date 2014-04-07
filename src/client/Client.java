@@ -23,6 +23,7 @@ import shared.Response;
 import shared.ServerStatus;
 import shared.WayRequest;
 import shared.WayResponse;
+import backend.Constants;
 import backend.Util;
 import frontend.Frontend;
 
@@ -60,6 +61,10 @@ public class Client {
 	public void start() {
 		try {
 			_frontend = new Frontend(this);
+			
+			if (Constants.DEBUG_MODE)
+				Util.out("Attempting to connect to server now");
+			
 			_socket = new Socket((_IP.equals("localhost")) ? InetAddress.getLocalHost(): InetAddress.getByName(_IP), _port);
 			_input = new ObjectInputStream(_socket.getInputStream());
 			_output = new ObjectOutputStream(_socket.getOutputStream());

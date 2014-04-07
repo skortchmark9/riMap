@@ -22,7 +22,7 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IOException {
 		if(args.length != 6) {
-			Util.err("ERROR: incorrect number of arguments.\n", "Usage: trafficServer <ways> <nodes> <index> <hostname> <trafficport> <serverport>" );
+			Util.out("Incorrect number of arguments.\n", "Usage: trafficServer <ways> <nodes> <index> <hostname> <trafficport> <serverport>" );
 			return;
 		}
 		
