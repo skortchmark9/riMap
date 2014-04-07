@@ -56,10 +56,10 @@ public class Main {
 		
 		//initialize backend
 		Backend b = new Backend();
-		b.initBackend();
-		
 		//create a new Server using the backend we just made:
 		Server server = new Server(serverPort, b);
+		b.setMessageDestination(server);
+		b.initBackend();
 		server.start();
 		
 		//Listen for "exit" or empty line to quit server
