@@ -2,11 +2,13 @@ package frontend;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
@@ -73,7 +75,8 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		//Setting up the frame.
 		this.setTitle("MAPS - By Samuel Kortchmar and Eli Martinez Cohen");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setExtendedState(Frame.MAXIMIZED_BOTH);
+		this.setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize());
+		//this.setExtendedState(Frame.MAXIMIZED_BOTH);
 		this.getContentPane().setLayout(new FlowLayout());
 		this.getContentPane().setBackground(Color.BLACK);
 		this.setCursor(busyCursor);
