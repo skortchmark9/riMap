@@ -6,6 +6,7 @@ import graph.Edge;
 
 public class Way implements Edge<Node>, Serializable {
 	
+	private static final long serialVersionUID = 1L;
 	Node target;
 	String name;
 	Node start;
