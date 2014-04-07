@@ -8,25 +8,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import shared.AutocorrectRequest;
-import shared.AutocorrectResponse;
-import shared.ExitRequest;
 import shared.NeighborsRequest;
-import shared.NeighborsResponse;
 import shared.PathRequest;
-import shared.PathResponse;
 import shared.Request;
 import shared.Response;
 import shared.WayRequest;
-import shared.WayResponse;
 import backend.Backend;
-import backend.Constants;
 import backend.Util;
 
 /**
@@ -41,10 +30,13 @@ public class ClientHandler extends Thread {
 	Backend _b;
 	
 	//stuff for threading requests:
-	private Executor _requestHandlerPool;
 	private PathWayGetter _pwGetter;
+	private SuggestionGetter _sugGetter;
+	private NeighborGetter _nbrGetter;
+	private WayGetter _wayGetter;
+	
+	//they all share this response queue
 	ConcurrentLinkedQueue<Response> _responseQueue;
-	private AtomicInteger _autocThreadCount, _neighborThreadCount, _wayGetThreadCount, _pathGetThreadCount;
 	
 	/**
 	 * Default constructor.
@@ -68,14 +60,8 @@ public class ClientHandler extends Thread {
 		_output = new ObjectOutputStream(_client.getOutputStream());
 		
 		_pwGetter = new PathWayGetter(this);
-		//We need atomic int's for each type of request/response 
-		_autocThreadCount = new AtomicInteger(0);
-		_neighborThreadCount = new AtomicInteger(0);
-		_wayGetThreadCount = new AtomicInteger(0);
-		_pathGetThreadCount = new AtomicInteger(0);
-
-		//XXX: I'm making the max size 8 instead of 4
-		_requestHandlerPool = new ThreadPoolExecutor(Constants.THREADPOOL_CORE_SIZE, 8, Constants.THREADPOOL_TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+		_sugGetter = new SuggestionGetter(this);
+		_nbrGetter = new NeighborGetter(this);
 		
 		_pool.add(this);
 	}
@@ -117,20 +103,17 @@ public class ClientHandler extends Thread {
 		switch (req.getType()) {
 		case AUTO_CORRECTIONS:
 			AutocorrectRequest aReq = (AutocorrectRequest) req;
-			//submit a new suggestion getter to its pool
-			_requestHandlerPool.execute(new SuggestionGetter(aReq.getInput(), aReq.getBoxNo()));
+			_sugGetter.suggestFor(aReq.getInput(), aReq.getBoxNo()); //start a new thread for request box #
 			break;
 			
 		case NEAREST_NEIGHBORS:
 			NeighborsRequest nReq = (NeighborsRequest) req;
-			//submit a new nearest-neighbors getter to its pool
-			_requestHandlerPool.execute(new NeighborGetter(nReq.getNumNeighbors(), nReq.getLocation()));
+			_nbrGetter.getNeighbors(nReq.getNumNeighbors(), nReq.getLocation()); //start a new worker thread in getter
 			break;
 			
 		case WAYS:
 			WayRequest wReq = (WayRequest) req;
-			//submit a new way getter to the its pool
-			_requestHandlerPool.execute(new WayGetter(wReq.getMinLat(), wReq.getMaxLat(), wReq.getMinLon(), wReq.getMaxLon()));
+			_wayGetter.getWays(wReq.getMinLat(), wReq.getMaxLat(), wReq.getMinLon(), wReq.getMaxLon()); //start a new worker thread in the getter
 			break;
 			
 		case PATH:
@@ -141,7 +124,6 @@ public class ClientHandler extends Thread {
 		default:
 			//not much we can do with an invalid request
 			throw new IllegalArgumentException("Unsupported request type");
-			break;
 		}
 	}
 		
@@ -160,70 +142,5 @@ public class ClientHandler extends Thread {
 		} catch (IOException e) {
 			Util.err("ERROR killing client handler.\n", e.getMessage());	
 		}
-	}
-	
-	
-	
-	
-	private class SuggestionGetter implements Runnable {
-		private int _threadID, _boxNum;
-		private String _input;
-		
-		private SuggestionGetter(String input, int boxNum) {
-			_input = input;
-			_boxNum = boxNum;
-		}
-
-		@Override
-		public void run() {
-			_threadID = _autocThreadCount.incrementAndGet();
-			Response resp = new AutocorrectResponse(_b.getAutoCorrections(_input), _boxNum);
-			if (_threadID == _autocThreadCount.get()) {
-				_responseQueue.add(resp);
-			}
-		}
-		
-	}
-	
-	private class NeighborGetter implements Runnable {
-		private int _threadID, _numNeighbors;
-		private KDimensionable _location;
-		
-		private NeighborGetter(int numNeighbors, KDimensionable location) {
-			_numNeighbors = numNeighbors;
-			_location = location;
-		}
-		
-		@Override
-		public void run() {
-			_threadID = _neighborThreadCount.incrementAndGet();
-			Response resp = new NeighborsResponse(_b.getNearestNeighbors(_numNeighbors, _location));
-			if (_threadID == _neighborThreadCount.get()) {
-				_responseQueue.add(resp);
-			}
-		}
-		
-	}
-	
-	private class WayGetter implements Runnable {
-		private int _threadID;
-		private double _minLat, _maxLat, _minLon, _maxLon; 
-		
-		public WayGetter(double minLat, double maxLat, double minLon, double maxLon) {
-			_minLat = minLat;
-			_maxLat = maxLat;
-			_minLon = minLon;
-			_maxLon = maxLon;
-		}
-
-		@Override
-		public void run() {
-			_threadID = _wayGetThreadCount.incrementAndGet();
-			Response resp = new WayResponse(_b.getWaysInRange(_minLat, _maxLat, _minLon, _maxLon));
-			if (_threadID == _wayGetThreadCount.get()) {
-				_responseQueue.add(resp);
-			}
-		}
-		
 	}
 }
