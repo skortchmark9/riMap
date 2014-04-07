@@ -1,6 +1,8 @@
 package kdtree;
+import java.io.Serializable;
 
-public interface KDimensionable {
+
+public interface KDimensionable extends Serializable {
 	
 	
 	/**
