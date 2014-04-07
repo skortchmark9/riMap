@@ -76,6 +76,8 @@ public class Client {
 			
 			Util.debug("Frontend done\n","Attempting to connect to server now");
 			
+			_frontend.setVisible(true);
+			
 			run();
 		}
 		catch (IOException ex) {
