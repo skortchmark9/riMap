@@ -6,15 +6,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import backend.BinarySearchFile.SearchType;
-import backend.Util;
-
 import org.junit.Test;
+
+import backend.BinarySearchFile.SearchType;
 
 public class BinarySearchFileTest {
 	String films = "./data/baconfiles/films.tsv";

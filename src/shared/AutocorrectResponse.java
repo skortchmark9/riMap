@@ -1,12 +1,15 @@
 package shared;
 
 import java.util.List;
-
+/**
+ * A Response to an Autocorrect Request
+ * @author samkortchmar
+ */
 public class AutocorrectResponse implements Response {
 	
 	private static final long serialVersionUID = 1L;
-	List<String> autocorrections;
-	int boxNo;
+	List<String> autocorrections; //The autocorrections to be suggested.
+	int boxNo; //The box that requested autocorrections.
 	
 	public AutocorrectResponse(List<String> autocorrections, int boxNo) {
 		this.autocorrections = autocorrections;

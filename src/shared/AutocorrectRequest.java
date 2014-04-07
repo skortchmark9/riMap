@@ -1,10 +1,14 @@
 package shared;
 
+/**
+ * A Request for autocorrections
+ * @author samkortchmar
+ */
 public class AutocorrectRequest implements Request {
 
 	private static final long serialVersionUID = 1L;
-	private final String input;
-	private final int boxNo;
+	private final String input; //The string to be autocorrected
+	private final int boxNo; //the current textfield on the front end.
 	
 	public AutocorrectRequest(String input, int boxNo) {
 		this.input = input;
