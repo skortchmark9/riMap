@@ -28,7 +28,7 @@ public class Main {
 		
 		Client client = new Client(args[0], port);
 		
-		Util.debug("client created.\n","attempting to start client");
+		Util.debug("client created. \nattempting to start client");
 		
 		client.start();
 	}

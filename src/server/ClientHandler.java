@@ -28,6 +28,7 @@ public class ClientHandler extends Thread {
 	private ObjectInputStream _input;
 	private ObjectOutputStream _output;
 	private ClientPool _pool;
+	private boolean _running = false;
 	Backend _b;
 
 	//stuff for threading requests:
@@ -61,10 +62,6 @@ public class ClientHandler extends Thread {
 
 		_output = new ObjectOutputStream(_client.getOutputStream());
 		_input = new ObjectInputStream(_client.getInputStream());
-		
-		_pushThread = new PushThread();
-		_pushThread.start();
-
 
 		_pwGetter = new PathWayGetter(this);
 		_pwGetter.start();
@@ -82,12 +79,16 @@ public class ClientHandler extends Thread {
 	 * respond with the data resulting from the request.
 	 */
 	public void run() {
+		_running = true;
+		_pushThread = new PushThread();
+		_pushThread.start();
 		try {
 			Request req;
-			while ((req = (Request)_input.readObject()) != null) {
+			while (_running) {
+				req = (Request) _input.readObject();
 				processRequest(req);
 			}
-			Util.out("Nulled request. Terminating client handler");
+			Util.out("Running has ceased. Killing this client handler.");
 		} catch(IOException | ClassNotFoundException e) {
 			Util.err("User has exited.");
 		} finally {
@@ -145,6 +146,7 @@ public class ClientHandler extends Thread {
 	 */
 	public void kill() {
 		try {
+			_running = false;
 			_pool.remove(this);
 			_input.close();
 			_output.close();
@@ -156,23 +158,22 @@ public class ClientHandler extends Thread {
 
 	private class PushThread extends Thread {
 
-		PushThread() {
-			super("Push Thread");
-		}
-
 		@Override
 		public void run() {
 			try {
 				_output.writeObject(new ServerStatus(_b.isDone()));
 				_output.flush();
-				while (true) {
+				while (_running) {
 					if (!_responseQueue.isEmpty()) {
 						_output.writeObject(_responseQueue.poll());
 						_output.flush();
 					}
 				}
 			} catch (IOException e) {
-				Util.err("ERROR writing response in push thread");
+				if (!_running)
+					Util.out("Connection closed. No more responses will be sent.");
+				else
+					Util.err("ERROR writing response in push thread");
 			}
 		}
 	}
