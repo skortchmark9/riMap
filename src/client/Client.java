@@ -51,6 +51,7 @@ public class Client {
 		_executor = Executors.newFixedThreadPool(5);
 		_port = port;
 		_IP = IPAddress;
+		_serverReady = true;
 	}
 
 	/**
@@ -61,8 +62,8 @@ public class Client {
 	public void start() {
 		try {
 			_socket = new Socket((_IP.equals("localhost")) ? InetAddress.getLocalHost(): InetAddress.getByName(_IP), _port);
-			_input = new ObjectInputStream(_socket.getInputStream());
 			_output = new ObjectOutputStream(_socket.getOutputStream());
+			_input = new ObjectInputStream(_socket.getInputStream());
 			_running = true;
 			_thread = new ReceiveThread();
 			_thread.start();
@@ -71,6 +72,7 @@ public class Client {
 			Util.debug("creating new frontend");
 			
 			_frontend = new Frontend(this);
+			_frontend.setVisible(true);
 			
 			Util.debug("Frontend done\n","Attempting to connect to server now");
 			
@@ -165,16 +167,19 @@ public class Client {
 			//If the response is an auto correction, we'll send the list of
 			//suggestions to the appropriate text box.
 			AutocorrectResponse autocResp = (AutocorrectResponse) resp;
+			Util.out(autocResp.toString());
 			_frontend.getBox(autocResp.getBoxNo()).setSuggestions(autocResp.getAutocorrections());
 			break;
 		case NEAREST_NEIGHBORS:
 			//If the response is a neighbors list, then we'll send the list
 			NeighborsResponse nbrResp = (NeighborsResponse) resp;
+			Util.out(nbrResp.toString());
 			_frontend.updateNeighbor(nbrResp.getNeighbors(), nbrResp.isSource());
 			break;
 		case PATH:
 			//If the response is a path of ways, we'll send it to the mapPane.
 			PathResponse pathResp = (PathResponse) resp;
+			Util.out(pathResp.toString());
 			_frontend.giveDirections(pathResp.getPath());
 			break;
 		case SERVER_STATUS:
@@ -182,7 +187,7 @@ public class Client {
 			//console or the loading screen, whichever is currently being used
 			//to display messages to the user.
 			ServerStatus statResp = (ServerStatus) resp;
-			Util.out(statResp.getMsg());
+			Util.out(statResp.toString());
 			if (statResp.getMsg().equals("Done!"))
 				_serverReady = true;
 			_frontend.guiMessage(statResp.getMsg());
@@ -190,6 +195,7 @@ public class Client {
 		case WAYS:
 			//tell the front end to tell the map to render the new ways
 			WayResponse wayResp = (WayResponse) resp;
+			Util.out(wayResp.toString());
 			_frontend.setWays(wayResp.getWays());
 			break;
 		default:

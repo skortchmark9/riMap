@@ -33,4 +33,9 @@ public class PathRequest implements Request {
 	public RequestType getType() {
 		return RequestType.PATH;
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("PathReq source = %s dest = %s timeout = %s", _source, _dest, _timeout);
+	}
 }

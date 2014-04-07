@@ -28,5 +28,8 @@ public class AutocorrectResponse implements Response {
 	public int getBoxNo() {
 		return boxNo;
 	}
-
+	@Override
+	public String toString() {
+		return String.format("ACResponse: autocorrections = %s boxNo = %s", autocorrections, boxNo);
+	}
 }
