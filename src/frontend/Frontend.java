@@ -112,7 +112,7 @@ public class Frontend implements ActionListener {
 		loadingPanel.requestFocusInWindow();
 
 		//Waiting for the backend to be done/server connection to be made.
-		while(!client.isReady()) {}
+		while(!client.serverReady()) {}
 
 		//Finished loading, removing the loading screen.
 		frame.remove(loadingPanel);
