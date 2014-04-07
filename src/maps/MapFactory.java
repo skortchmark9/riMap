@@ -206,19 +206,12 @@ public class MapFactory {
 	}
 
 	
-	public static KDTree<Node> createKDTree() throws IOException {
-		return createKDTree(null);
-	}
-
 	/** Attempts to create a KDTree from the nodes file we have. */
-	public static KDTree<Node> createKDTree(LoadingPane l) throws IOException {
+	public static KDTree<Node> createKDTree() throws IOException {
 		long start = 0; //XXX: FOR DEBUGGING
 		if (Constants.DEBUG_MODE) {
 			Util.out("Reading node data from file to List (System Calls):");
 			start = Util.resetClock();
-		}
-		if (l != null) {
-			l.updateProgress("Reading node data from file", 20);
 		}
 		List<List<String>> nodes = Resources.nodesFile.readChunks("id", "latitude", "longitude", "ways");
 		if (Constants.DEBUG_MODE) {
@@ -226,9 +219,6 @@ public class MapFactory {
 			Util.memLog();
 			Util.out("Creating Node objects from node data:");
 			start = Util.resetClock();
-		}
-		if (l != null) {
-			l.updateProgress("Creating nodes from node data", 50);
 		}
 		List<Node> nodeList = new LinkedList<>();
 		//Iterators here because we are parsing a lot of data and we want to make the best use of our
@@ -243,9 +233,6 @@ public class MapFactory {
 				}
 			}
 		}
-		if (l != null) {
-			l.updateProgress("Creating KDTree from nodes", 70);
-		}
 
 		if (Constants.DEBUG_MODE) {
 			Util.out("Finished Nodes creation", "(Elapsed:", Util.timeSince(start) + ")");
@@ -253,11 +240,6 @@ public class MapFactory {
 			Util.out("Creating KDTree from Nodes List:");
 			Util.resetClock();
 		}
-		if (l != null) {
-			l.updateProgress("Done with KDTree", 90);
-		}
-
-
 		return new KDTree<Node>(nodeList);
 	}
 	

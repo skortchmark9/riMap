@@ -3,8 +3,9 @@
  */
 package server;
 
-import java.io.IOException;
 import java.util.LinkedList;
+
+import shared.ServerStatus;
 
 /**
  * @author emc3
@@ -39,6 +40,16 @@ public class ClientPool {
 	public synchronized boolean remove(ClientHandler client) {
 		return _clients.remove(client);
 	}
+	
+	public synchronized void broadcast(String message) {
+		ServerStatus msg = new ServerStatus(message);
+		for (ClientHandler client : _clients) {
+			client._responseQueue.add(msg);
+		}
+	}
+
+	
+	
 	
 	
 	/**

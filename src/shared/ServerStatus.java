@@ -4,7 +4,7 @@ public class ServerStatus implements Response {
 
 	private String msg;
 	
-	ServerStatus(String msg) {
+	public ServerStatus(String msg) {
 		this.msg = msg;
 	}
 	@Override

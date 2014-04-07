@@ -73,7 +73,7 @@ public class Client {
 			err("ERROR: Can't connect to server");
 		}
 	}
-	
+
 	public void run() {
 		while (_running && !_socket.isClosed()) {
 			if (!_requests.isEmpty()) {
@@ -105,7 +105,7 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * A method that sends a message to the server.
 	 * @param message that will be sent to the server for broadcasting.
@@ -122,19 +122,19 @@ public class Client {
 	public void requestAutocorrections(String input, int boxNo) {
 		request(new AutocorrectRequest(input, boxNo));
 	}
-	
+
 	public void requestNearestNeighbors(int i, KDimensionable kd) {
 		request(new NeighborsRequest(i, kd));
 	}
-	
+
 	public void requestWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
 		request(new WayRequest(minLat, maxLat, minLon, maxLon));
 	}
-	
+
 	public void requestPath(Node start, Node end, int timeout) {
 		request(new PathRequest(start, end, timeout));
 	}
-/*	
+	/*	
 	public void removeAllResponses(ResponseType type) {
 		Iterator<Response>  itr = _responses.iterator();
 		while(itr.hasNext()) {
@@ -142,11 +142,11 @@ public class Client {
 				itr.remove();
 		}
 	}*/
-	
+
 	public boolean isReady() {
 		return _running;
 	}
-	
+
 	/**
 	 * Process a response from the queue. Figures out which kind of response it
 	 * is and then acts accordingly.
@@ -165,24 +165,24 @@ public class Client {
 			//If the response is a neighbors list, then we'll send the list
 			//XXX: not yet implemented.
 			NeighborsResponse nR = (NeighborsResponse) r;
-//			mapPane.send(nR.getNeighbors());
+			//			mapPane.send(nR.getNeighbors());
 			break;
 		case PATH:
 			//If the response is a path of ways, we'll send it to the mapPane.
 			PathResponse pR = (PathResponse) r;
-//			mapPane.setRenderedWays(pR.getPath());
+			//			mapPane.setRenderedWays(pR.getPath());
 			break;
 		case SERVER_STATUS:
 			//If the response is a server status, we'll print the message to the
 			//console or the loading screen, whichever is currently being used
 			//to display messages to the user.
 			ServerStatus sR = (ServerStatus) r;
-		//	_frontend.message(sR.getMsg())
+			_frontend.guiMessage(sR.getMsg());
 			break;
 		case WAYS:
 			//If the response is ways, we'll set the mapPane to display them
 			WayResponse wR = (WayResponse) r;
-//			mapPane.setWays(wR.getWays());
+			//			mapPane.setWays(wR.getWays());
 			break;
 		default:
 			//We should never get here.
