@@ -168,7 +168,7 @@ public class Client {
 		case PATH:
 			//If the response is a path of ways, we'll send it to the mapPane.
 			PathResponse pathResp = (PathResponse) resp;
-//			mapPane.setRenderedWays(pR.getPath());
+			_frontend.giveDirections(pathResp.getPath());
 			break;
 		case SERVER_STATUS:
 			//If the response is a server status, we'll print the message to the
@@ -178,14 +178,13 @@ public class Client {
 			_frontend.guiMessage(statResp.getMsg());
 			break;
 		case WAYS:
-			//If the response is ways, we'll set the mapPane to display them
+			//tell the front end to tell the map to render the new ways
 			WayResponse wayResp = (WayResponse) resp;
-//			mapPane.setWays(wR.getWays());
+			_frontend.setWays(wayResp.getWays());
 			break;
 		default:
 			//We should never get here.
-			Util.err("WHOA, we shouldn't be here");
-			break;
+			throw new IllegalArgumentException("Unsupported Response type");
 		}
 	}
 
