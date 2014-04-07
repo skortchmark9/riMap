@@ -17,3 +17,12 @@ Make server cleanly disengage
 Fix bug with first click.
 think about traffic values.
 quit gracefully.
+
+
+-Think of some nice display for calculated paths other than just highlighting the streets. (e.g. street names, turn-by-turn)
+-When you maximize the app, the layout should remain user friendly
+-Finding a path with one click and one typed intersection
+-Display fewer roads on zoom out
+-No maximum zoom (or at least allow a wider zoom)
+-keyboard navigation
+-focus starts in the input box ( you can immediately start typing)

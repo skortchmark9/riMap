@@ -35,7 +35,7 @@ public class AutoFillField extends JTextField {
 	private String initialText;
 	private List<String> suggestions;
 	private final int boxNo;
-	private boolean popped = false;
+	private boolean popped, accepted = false;
 
 	public AutoFillField(Client client, String startField, int boxNo) {
 		super(10);
@@ -45,7 +45,7 @@ public class AutoFillField extends JTextField {
 		setForeground(Color.DARK_GRAY);
 		setText(initialText);
 		setOpaque(true);
-		
+
 		searchTableModel = new DefaultTableModel();
 		searchTable = new JTable(searchTableModel);
 		searchTable.setFillsViewportHeight(true);
@@ -54,7 +54,7 @@ public class AutoFillField extends JTextField {
 		searchTable.getTableHeader().setReorderingAllowed(false);
 		searchTable.setGridColor(Color.WHITE);
 		searchTable.setEnabled(false);
-		
+
 		popup = new JPopupMenu();
 		popup.add(searchTable);
 		popup.setVisible(false);
@@ -88,7 +88,6 @@ public class AutoFillField extends JTextField {
 		getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void changedUpdate(DocumentEvent e) {
-				requestAutocorrections();
 			}
 			@Override
 			public void insertUpdate(DocumentEvent e) {
@@ -135,7 +134,7 @@ public class AutoFillField extends JTextField {
 					cycleTableSelectionDown();
 				else
 					setCaretPosition(getDocument().getLength());
-				
+
 			}
 		});
 
@@ -172,6 +171,7 @@ public class AutoFillField extends JTextField {
 					int selectedRow = searchTable.getSelectedRow();
 					if (selectedRow >= 0) {
 						String suggestion = (String) searchTable.getValueAt(selectedRow, 0);
+						accepted = true;
 						setText(suggestion);
 						int end = getSelectionEnd();
 						setSelectionStart(end);
@@ -191,12 +191,16 @@ public class AutoFillField extends JTextField {
 			popup.setVisible(false);
 		}
 	}
-	
+
 	public void setSuggestions(List<String> suggestions) {
 		this.suggestions = suggestions;
+		if (accepted) {
+			accepted = false;
+		} else {
 		showPopup();
+		}
 	}
-	
+
 	private void showPopup() {
 		initTableModel();
 		if(!popup.isVisible()) { 
@@ -236,7 +240,7 @@ public class AutoFillField extends JTextField {
 			selModel.setSelectionInterval(index0-1, index0-1);
 		}
 	}
-	
+
 	/**
 	 * Moves down to the next search result.
 	 */
@@ -250,12 +254,12 @@ public class AutoFillField extends JTextField {
 			selModel.setSelectionInterval(index0+1, index0+1);
 		}
 	}
-	
+
 	private void requestAutocorrections() {
-		client.requestAutocorrections(this.getText(), boxNo);
+			client.requestAutocorrections(this.getText(), boxNo);
 	}
 
-	
+
 	/**
 	 * Initializes the table model - filling the table rows with suggestions
 	 * from the backend.
