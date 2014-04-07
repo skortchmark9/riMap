@@ -33,7 +33,7 @@ import frontend.Frontend;
 public class Client {
 
 	private Socket _socket;
-	private volatile boolean _running;
+	private volatile boolean _running, _serverReady;
 	private int _port;
 	private ObjectOutputStream _output;
 	private ObjectInputStream _input;
@@ -148,7 +148,7 @@ public class Client {
 		}
 	}*/
 
-	public boolean isReady() {
+	public boolean serverReady() {
 		return _running;
 	}
 
@@ -180,6 +180,9 @@ public class Client {
 			//console or the loading screen, whichever is currently being used
 			//to display messages to the user.
 			ServerStatus statResp = (ServerStatus) resp;
+			Util.out(statResp.getMsg());
+			if (statResp.getMsg().equals("Done!"))
+				_serverReady = true;
 			_frontend.guiMessage(statResp.getMsg());
 			break;
 		case WAYS:
