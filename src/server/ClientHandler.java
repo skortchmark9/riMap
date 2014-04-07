@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import shared.AutocorrectRequest;
@@ -38,7 +37,6 @@ public class ClientHandler extends Thread {
 	
 	//they all share this response queue
 	ConcurrentLinkedQueue<Response> _responseQueue;
-	private PushThread _pushThread;
 	
 	/**
 	 * Default constructor.
@@ -69,8 +67,7 @@ public class ClientHandler extends Thread {
 		_wayGetter = new WayGetter(this);
 		
 		
-		_pushThread = new PushThread();
-		_pushThread.start();
+		new PushThread().start();
 		
 		_pool.add(this);
 	}
@@ -155,9 +152,6 @@ public class ClientHandler extends Thread {
 	
 	private class PushThread extends Thread {
 		
-		PushThread() {
-			super();
-		}
 		
 		@Override
 		public void run() {
