@@ -7,12 +7,13 @@ import maps.Node;
 /**
  * The response from the server in the event of a NeighborsRequest
  * @author samkortchmar
- *
  */
 public class NeighborsResponse implements Response {
 	
+	private static final long serialVersionUID = 1L;
 	private final List<Node> _neighbors;
-	private final boolean _isSource;
+	private final boolean _isSource; //This boolean tells the mapPane if the
+	//KDimensionable we searched for was supposed to be the source or the dest.
 	
 	public NeighborsResponse(List<Node> neighbors, boolean isSource) {
 		_neighbors = neighbors;

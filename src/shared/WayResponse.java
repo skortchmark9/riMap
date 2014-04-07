@@ -4,9 +4,14 @@ import java.util.List;
 
 import maps.Way;
 
+/**
+ * A Response to a client's WayRequest - contains a list of all ways in the
+ * requested Range.
+ * @author samkortchmar
+ *
+ */
 public class WayResponse implements Response {
 	
-
 	private static final long serialVersionUID = 1L;
 	private List<Way> _ways;
 	
