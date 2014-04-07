@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import kdtree.KDimensionable;
+import maps.MapFactory;
 import maps.Node;
 import shared.AutocorrectRequest;
 import shared.AutocorrectResponse;
@@ -21,9 +22,9 @@ import shared.Request;
 import shared.Request.RequestType;
 import shared.Response;
 import shared.ServerStatus;
+import shared.TrafficResponse;
 import shared.WayRequest;
 import shared.WayResponse;
-import backend.Constants;
 import backend.Util;
 import frontend.Frontend;
 
@@ -48,7 +49,6 @@ public class Client {
 	 * @param port the port number the client will connect to
 	 */
 	public Client(String IPAddress, int port) {
-		_serverReady = true;
 		_executor = Executors.newFixedThreadPool(5);
 		_port = port;
 		_IP = IPAddress;
@@ -68,15 +68,14 @@ public class Client {
 			_thread = new ReceiveThread();
 			_thread.start();
 			_requests = new LinkedList<>();
-			
+
 			Util.debug("creating new frontend");
-			
+
 			_frontend = new Frontend(this);
-			_frontend.setVisible(true);
-			
+			new Thread(_frontend).start();
+
 			Util.debug("Frontend done\n","Attempting to connect to server now");
 			_frontend.setVisible(true);
-			
 			run();
 		}
 		catch (IOException ex) {
@@ -134,7 +133,7 @@ public class Client {
 		Util.out("Requesting corrections");
 		request(new AutocorrectRequest(input, boxNo));
 	}
-	
+
 	public void requestNearestNeighbors(int i, KDimensionable kd, boolean isSource) {
 		request(new NeighborsRequest(i, kd, isSource));
 	}
@@ -184,7 +183,12 @@ public class Client {
 			//If the response is a path of ways, we'll send it to the mapPane.
 			PathResponse pathResp = (PathResponse) resp;
 			Util.out(pathResp.toString());
-			_frontend.giveDirections(pathResp.getPath());
+			if (pathResp.getPath().isEmpty()) {
+				_frontend.guiMessage(pathResp.getMsg());
+			} else {
+				_frontend.giveDirections(pathResp.getPath());
+				_executor.submit(new CacheThread(pathResp.getPath()));
+			}
 			break;
 		case SERVER_STATUS:
 			//If the response is a server status, we'll print the message to the
@@ -192,16 +196,21 @@ public class Client {
 			//to display messages to the user.
 			ServerStatus statResp = (ServerStatus) resp;
 			Util.out(statResp.toString());
-			if (statResp.getMsg().equals("Done!"))
+			if (statResp.getMsg().equals("Done"))
 				_serverReady = true;
+			if (_frontend != null)
 			_frontend.guiMessage(statResp.getMsg());
 			break;
 		case WAYS:
 			//tell the front end to tell the map to render the new ways
 			Util.debug("Got ways");
 			WayResponse wayResp = (WayResponse) resp;
-			Util.out(wayResp.toString());
 			_frontend.setWays(wayResp.getWays());
+			_executor.submit(new CacheThread(wayResp.getWays()));
+			break;
+		case TRAFFIC:
+			TrafficResponse trafResp = (TrafficResponse) resp;
+			MapFactory.setTrafficMap(trafResp.getTraffic());
 			break;
 		default:
 			//We should never get here.
