@@ -95,6 +95,7 @@ public class Backend {
 		Constants.MINIMUM_LATITUDE = kd.getMin(0);
 		Constants.MAXIMUM_LONGITUDE = kd.getMax(1);
 		Constants.MINIMUM_LONGITUDE = kd.getMin(1);
+		Util.debug(" Min Lat:", Constants.MINIMUM_LATITUDE, "\n", "Max lat:", Constants.MAXIMUM_LATITUDE, "\n", "Min Lon:", Constants.MINIMUM_LONGITUDE, "\n", "Max Lon:", Constants.MAXIMUM_LONGITUDE);
 	}
 
 	/**

@@ -101,6 +101,7 @@ public class ClientHandler extends Thread {
 	 * A response containing the data received from the backend.
 	 */
 	private void processRequest(Request req) {
+		Util.debug("Processing Request...");
 		switch (req.getType()) {
 		case AUTO_CORRECTIONS:
 			AutocorrectRequest aReq = (AutocorrectRequest) req;
