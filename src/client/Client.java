@@ -174,7 +174,7 @@ public class Client {
 			//If the response is a server status, we'll print the message to the
 			//console or the loading screen, whichever is currently being used
 			//to display messages to the user.
-			ServerStatus sR = (ServerStatus) r;
+			ServerStatus sR = (ServerStatus) resp;
 			_frontend.guiMessage(sR.getMsg());
 			break;
 		case WAYS:
