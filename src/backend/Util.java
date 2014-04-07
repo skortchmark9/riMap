@@ -3,6 +3,10 @@
  */
 package backend;
 
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import javax.swing.JTextArea;
 
 /**
@@ -196,5 +200,10 @@ public class Util {
 		if (msgBox == null) return;
 		msgBox.append(str + "\n");
 		msgBox.revalidate();
+	}
+	
+	
+	public static ThreadPoolExecutor defaultThreadPool(int core, int max) {
+		return new ThreadPoolExecutor(core, max, Constants.THREADPOOL_TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 	}
 }
