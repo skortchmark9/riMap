@@ -149,6 +149,8 @@ public class IndeterminateFrontend implements ActionListener {
 		} catch (PropertyVetoException e) {
 		}
 		frame.revalidate();		
+		
+		//XXX: does this work?
 		box1.requestFocusInWindow();
 	}
 	
