@@ -48,7 +48,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private Client _client;
 	private boolean clickSwitch = true;
 	//private ExecutorService executor;
-	private IndeterminateFrontend _front;
+	private Frontend _front;
 	
 	/**
 	 * Construct a MapPane linked to the given backend.
@@ -56,7 +56,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * well as zooming / panning over the map.
 	 * @param b - the backend to link to this MapPane.
 	 */
-	MapPane(IndeterminateFrontend front, Client client)   {
+	MapPane(Frontend front, Client client)   {
 		_client = client;
 		_front = front; //need this for updated text fields on clicks, resizing map
 		this.setBackground(Constants.BG_COLOR);
