@@ -1,0 +1,3 @@
+#! /bin/bash
+
+java -cp "derived/riMaps.jar:lib/*" server.Main "$@"
