@@ -87,7 +87,7 @@ public class Client {
 		while (_running && !_socket.isClosed()) {
 			if (!_requests.isEmpty() && _serverReady) {
 				try {
-					Util.out("Sending Request");
+					Util.debug("Sending Request");
 					_output.writeObject(_requests.poll());
 					_output.flush();
 				} catch (IOException e) {
@@ -130,7 +130,7 @@ public class Client {
 	}
 
 	public void requestAutocorrections(String input, int boxNo) {
-		Util.out("Requesting corrections");
+		Util.debug("Requesting corrections");
 		request(new AutocorrectRequest(input, boxNo));
 	}
 
@@ -170,19 +170,19 @@ public class Client {
 			//If the response is an auto correction, we'll send the list of
 			//suggestions to the appropriate text box.
 			AutocorrectResponse autocResp = (AutocorrectResponse) resp;
-			Util.out(autocResp.toString());
+			Util.debug(autocResp.toString());
 			_frontend.getBox(autocResp.getBoxNo()).setSuggestions(autocResp.getAutocorrections());
 			break;
 		case NEAREST_NEIGHBORS:
 			//If the response is a neighbors list, then we'll send the list
 			NeighborsResponse nbrResp = (NeighborsResponse) resp;
-			Util.out(nbrResp.toString());
+			Util.debug(nbrResp.toString());
 			_frontend.updateNeighbor(nbrResp.getNeighbors(), nbrResp.isSource());
 			break;
 		case PATH:
 			//If the response is a path of ways, we'll send it to the mapPane.
 			PathResponse pathResp = (PathResponse) resp;
-			Util.out(pathResp.toString());
+			Util.debug(pathResp.toString());
 			if (pathResp.getPath().isEmpty()) {
 				_frontend.guiMessage(pathResp.getMsg());
 			} else {
@@ -195,7 +195,7 @@ public class Client {
 			//console or the loading screen, whichever is currently being used
 			//to display messages to the user.
 			ServerStatus statResp = (ServerStatus) resp;
-			Util.out(statResp.toString());
+			Util.debug(statResp.toString());
 			_serverReady = statResp.isServerUp();
 			if (_frontend != null)
 				_frontend.guiMessage(statResp.getMsg());
