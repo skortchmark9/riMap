@@ -23,14 +23,14 @@ public class PathWayGetter {
 
 	ExecutorService _executor;
 	ClientHandler _owner;
-	
+
 	public PathWayGetter(ClientHandler owner) {
 		_owner = owner;
 		_executor = Executors.newFixedThreadPool(5);
 	}
 
 	public void findPath(Node start, Node end, int seconds) {
-		Runnable worker = new FinderThread(start,end, seconds);
+		Runnable worker = new FinderThread(start, end, seconds);
 		_executor.execute(worker);
 	}
 
@@ -49,18 +49,20 @@ public class PathWayGetter {
 		public void run() {
 			Future<List<Way>> future = _executor.submit(new CallableWays(_start, _end));
 			List<Way> wayList = new LinkedList<>();
-			PathResponse pr;
+			PathResponse pr = null;
 			try {
 				wayList = future.get(_timeout, TimeUnit.SECONDS);
+				if (wayList.isEmpty()) {
+					pr = new PathResponse("Sorry, could not find a path");
+				}
 			} catch (InterruptedException e1) {
 				return;
 			} catch (ExecutionException e1) {
 			} catch (TimeoutException e1) {
-				pr = new PathResponse("The search timed out"));
+				pr = new PathResponse("The search timed out");
 			}
-			if (wayList.isEmpty()) {
-				pr = new PathResponse("Sorry, could not find a path");
-			}
+			if (pr != null)
+				_owner._responseQueue.add(pr);
 		}
 	}
 
@@ -75,7 +77,7 @@ public class PathWayGetter {
 
 		@Override
 		public List<Way> call() {
-			return _owner.getBackend().getPath(start, end);
+			return _owner._b.getPath(start, end);
 		}
 	}
 }
