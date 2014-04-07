@@ -4,6 +4,7 @@ import kdtree.KDimensionable;
 
 public class NeighborsRequest implements Request {
 	
+	private static final long serialVersionUID = 1L;
 	private final int numNeighbors;
 	private final KDimensionable location;
 	

@@ -6,6 +6,8 @@ import java.util.List;
 import maps.Way;
 
 public class PathResponse implements Response {
+	
+	private static final long serialVersionUID = 1L;
 	List<Way> _path;
 	String _msg;
 	

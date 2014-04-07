@@ -6,6 +6,7 @@ import maps.Node;
 
 public class NeighborsResponse implements Response {
 	
+	private static final long serialVersionUID = 1L;
 	private List<Node> _neighbors;
 	
 	public NeighborsResponse(List<Node> neighbors) {
