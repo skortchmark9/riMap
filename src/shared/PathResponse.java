@@ -33,6 +33,10 @@ public class PathResponse implements Response {
 		return _path;
 	}
 	
+	public String getMsg() {
+		return _msg;
+	}
+	
 	@Override
 	public ResponseType getType() {
 		return ResponseType.PATH;
