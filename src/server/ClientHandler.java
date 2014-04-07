@@ -155,12 +155,18 @@ public class ClientHandler extends Thread {
 	
 	private class PushThread extends Thread {
 		
+		PushThread() {
+			super();
+		}
+		
 		@Override
 		public void run() {
 			while (true) {
 				try {
-					_output.writeObject(_responseQueue.poll());
-					_output.flush();
+					if (!_responseQueue.isEmpty()) {
+						_output.writeObject(_responseQueue.poll());
+						_output.flush();
+					}
 				} catch (IOException e) {
 					Util.err("ERROR writing response in push thread");
 				}
