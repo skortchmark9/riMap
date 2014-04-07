@@ -51,6 +51,20 @@ public class Util {
 	}
 	
 	
+	public static void debug(Object...varg) {
+		if (!Constants.DEBUG_MODE)
+			return; //only continue if debug mode is off
+		String str = "";
+		for (Object o : varg) {
+			if (str.equals(""))
+				str += o;
+			else
+				str += " " + o;
+		}
+		System.out.println(str);
+	}
+	
+	
 	/**
 	 * Logs the current state of the 
 	 * Virtual memory. (should be only used as an
