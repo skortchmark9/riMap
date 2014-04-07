@@ -6,6 +6,8 @@ import maps.Way;
 
 public class WayResponse implements Response {
 	
+
+	private static final long serialVersionUID = 1L;
 	private List<Way> _ways;
 	
 	public WayResponse(List<Way> ways) {

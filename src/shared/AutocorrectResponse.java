@@ -4,6 +4,7 @@ import java.util.List;
 
 public class AutocorrectResponse implements Response {
 	
+	private static final long serialVersionUID = 1L;
 	List<String> autocorrections;
 	int boxNo;
 	

@@ -2,6 +2,7 @@ package shared;
 
 public class WayRequest implements Request {
 	
+	private static final long serialVersionUID = 1L;
 	private final double _minLat, _maxLat, _minLon, _maxLon;
 	
 	public WayRequest(double minLat, double maxLat, double minLong, double maxLong) {

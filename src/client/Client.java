@@ -73,7 +73,7 @@ public class Client {
 			err("ERROR: Can't connect to server");
 		}
 	}
-	
+
 	public void run() {
 		while (_running && !_socket.isClosed()) {
 			if (!_requests.isEmpty()) {
@@ -105,7 +105,7 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * A method that sends a message to the server.
 	 * @param message that will be sent to the server for broadcasting.
@@ -126,15 +126,15 @@ public class Client {
 	public void requestNearestNeighbors(int i, KDimensionable kd, boolean isSource) {
 		request(new NeighborsRequest(i, kd, isSource));
 	}
-	
+
 	public void requestWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
 		request(new WayRequest(minLat, maxLat, minLon, maxLon));
 	}
-	
+
 	public void requestPath(Node start, Node end, int timeout) {
 		request(new PathRequest(start, end, timeout));
 	}
-/*	
+	/*	
 	public void removeAllResponses(ResponseType type) {
 		Iterator<Response>  itr = _responses.iterator();
 		while(itr.hasNext()) {
@@ -142,11 +142,11 @@ public class Client {
 				itr.remove();
 		}
 	}*/
-	
+
 	public boolean isReady() {
 		return _running;
 	}
-	
+
 	/**
 	 * Process a response from the queue. Figures out which kind of response it
 	 * is and then acts accordingly.
@@ -174,8 +174,8 @@ public class Client {
 			//If the response is a server status, we'll print the message to the
 			//console or the loading screen, whichever is currently being used
 			//to display messages to the user.
-			ServerStatus statResp = (ServerStatus) resp;
-		//	_frontend.message(sR.getMsg())
+			ServerStatus sR = (ServerStatus) r;
+			_frontend.guiMessage(sR.getMsg());
 			break;
 		case WAYS:
 			//If the response is ways, we'll set the mapPane to display them

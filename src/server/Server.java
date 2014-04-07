@@ -31,7 +31,6 @@ public class Server extends Thread {
 			throw new IllegalArgumentException("Ports 1024 and under are reserved.");
 		_port = serverPort;
 		_backend = b;
-		
 		_clientPool = new ClientPool();
 		_socket = new ServerSocket(_port);
 		_running = true;
@@ -43,11 +42,14 @@ public class Server extends Thread {
 			Socket clientConn = _socket.accept(); //blocks waiting for connections
 			new ClientHandler(_clientPool, clientConn, _backend);
 			Util.out("--New client connection");
-			
 		}
 		} catch (IOException e) {
 			//handle
 		}
+	}
+	
+	public void serverMessage(String s) {
+		_clientPool.broadcast(s);
 	}
 	
 	

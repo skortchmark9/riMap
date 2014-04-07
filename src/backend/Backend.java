@@ -1,5 +1,8 @@
 package backend;
 
+import graph.Edge;
+import graph.PathFinder;
+
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,11 +13,9 @@ import maps.MapFactory;
 import maps.Node;
 import maps.PathNodeWrapper;
 import maps.Way;
+import server.Server;
 import autocorrect.Engine;
 import autocorrect.RadixTree;
-import frontend.LoadingPane;
-import graph.Edge;
-import graph.PathFinder;
 
 
 /**
@@ -31,7 +32,7 @@ public class Backend {
 	KDTree<Node> kd = null; //the KDTree!
 	Engine autoCorrectEngine = null;
 	volatile boolean done;
-	LoadingPane l = null;
+	Server _server;
 
 	/**
 	 * Main constructor for the backend.
@@ -39,23 +40,25 @@ public class Backend {
 	public Backend() {
 		done = false;
 	}
-	
-	public void setLoadingScreen(LoadingPane l) {
-		this.l = l;
+
+	public void setMessageDestination(Server server) {
+		_server = server;
 	}
-	
+
+	public void sendStatusMessage(String s) {
+		if (_server != null) {
+			_server.serverMessage(s);
+		}
+	}
+
 	public void initBackend() {
 		new BackendInitializer().start();;
 	}
-		
+
 	public boolean isDone() {
 		return done;
 	}
-	
-	LoadingPane getLoadingScreen() {
-		return l;
-	}
-	
+
 	/**
 	 * Initializes a new KDTree by querying MapFactory
 	 */
@@ -66,11 +69,12 @@ public class Backend {
 			Util.out("Start KD Build");
 			Util.memLog();
 		}
-		
+		sendStatusMessage("Starting KD Build");
 		try {
-			kd = MapFactory.createKDTree(l);
+			kd = MapFactory.createKDTree();
 		} catch (IOException e) {
 			Util.err("ERROR: Loading KDTree from nodes file failed");
+			sendStatusMessage("ERROR: Loading KDTree from nodes file failed");
 			System.exit(1);
 		}
 
@@ -79,25 +83,20 @@ public class Backend {
 			Util.out("End KD Build (Total Elapsed:", Util.timeSince(start)+")");
 			Util.memLog();
 		}
+		sendStatusMessage("Finished KD Build");
 	}
-	
+
 	void initBoundaries() {
 		if (kd == null) {
 			Util.err("ERROR: Could not load boundaries because KD Tree is not initialized");
 		}
-		if (l != null) {
-			l.updateProgress("Initializing boundaries", 95);
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-			}
-		}
+		sendStatusMessage("Initializing Boundaries");
 		Constants.MAXIMUM_LATITUDE = kd.getMax(0);
 		Constants.MINIMUM_LATITUDE = kd.getMin(0);
 		Constants.MAXIMUM_LONGITUDE = kd.getMax(1);
 		Constants.MINIMUM_LONGITUDE = kd.getMin(1);
 	}
-	
+
 	/**
 	 * Initializes the AutoCorrect tree by querying the MapFactory
 	 */
@@ -108,15 +107,16 @@ public class Backend {
 			Util.out("Start Autoc build");
 			Util.memLog();
 		}
-
+		sendStatusMessage("Building Autocorrections");
 		RadixTree rt; //we store our words in a RadixTree rather than a Trie.
 		try {
-			rt = MapFactory.createRadixTree(l);
+			rt = MapFactory.createRadixTree();
 			if (rt.isEmpty()) {
 				Util.err("ERROR: Could not instantiate AutoCorrectEngine");
 				return;
 			} else {
-				if(Constants.DEBUG_MODE) Util.out("Done with radix tree. building engine...");
+				if (Constants.DEBUG_MODE) Util.out("Done with radix tree. building engine...");
+				sendStatusMessage("Done with radix tree. building engine...");
 				autoCorrectEngine = new Engine(Constants.defaultGenerator, Constants.defaultRanker, rt);
 				if(Constants.DEBUG_MODE) Util.out("Done.");
 			}
@@ -124,11 +124,12 @@ public class Backend {
 				Util.out("End Autoc build (Total Elapsed:", Util.timeSince(start)+")");
 				Util.memLog();
 			}
+			sendStatusMessage("Done with Autocorrection build");
 		} catch (IOException e) {
 			Util.out("ERROR: Unable to load RadixTree from index file");
 		}
 	}
-	
+
 	/**
 	 * @param name
 	 * @return
@@ -141,7 +142,7 @@ public class Backend {
 			return null;
 		}
 	}
-	
+
 	public List<Way> getPath(Node source, Node dest) {
 		PathFinder<PathNodeWrapper, Node> p = new PathFinder<>(new PathNodeWrapper(source), new PathNodeWrapper(dest));
 		List<Way> ways = new LinkedList<>();
@@ -166,20 +167,16 @@ public class Backend {
 			return null;
 		}
 	}
-	
+
 	public class BackendInitializer extends Thread {
-		
+
 		@Override
 		public void run() {
-			if (l != null) {
-			l.updateProgress("Creating Backend", 0);
-			}
+			sendStatusMessage("Building backend");
 			initAutoCorrect();
 			initKDTree();
 			initBoundaries();
-			if (l != null) {
-			l.updateProgress("Done!", 100);
-			}
+			sendStatusMessage("Done");
 			done = true;
 		}
 	}

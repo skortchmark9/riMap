@@ -1,6 +1,8 @@
 package shared;
 
 public class AutocorrectRequest implements Request {
+
+	private static final long serialVersionUID = 1L;
 	private final String input;
 	private final int boxNo;
 	

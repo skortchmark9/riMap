@@ -3,6 +3,8 @@ package shared;
 import maps.Node;
 
 public class PathRequest implements Request {
+
+	private static final long serialVersionUID = 1L;
 	private final Node _source, _dest;
 	private final int _timeout;
 	
