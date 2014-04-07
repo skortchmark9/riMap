@@ -35,8 +35,8 @@ class NeighborGetter {
 	 * @param num
 	 * @param loc
 	 */
-	void getNeighbors(int num, KDimensionable loc) {
-		_exec.execute(new NeighborWorker(num, loc));
+	void getNeighbors(int num, KDimensionable loc, boolean isSource) {
+		_exec.execute(new NeighborWorker(num, loc, isSource));
 	}
 	
 	
@@ -47,6 +47,7 @@ class NeighborGetter {
 	 */
 	private class NeighborWorker implements Runnable {
 		int _id, _numNeighbors;
+		boolean _isSource;
 		KDimensionable _location;
 		
 		/**
@@ -54,15 +55,16 @@ class NeighborGetter {
 		 * @param num
 		 * @param loc
 		 */
-		public NeighborWorker(int num, KDimensionable loc) {
+		public NeighborWorker(int num, KDimensionable loc, boolean isSource) {
 			_numNeighbors = num;
 			_location = loc;
+			_isSource = isSource;
 		}
 		
 		@Override
 		public void run() {
 			_id = _threadCount.incrementAndGet();
-			Response resp = new NeighborsResponse(_owner._b.getNearestNeighbors(_numNeighbors, _location));
+			Response resp = new NeighborsResponse(_owner._b.getNearestNeighbors(_numNeighbors, _location), _isSource);
 			if (_id == _threadCount.get()) {
 				_owner._responseQueue.add(resp);
 			}

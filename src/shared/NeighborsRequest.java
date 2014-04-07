@@ -6,10 +6,12 @@ public class NeighborsRequest implements Request {
 	
 	private final int numNeighbors;
 	private final KDimensionable location;
+	private final boolean _isSource;
 	
-	public NeighborsRequest(int numNeighbors, KDimensionable location) {
+	public NeighborsRequest(int numNeighbors, KDimensionable location, boolean isSource) {
 		this.numNeighbors = numNeighbors;
 		this.location = location;
+		_isSource = isSource;
 	}
 	
 	public int getNumNeighbors() {
@@ -18,6 +20,10 @@ public class NeighborsRequest implements Request {
 	
 	public KDimensionable getLocation() {
 		return location;
+	}
+	
+	public boolean isSource() {
+		return _isSource;
 	}
 
 	@Override

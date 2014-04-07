@@ -109,7 +109,7 @@ public class ClientHandler extends Thread {
 			
 		case NEAREST_NEIGHBORS:
 			NeighborsRequest nReq = (NeighborsRequest) req;
-			_nbrGetter.getNeighbors(nReq.getNumNeighbors(), nReq.getLocation()); //start a new worker thread in getter
+			_nbrGetter.getNeighbors(nReq.getNumNeighbors(), nReq.getLocation(), nReq.isSource()); //start a new worker thread in getter
 			break;
 			
 		case WAYS:

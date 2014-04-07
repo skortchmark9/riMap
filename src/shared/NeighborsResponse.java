@@ -6,10 +6,12 @@ import maps.Node;
 
 public class NeighborsResponse implements Response {
 	
-	private List<Node> _neighbors;
+	private final List<Node> _neighbors;
+	private final boolean _isSource;
 	
-	public NeighborsResponse(List<Node> neighbors) {
+	public NeighborsResponse(List<Node> neighbors, boolean isSource) {
 		_neighbors = neighbors;
+		_isSource = isSource;
 	}
 
 	@Override
@@ -19,5 +21,9 @@ public class NeighborsResponse implements Response {
 
 	public List<Node> getNeighbors() {
 		return _neighbors;
+	}
+	
+	public boolean isSource() {
+		return _isSource;
 	}
 }
