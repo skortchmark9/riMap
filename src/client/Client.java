@@ -48,6 +48,7 @@ public class Client {
 	 * @param port the port number the client will connect to
 	 */
 	public Client(String IPAddress, int port) {
+		_serverReady = true;
 		_executor = Executors.newFixedThreadPool(5);
 		_port = port;
 		_IP = IPAddress;
@@ -141,6 +142,7 @@ public class Client {
 	}
 
 	public void requestWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+		Util.debug("Requesting Ways");
 		request(new WayRequest(minLat, maxLat, minLon, maxLon));
 	}
 
@@ -198,6 +200,7 @@ public class Client {
 			break;
 		case WAYS:
 			//tell the front end to tell the map to render the new ways
+			Util.debug("Got ways");
 			WayResponse wayResp = (WayResponse) resp;
 			Util.out(wayResp.toString());
 			_frontend.setWays(wayResp.getWays());
@@ -216,8 +219,8 @@ public class Client {
 		public void run() {
 			while(_running) {
 				try {
-					Object received = _input.readObject();
-					processResponse((Response) received);
+					Response received = (Response) _input.readObject();
+					processResponse(received);
 				} catch (IOException e) {
 					if (_running == false) {
 						err("Error message:", e.getMessage());
