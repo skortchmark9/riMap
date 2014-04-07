@@ -34,6 +34,7 @@ import javax.swing.text.DefaultCaret;
 import server.PathWayGetter;
 import maps.MapFactory;
 import maps.Node;
+import maps.Way;
 import backend.Constants;
 import backend.Util;
 import client.Client;
@@ -279,6 +280,15 @@ public class Frontend implements ActionListener {
 			box3.setText(street1);
 			box4.setText(street2);
 		}
+	}
+	
+	public void giveDirections(List<Way> path) {
+		map.setCalculatedRoute(path);
+		//TODO: turn-by-turn directions
+	}
+	
+	public void setWays(List<Way> ways) {
+		map.renderWays(ways);
 	}
 
 	public AutoFillField getBox(int num) {

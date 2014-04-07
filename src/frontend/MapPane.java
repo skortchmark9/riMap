@@ -48,7 +48,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private Client _client;
 	private boolean clickSwitch = true;
 	//private ExecutorService executor;
-	private Frontend _front;
 	
 	/**
 	 * Construct a MapPane linked to the given backend.
@@ -58,7 +57,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 */
 	MapPane(Frontend front, Client client)   {
 		_client = client;
-		_front = front; //need this for updated text fields on clicks, resizing map
 		this.setBackground(Constants.BG_COLOR);
 		this.setPreferredSize(new Dimension(PIXEL_WIDTH, PIXEL_HEIGHT));
 		this.setMaximumSize(getPreferredSize());
@@ -216,12 +214,18 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	}
 	
 	
+	public void renderWays(List<Way> ways) {
+		renderedWays = ways;
+		this.repaint();
+	}
+	
 	/**
 	 * Sets the calculated route to be drawn over the map.
 	 * @param route - the list of ways to be drawn.
 	 */
 	public void setCalculatedRoute(List<Way> route) {
 		calculatedRoute = route;
+		this.repaint();
 	}
 	
 	/**
