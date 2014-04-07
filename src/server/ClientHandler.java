@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import shared.AutocorrectRequest;
@@ -56,11 +57,13 @@ public class ClientHandler extends Thread {
 		_client = clientSocket;
 		_pool = pool;
 		_b = backend;
+		_responseQueue = new ConcurrentLinkedQueue<>();
 		
 		_output = new ObjectOutputStream(_client.getOutputStream());
 		_input = new ObjectInputStream(_client.getInputStream());
 		
 		_pwGetter = new PathWayGetter(this);
+		_pwGetter.start();
 		_sugGetter = new SuggestionGetter(this);
 		_nbrGetter = new NeighborGetter(this);
 		_wayGetter = new WayGetter(this);

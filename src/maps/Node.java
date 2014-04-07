@@ -3,6 +3,7 @@
  */
 package maps;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,7 +12,7 @@ import kdtree.KDimensionable;
 /**
  * @author emc3 / skortchm
  */
-public class Node implements KDimensionable {
+public class Node implements KDimensionable, Serializable {
 	final String id;
 	final List<String> wayIDs;
 	final double[] coords;

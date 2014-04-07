@@ -90,7 +90,7 @@ public class Client {
 		while (_running && !_socket.isClosed()) {
 			if (!_requests.isEmpty()) {
 				try {
-					Util.debug("Writing obj");
+					Util.out("Sending Request");
 					_output.writeObject(_requests.poll());
 					_output.flush();
 				} catch (IOException e) {
@@ -133,6 +133,7 @@ public class Client {
 	}
 
 	public void requestAutocorrections(String input, int boxNo) {
+		Util.out("Requesting corrections");
 		request(new AutocorrectRequest(input, boxNo));
 	}
 	

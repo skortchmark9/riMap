@@ -253,8 +253,8 @@ public class AutoFillField extends JTextField {
 		String input = getText();
 		String[] columns = new String[] {input};
 		client.requestAutocorrections(input, boxNo);
-		//XXX
-		//Probably should do this.wait() here.
+		if (suggestions == null)
+			return;
 		String[][] data = new String[suggestions.size()][];
 		for(int i = 0; i < data.length; i++) {
 			//We lowercase all text entering the prefix tree, so here we need

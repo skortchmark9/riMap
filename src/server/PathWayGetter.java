@@ -18,7 +18,7 @@ import maps.Way;
  * @author samkortchmar
  * Should be changed probably
  */
-public class PathWayGetter implements Runnable {
+public class PathWayGetter extends Thread {
 
 	ClientHandler _owner;
 	CallableWays _worker;
@@ -31,7 +31,6 @@ public class PathWayGetter implements Runnable {
 		_owner = owner;
 		_running = true;
 		_executor = Executors.newSingleThreadExecutor();
-		run();
 	}
 
 	public void findPath(Node start, Node end, int seconds) {
