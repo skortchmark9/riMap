@@ -48,7 +48,7 @@ public class Server extends Thread {
 			if (Constants.DEBUG_MODE)
 				Util.out("-- NEW CONNECTION ACCEPTED --");
 			
-			new ClientHandler(_clientPool, clientConn, _backend);
+			new ClientHandler(_clientPool, clientConn, _backend).start();
 			Util.out("--New client connection!");
 		}
 		} catch (IOException e) {

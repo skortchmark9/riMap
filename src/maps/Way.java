@@ -1,8 +1,10 @@
 package maps;
 
+import java.io.Serializable;
+
 import graph.Edge;
 
-public class Way implements Edge<Node> {
+public class Way implements Edge<Node>, Serializable {
 	
 	Node target;
 	String name;

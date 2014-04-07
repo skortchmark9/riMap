@@ -42,10 +42,10 @@ public class Constants {
 	
 	//Boundary lines on map
 	//To be set by initBoundaries() in backend.
-	public static double MINIMUM_LATITUDE = 0;
-	public static double MAXIMUM_LATITUDE = 0;
-	public static double MINIMUM_LONGITUDE = 0;
-	public static double MAXIMUM_LONGITUDE =  0;
+	public static double MINIMUM_LATITUDE = 40.1581762;
+	public static double MAXIMUM_LATITUDE = 42.0952906;
+	public static double MINIMUM_LONGITUDE = -73.7485663;
+	public static double MAXIMUM_LONGITUDE =  -70.5590942;
 	
 	public static final int DEFAULT_REQUEST_TIMEOUT = 5;
 	

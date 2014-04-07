@@ -89,6 +89,7 @@ public class Client {
 		while (_running && !_socket.isClosed()) {
 			if (!_requests.isEmpty()) {
 				try {
+					Util.out("Sending Request");
 					_output.writeObject(_requests.poll());
 					_output.flush();
 				} catch (IOException e) {
@@ -131,6 +132,7 @@ public class Client {
 	}
 
 	public void requestAutocorrections(String input, int boxNo) {
+		Util.out("Requesting corrections");
 		request(new AutocorrectRequest(input, boxNo));
 	}
 	
@@ -214,8 +216,8 @@ public class Client {
 		public void run() {
 			while(_running) {
 				try {
-					Response received = (Response) _input.readObject();
-					processResponse(received);
+					Object received = _input.readObject();
+					processResponse((Response) received);
 				} catch (IOException e) {
 					if (_running == false) {
 						err("Error message:", e.getMessage());
