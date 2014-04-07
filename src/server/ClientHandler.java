@@ -42,6 +42,7 @@ public class ClientHandler extends Thread {
 	
 	//stuff for threading requests:
 	private Executor _requestHandlerPool;
+	private PathWayGetter _pwGetter;
 	ConcurrentLinkedQueue<Response> _responseQueue;
 	private AtomicInteger _autocThreadCount, _neighborThreadCount, _wayGetThreadCount, _pathGetThreadCount;
 	
@@ -66,6 +67,7 @@ public class ClientHandler extends Thread {
 		_input = new ObjectInputStream(_client.getInputStream());
 		_output = new ObjectOutputStream(_client.getOutputStream());
 		
+		_pwGetter = new PathWayGetter(this);
 		//We need atomic int's for each type of request/response 
 		_autocThreadCount = new AtomicInteger(0);
 		_neighborThreadCount = new AtomicInteger(0);
@@ -133,7 +135,7 @@ public class ClientHandler extends Thread {
 			
 		case PATH:
 			PathRequest pReq = (PathRequest) req;
-			new PathResponse(_b.getPath(pReq.getSource(), pReq.getDest()), "success!");
+			_pwGetter.findPath(pReq.getSource(), pReq.getDest(), pReq.getTimeout());
 			break;
 			
 		default:
@@ -224,16 +226,4 @@ public class ClientHandler extends Thread {
 		}
 		
 	}
-	
-	private class PathGetter implements Runnable {
-		int _threadID;
-		
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			
-		}
-		
-	}
-
 }
