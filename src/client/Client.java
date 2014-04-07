@@ -122,9 +122,9 @@ public class Client {
 	public void requestAutocorrections(String input, int boxNo) {
 		request(new AutocorrectRequest(input, boxNo));
 	}
-
-	public void requestNearestNeighbors(int i, KDimensionable kd) {
-		request(new NeighborsRequest(i, kd));
+	
+	public void requestNearestNeighbors(int i, KDimensionable kd, boolean isSource) {
+		request(new NeighborsRequest(i, kd, isSource));
 	}
 
 	public void requestWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
@@ -150,27 +150,25 @@ public class Client {
 	/**
 	 * Process a response from the queue. Figures out which kind of response it
 	 * is and then acts accordingly.
-	 * @param r - the response to be processed
+	 * @param resp - the response to be processed
 	 */
-	public void processResponse(Response r) {
-		switch (r.getType()) {
+	public void processResponse(Response resp) {
+		switch (resp.getType()) {
 		case AUTO_CORRECTIONS:
-			//If the response is an autocorrection, we'll send the list of
+			//If the response is an auto correction, we'll send the list of
 			//suggestions to the appropriate text box.
-			AutocorrectResponse acR = (AutocorrectResponse) r;
-			_frontend.getBox(acR.getBoxNo()).setSuggestions(
-					acR.getAutocorrections());
+			AutocorrectResponse autocResp = (AutocorrectResponse) resp;
+			_frontend.getBox(autocResp.getBoxNo()).setSuggestions(autocResp.getAutocorrections());
 			break;
 		case NEAREST_NEIGHBORS:
 			//If the response is a neighbors list, then we'll send the list
-			//XXX: not yet implemented.
-			NeighborsResponse nR = (NeighborsResponse) r;
-			//			mapPane.send(nR.getNeighbors());
+			NeighborsResponse nbrResp = (NeighborsResponse) resp;
+			_frontend.updateNeighbor(nbrResp.getNeighbors(), nbrResp.isSource());
 			break;
 		case PATH:
 			//If the response is a path of ways, we'll send it to the mapPane.
-			PathResponse pR = (PathResponse) r;
-			//			mapPane.setRenderedWays(pR.getPath());
+			PathResponse pathResp = (PathResponse) resp;
+//			mapPane.setRenderedWays(pR.getPath());
 			break;
 		case SERVER_STATUS:
 			//If the response is a server status, we'll print the message to the
@@ -181,8 +179,8 @@ public class Client {
 			break;
 		case WAYS:
 			//If the response is ways, we'll set the mapPane to display them
-			WayResponse wR = (WayResponse) r;
-			//			mapPane.setWays(wR.getWays());
+			WayResponse wayResp = (WayResponse) resp;
+//			mapPane.setWays(wR.getWays());
 			break;
 		default:
 			//We should never get here.

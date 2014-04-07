@@ -256,17 +256,23 @@ public class Frontend implements ActionListener {
 	}
 
 	/**
-	 * Sets the text of the AutoCorrect boxes to contain the intersection
-	 * selected by clicking the map.
-	 * @param wayIDs - the way IDs stored at the node selected on the map
-	 * @param flag - the "clickSwitch": if true, update the first set of cross
-	 * streets but if false, update the second set of cross streets.
+	 * Updates the click point in the map pane and fills the 
+	 * street-name search box to contain the name of the
+	 * street.  
+	 * @param neighbors - the list of neighbors returned by the request (should be size 1)
+	 * @param isSource - whether or not to set the point as the source (green), 
+	 * 					otherwise set the destination (red).
 	 */
-	public void updateInputFields(List<String> wayIDs, boolean flag) {
+	public void updateNeighbor(List<Node> neighbors, boolean isSource) {
+		//set point on map
+		Node n = neighbors.get(0);
+		map.setPoint(n, isSource);
+		
+		//update search boxes
+		List<String> wayIDs = n.getWayIDs();
 		String street1 = MapFactory.createWay(wayIDs.get(0)).getName();
 		String street2 = MapFactory.createWay(wayIDs.get(1)).getName();
-
-		if (flag) {
+		if (isSource) {
 			box1.setText(street1);
 			box2.setText(street2);
 		} else {

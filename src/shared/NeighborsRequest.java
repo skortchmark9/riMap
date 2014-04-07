@@ -11,16 +11,12 @@ public class NeighborsRequest implements Request {
 	private static final long serialVersionUID = 1L;
 	private final int numNeighbors;
 	private final KDimensionable location;
+	private final boolean _isSource;
 	
-	/**
-	 * Will almost always require only 1 numNeighbor, but we thought we'd keep
-	 * it this way for flexibility.
-	 * @param numNeighbors - the number of neighbors to be found.
-	 * @param location - the location to search at.
-	 */
-	public NeighborsRequest(int numNeighbors, KDimensionable location) {
+	public NeighborsRequest(int numNeighbors, KDimensionable location, boolean isSource) {
 		this.numNeighbors = numNeighbors;
 		this.location = location;
+		_isSource = isSource;
 	}
 	
 	public int getNumNeighbors() {
@@ -29,6 +25,10 @@ public class NeighborsRequest implements Request {
 	
 	public KDimensionable getLocation() {
 		return location;
+	}
+	
+	public boolean isSource() {
+		return _isSource;
 	}
 
 	@Override

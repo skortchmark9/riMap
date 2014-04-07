@@ -598,6 +598,16 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		return _source != null && _dest != null;
 	}
 	
+	
+	
+	public void setPoint(Node node, boolean isSource) {
+		if (isSource) {
+			_source = new ClickNeighbor(node);
+		} else {
+			_dest = new ClickNeighbor(node);
+		}
+	}
+	
 	/**
 	 * Sets the click points on the map for painting
 	 * @param start - the start node to paint (green circle)
@@ -698,11 +708,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		
 		/**
 		 * Default constructor<br> 
-		 * First takes in the parametric coordinates representing 
+		 * This takes in the parametric coordinates representing 
 		 * a point on the screen and converts it to a  lat-lon pair.
-		 * Then it queries the backend for a nearest neighbor node.
-		 * It stores this node in its node field and also keeps track of 
-		 * the screen coordinates of that node for painting. 
+		 * It then makes a new request for the nearest neighbor to
+		 * that click via the client.
 		 * 
 		 * @param x - the x coordinate of the click on the screen.
 		 * @param y - the y coordinate of the click on the screen.
@@ -710,13 +719,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		private ClickNeighbor(int x, int y) {
 			double[] geoCoords = pixel2geo(x,y);
 			KDStub p = new KDStub(geoCoords[0], geoCoords[1]);
-			_client.requestNearestNeighbors(1, p);
-			
-			//TODO: move this stuff to the place where nearest neighbor response is received.
-			List<String> wayIDs = node.getWayIDs();
-			_front.updateInputFields(wayIDs, clickSwitch); //update front end to include names of ways
-			
-			screenCoords = geo2pixel(node.getCoordinates());
+			_client.requestNearestNeighbors(1, p, clickSwitch);
 		}
 		
 		/**
