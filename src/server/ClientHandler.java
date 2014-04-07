@@ -56,8 +56,8 @@ public class ClientHandler extends Thread {
 		_pool = pool;
 		_b = backend;
 		
-		_input = new ObjectInputStream(_client.getInputStream());
 		_output = new ObjectOutputStream(_client.getOutputStream());
+		_input = new ObjectInputStream(_client.getInputStream());
 		
 		_pwGetter = new PathWayGetter(this);
 		_sugGetter = new SuggestionGetter(this);

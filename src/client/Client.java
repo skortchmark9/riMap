@@ -61,8 +61,8 @@ public class Client {
 	public void start() {
 		try {
 			_socket = new Socket((_IP.equals("localhost")) ? InetAddress.getLocalHost(): InetAddress.getByName(_IP), _port);
-			_input = new ObjectInputStream(_socket.getInputStream());
 			_output = new ObjectOutputStream(_socket.getOutputStream());
+			_input = new ObjectInputStream(_socket.getInputStream());
 			_running = true;
 			_thread = new ReceiveThread();
 			_thread.start();
@@ -73,6 +73,8 @@ public class Client {
 			_frontend = new Frontend(this);
 			
 			Util.debug("Frontend done\n","Attempting to connect to server now");
+			
+			_frontend.setVisible(true);
 			
 			run();
 		}
