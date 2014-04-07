@@ -55,7 +55,7 @@ public class IndeterminateFrontend implements ActionListener {
 	Client client;
 	final Cursor defaultCursor = Cursor.getDefaultCursor();
 	final Cursor busyCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
-	
+
 	SimpleLoadingPane loadingScreen;
 	private JLabel lblTimeouts;
 	private JSpinner timeOutSpinner;
@@ -66,7 +66,7 @@ public class IndeterminateFrontend implements ActionListener {
 	 * Also puts a few buttons on the screen.
 	 */	
 	public IndeterminateFrontend(Client client) {
-		
+
 		this.client = client;
 
 		//Setting up the frame.
@@ -77,14 +77,14 @@ public class IndeterminateFrontend implements ActionListener {
 		frame.getContentPane().setLayout(new FlowLayout());
 		frame.getContentPane().setBackground(Color.BLACK);
 		frame.setCursor(busyCursor);
-		
+
 		//Setting up the loading screen's info.
 		JPanel boilerPlate = new JPanel();
 		boilerPlate.setLayout(new BoxLayout(boilerPlate, BoxLayout.Y_AXIS));
 		boilerPlate.setBorder(BorderFactory.createEmptyBorder(300, 100, 100, 100));
 		boilerPlate.setOpaque(false);
 
-		
+
 		//Making our names look dope.
 		String[] titles = {"       MAPS", "BY ELIAS MARTINEZ COHEN", "AND SAMUEL V. KORTCHMAR"};
 		for(int i = 0; i < titles.length; i++ ) {
@@ -96,14 +96,14 @@ public class IndeterminateFrontend implements ActionListener {
 				label.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
 			boilerPlate.add(label);
 		}
-		
+
 		//Creating the loading screen.
 		loadingScreen = new SimpleLoadingPane();
 		JPanel loadingPanel = new JPanel(new BorderLayout());
 		loadingPanel.setOpaque(false);
 		loadingPanel.add(loadingScreen);
 		loadingPanel.add(boilerPlate, BorderLayout.NORTH);
-		
+
 		//Adding the loading screen to the frame.
 		frame.getContentPane().add(loadingPanel);
 		frame.pack();
@@ -139,7 +139,7 @@ public class IndeterminateFrontend implements ActionListener {
 		backgroundPanel.add(map);
 		backgroundPanel.setBounds(0, 0, frame.getWidth(), frame.getHeight());
 
-		
+
 		//Adds the controlPanel and Map/BackgroundPanel to the desktop.
 		desktop.add(controlPanel);
 		desktop.add(backgroundPanel);
@@ -151,7 +151,7 @@ public class IndeterminateFrontend implements ActionListener {
 		frame.revalidate();		
 		box1.requestFocusInWindow();
 	}
-	
+
 	private JInternalFrame createControlPanel() {
 		//The panel which holds the control box.
 		JPanel sidePanel = new JPanel();
@@ -159,7 +159,7 @@ public class IndeterminateFrontend implements ActionListener {
 		sidePanel.setBackground(Color.BLACK);
 		sidePanel.setOpaque(true);
 
-		
+
 		//Holds the buttons and the autocomplete fields.
 		JPanel searchButtonsPanel = new JPanel();
 		searchButtonsPanel.setOpaque(false);
@@ -177,13 +177,13 @@ public class IndeterminateFrontend implements ActionListener {
 
 		clearPoints = new JButton("Clear");
 		clearPoints.addActionListener(this);
-		
-		
+
+
 		//This spinner is used to set the timeout duration for pwRequester.
 		timeOutSpinner = new JSpinner(new SpinnerNumberModel(Constants.DEFAULT_REQUEST_TIMEOUT, 0, 10, 1));
 		lblTimeouts = new JLabel("Timeout (s):");
 		lblTimeouts.setForeground(Constants.GLOW_IN_THE_DARK);
-		
+
 		//console box to print messages to the user
 		msgBox = new JTextArea(5, 20);
 		msgBox.setMargin(new Insets(5,5,5,5));		
@@ -191,63 +191,62 @@ public class IndeterminateFrontend implements ActionListener {
 		//Note these lines are necessary because we don't handle appending text
 		//from the event dispatching thread.
 		DefaultCaret caret = (DefaultCaret)msgBox.getCaret();
-		Util.setGUIMessageBox(msgBox);
 		JScrollPane scrollPane = new JScrollPane(msgBox);
 		sidePanel.add(scrollPane);
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);		
-		Util.guiMessage("Console: look here for messages");
+		guiMessage("Console: look here for messages");
 
-		
+
 		//Lays out the components for the control panel. It's a mess because it
 		//was made with WindowBuilder.
 		GroupLayout gl_searchButtonsPanel = new GroupLayout(searchButtonsPanel);
 		gl_searchButtonsPanel.setHorizontalGroup(
-			gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING)
+				gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_searchButtonsPanel.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_searchButtonsPanel.createSequentialGroup()
-							.addComponent(lblTimeouts)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(timeOutSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(getDirections, GroupLayout.PREFERRED_SIZE, 121, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(clearPoints, GroupLayout.PREFERRED_SIZE, 65, GroupLayout.PREFERRED_SIZE)
-							.addGap(10))
-						.addGroup(gl_searchButtonsPanel.createSequentialGroup()
-							.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING, false)
-								.addComponent(box3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-								.addComponent(box1, GroupLayout.DEFAULT_SIZE, 151, Short.MAX_VALUE))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING, false)
-								.addComponent(box4, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-								.addComponent(box2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-							.addGap(17)))
-					.addContainerGap())
-		);
+						.addContainerGap()
+						.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_searchButtonsPanel.createSequentialGroup()
+										.addComponent(lblTimeouts)
+										.addPreferredGap(ComponentPlacement.RELATED)
+										.addComponent(timeOutSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(ComponentPlacement.RELATED)
+										.addComponent(getDirections, GroupLayout.PREFERRED_SIZE, 121, Short.MAX_VALUE)
+										.addPreferredGap(ComponentPlacement.RELATED)
+										.addComponent(clearPoints, GroupLayout.PREFERRED_SIZE, 65, GroupLayout.PREFERRED_SIZE)
+										.addGap(10))
+										.addGroup(gl_searchButtonsPanel.createSequentialGroup()
+												.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING, false)
+														.addComponent(box3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+														.addComponent(box1, GroupLayout.DEFAULT_SIZE, 151, Short.MAX_VALUE))
+														.addPreferredGap(ComponentPlacement.UNRELATED)
+														.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING, false)
+																.addComponent(box4, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																.addComponent(box2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+																.addGap(17)))
+																.addContainerGap())
+				);
 		gl_searchButtonsPanel.setVerticalGroup(
-			gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING)
+				gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_searchButtonsPanel.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(box1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(box2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(box3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(box4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(getDirections, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(lblTimeouts)
-						.addComponent(timeOutSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(clearPoints, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-		);
+						.addContainerGap()
+						.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(box1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(box2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.BASELINE)
+										.addComponent(box3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+										.addComponent(box4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+										.addPreferredGap(ComponentPlacement.RELATED)
+										.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.BASELINE)
+												.addComponent(getDirections, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+												.addComponent(lblTimeouts)
+												.addComponent(timeOutSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+												.addComponent(clearPoints, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+				);
 		gl_searchButtonsPanel.setAutoCreateContainerGaps(true);
 		gl_searchButtonsPanel.setAutoCreateGaps(true);
 		searchButtonsPanel.setLayout(gl_searchButtonsPanel);
-		
+
 		//Create a control panel.
 		JInternalFrame controlPanel = new JInternalFrame("Controls", true, false, false, true);
 		controlPanel.add(sidePanel);
@@ -255,7 +254,7 @@ public class IndeterminateFrontend implements ActionListener {
 		controlPanel.setVisible(true);
 		return controlPanel;
 	}
-	
+
 	/**
 	 * Sets the text of the AutoCorrect boxes to contain the intersection
 	 * selected by clicking the map.
@@ -266,7 +265,7 @@ public class IndeterminateFrontend implements ActionListener {
 	public void updateInputFields(List<String> wayIDs, boolean flag) {
 		String street1 = MapFactory.createWay(wayIDs.get(0)).getName();
 		String street2 = MapFactory.createWay(wayIDs.get(1)).getName();
-		
+
 		if (flag) {
 			box1.setText(street1);
 			box2.setText(street2);
@@ -275,7 +274,7 @@ public class IndeterminateFrontend implements ActionListener {
 			box4.setText(street2);
 		}
 	}
-	
+
 	public AutoFillField getBox(int num) {
 		switch (num) {
 		case 1: return box1;
@@ -283,6 +282,23 @@ public class IndeterminateFrontend implements ActionListener {
 		case 3: return box3;
 		case 4: return box4;
 		default: return null;
+		}
+	}
+
+
+	/**
+	 * Log a message about the GUI or the state of the program
+	 * to the user in the GUI. This could be, for example, whether
+	 * or not Dijkstra's was able to find a path to connect the nodes.
+	 * 
+	 * @param str - the string (message) to display to the user.
+	 */
+	public void guiMessage(String str) {
+		if (loadingScreen.isVisible()) {
+			loadingScreen.updateProgress(str);
+		} else {
+			if (msgBox == null) return;
+			msgBox.append(str + "\n");
 		}
 	}
 
@@ -307,9 +323,9 @@ public class IndeterminateFrontend implements ActionListener {
 				end = MapFactory.createIntersection(xs1E, xs2E);
 				if (start == null || end == null) {
 					if (start == null)
-						Util.guiMessage("Could not find intersection of: " + xs1S + " and " +  xs2S);
+						guiMessage("Could not find intersection of: " + xs1S + " and " +  xs2S);
 					if (end == null)
-						Util.guiMessage("Could not find intersection of: " + xs1E + " and " +  xs2E);
+						guiMessage("Could not find intersection of: " + xs1E + " and " +  xs2E);
 					return;
 				}
 				map.setPoints(start, end); //draw points on map

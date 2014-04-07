@@ -181,28 +181,6 @@ public class Util {
 		return false;
 	}
 
-	/**
-	 * Sets the Util msgBox reference to the message box in the gui.
-	 * @param msgBox2 - the message box to set as the new message box reference
-	 */
-	public static void setGUIMessageBox(JTextArea msgBox) {
-		Util.msgBox = msgBox;
-	}
-	
-	/**
-	 * Log a message about the GUI or the state of the program
-	 * to the user in the GUI. This could be, for example, whether
-	 * or not Dijkstra's was able to find a path to connect the nodes.
-	 * 
-	 * @param str - the string (message) to display to the user.
-	 */
-	public static void guiMessage(String str) {
-		if (msgBox == null) return;
-		msgBox.append(str + "\n");
-		msgBox.revalidate();
-	}
-	
-	
 	public static ThreadPoolExecutor defaultThreadPool(int core, int max) {
 		return new ThreadPoolExecutor(core, max, Constants.THREADPOOL_TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 	}

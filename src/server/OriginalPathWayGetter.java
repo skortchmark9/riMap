@@ -19,13 +19,13 @@ import shared.PathResponse;
  * @author samkortchmar
  * Should be changed probably
  */
-public class CopyOfPathWayGetter {
+public class OriginalPathWayGetter {
 
 	ExecutorService _executor;
 	ClientHandler _owner;
 	Future<List<Way>> ways;
 
-	public CopyOfPathWayGetter(ClientHandler owner) {
+	public OriginalPathWayGetter(ClientHandler owner) {
 		_owner = owner;
 		_executor = Executors.newFixedThreadPool(5);
 	}
