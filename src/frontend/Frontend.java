@@ -54,6 +54,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	Client client;
 	final Cursor defaultCursor = Cursor.getDefaultCursor();
 	final Cursor busyCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
+	JInternalFrame controlPanel;
 
 	SimpleLoadingPane loadingScreen;
 	private JPanel loadingPanel;
@@ -127,7 +128,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	void initMainScreen() {
 
 		//A JInternal frame to hold all the controls.
-		JInternalFrame controlPanel = createControlPanel();
+		createControlPanel();
 
 		//Initializes a JDesktopPane to hold the control panel and the map.
 		JDesktopPane desktop = new JDesktopPane();
@@ -136,7 +137,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 
 		//Creates the map pane. Wrapping it in backgroundPanel allows us to use
 		//a layoutManager to center it, even though JDesktopPane does not support one.
-		map = new MapPane(this, client);
+		map = new MapPane(client);
 		map.setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100));
 		JPanel backgroundPanel = new JPanel(new GridBagLayout());
 		backgroundPanel.setBackground(Color.BLACK);
@@ -147,16 +148,21 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		//Adds the controlPanel and Map/BackgroundPanel to the desktop.
 		desktop.add(controlPanel);
 		desktop.add(backgroundPanel);
-		this.setContentPane(desktop);
-		try {
-			controlPanel.setSelected(true);
-		} catch (PropertyVetoException e) {
-		}
+		setContentPane(desktop);
+		setControlPanelFocus(true);
 		this.revalidate();		
 		box1.requestFocusInWindow();
 	}
+	
+	private void setControlPanelFocus(boolean yes) {
+		try {
+			controlPanel.setSelected(yes);
+		} catch (PropertyVetoException e) {
+		}
 
-	private JInternalFrame createControlPanel() {
+	}
+
+	private void createControlPanel() {
 		//The panel which holds the control box.
 		JPanel sidePanel = new JPanel();
 		sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.PAGE_AXIS));
@@ -252,11 +258,10 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		searchButtonsPanel.setLayout(gl_searchButtonsPanel);
 
 		//Create a control panel.
-		JInternalFrame controlPanel = new JInternalFrame("Controls", true, false, false, true);
+		controlPanel = new JInternalFrame("Controls", true, false, false, false);
 		controlPanel.add(sidePanel);
 		controlPanel.pack();
 		controlPanel.setVisible(true);
-		return controlPanel;
 	}
 
 	/**
@@ -278,6 +283,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 			box3.populateField(street1, true);
 			box4.populateField(street2, true);
 		}
+		setControlPanelFocus(false);
 	}
 	
 	public void refreshMap() {
@@ -285,7 +291,6 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 			map.repaint();
 	}
 	
-
 	public void giveDirections(List<Way> path) {
 		map.setCalculatedRoute(path);
 		//TODO: turn-by-turn directions

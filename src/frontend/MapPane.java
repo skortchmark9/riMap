@@ -50,7 +50,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * well as zooming / panning over the map.
 	 * @param b - the backend to link to this MapPane.
 	 */
-	MapPane(Frontend front, Client client)   {
+	MapPane(Client client)   {
 		_client = client;
 		this.setBackground(Constants.BG_COLOR);
 		this.setPreferredSize(_client.getFrameSize());
@@ -227,7 +227,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * (the route referred to is the route found by Dijkstra's)
 	 */
 	public void clearRoute() {
-		calculatedRoute = new LinkedList<>();
+		setCalculatedRoute(new LinkedList<Way>());
 	}
 	
 	
@@ -563,7 +563,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	}
 	
 	public void getFocus() {
-		grabFocus();
 
 	}
 	
