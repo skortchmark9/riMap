@@ -540,7 +540,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			Util.debug("Click registered!");
-			
 			requestClickNeighbor(e.getX(), e.getY(), clickSwitch);
 			clickSwitch = !clickSwitch;
 			clearRoute();

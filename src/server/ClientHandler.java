@@ -9,6 +9,8 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import maps.MapFactory;
+import maps.Node;
 import shared.AutocorrectRequest;
 import shared.NeighborsRequest;
 import shared.PathRequest;
@@ -129,7 +131,14 @@ public class ClientHandler extends Thread {
 		case PATH:
 			PathRequest pReq = (PathRequest) req;
 			Util.out(pReq.toString());
-			_pwGetter.findPath(pReq.getSource(), pReq.getDest(), pReq.getTimeout());
+			//We check if there are intersections to be found
+			Node source = MapFactory.createIntersection(pReq.getCrossStreet(true, 1), pReq.getCrossStreet(true, 2));
+			Node dest = MapFactory.createIntersection(pReq.getCrossStreet(false, 1), pReq.getCrossStreet(false, 2));
+			if (source == null)
+				source = pReq.getSource();
+			if (dest == null)
+				dest = pReq.getDest();
+			_pwGetter.findPath(source, dest, pReq.getTimeout());
 			break;
 
 		default:

@@ -152,6 +152,11 @@ public class Client {
 	public void requestPath(Node start, Node end, int timeout) {
 		request(new PathRequest(start, end, timeout));
 	}
+	
+	public void requestPath(Node start, Node end, int timeout, String xs1S, String xs2S, String xs1E, String xs2E) {
+		request(new PathRequest(start, end, timeout, xs1S, xs2S, xs1E, xs2E));
+	}
+
 	/*	
 	public void removeAllResponses(ResponseType type) {
 		Iterator<Response>  itr = _responses.iterator();

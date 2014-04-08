@@ -348,27 +348,15 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 			String xs2S = box2.getText();
 			String xs1E = box3.getText();
 			String xs2E = box4.getText();
-			start = MapFactory.createIntersection(xs1S, xs2S);
-			end = MapFactory.createIntersection(xs1E, xs2E);
-			if (start == null)
-				start = map.getStart();
-			if (end == null)
-				end = map.getEnd();
-			if (start == null || end == null) {
-				if (start == null)
-					guiMessage("Could not find intersection of: " + xs1S + " and " +  xs2S);
-				if (end == null)
-					guiMessage("Could not find intersection of: " + xs1E + " and " +  xs2E);
-				return;
-			}
-			map.setPoints(start, end); //draw points on map
+			start = map.getStart();
+			end = map.getEnd();
 			int timeOut = Constants.DEFAULT_REQUEST_TIMEOUT;
 			try {
 				timeOutSpinner.commitEdit();
 				timeOut = (int) timeOutSpinner.getValue();
 			} catch (ParseException e1) {
 			}
-			client.requestPath(start, end, timeOut);
+			client.requestPath(start, end, timeOut, xs1S, xs2S, xs1E, xs2E);
 
 		} else if (e.getSource() == clearPoints) {
 			clear();

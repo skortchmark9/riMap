@@ -209,6 +209,9 @@ public class MapFactory {
 	 * @return - the Node that is their intersection.
 	 */
 	public static Node createIntersection(String streetName1, String streetName2) {
+		if (streetName1.equals("") || streetName2.equals("")) {
+			return null;
+		}
 		List<List<String>> street1nodeLists = Resources.indexFile.searchMultiples(streetName1, "nodes");
 		Set<String> street1nodeIDs = new HashSet<>();
 		for(List<String> nodeList : street1nodeLists) {
