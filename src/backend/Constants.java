@@ -27,8 +27,8 @@ public class Constants {
 	public static final Ranker defaultRanker = new Ranker(Ranker.CompareMode.MAPS);
 	
 	//Info for rendering lines on map;	
-	public static final double INITIAL_LAT = 41.842678; //Home Depot
-	public static final double INITIAL_LON = -71.417541;
+	public static final double INITIAL_LAT =  41.837323; //Start @ Brown's campus
+	public static final double INITIAL_LON = -71.420103;
 	public static final double GEO_DIMENSION_FACTOR = 0.02;
 	public static final double MIN_ZOOM = 0.05; //x5 times more zoom out (from original submission)
 	public static final double MAX_ZOOM = 12.0;
