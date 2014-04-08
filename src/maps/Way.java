@@ -8,7 +8,7 @@ public class Way implements Edge<Node>, Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	Node target;
-	String name;
+	String name = "";
 	Node start;
 	String uniqueID;
 	
