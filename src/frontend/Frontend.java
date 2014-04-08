@@ -267,23 +267,19 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	 * @param isSource - whether or not to set the point as the source (green), 
 	 * 					otherwise set the destination (red).
 	 */
-	public void updateNeighbor(List<Node> neighbors, boolean isSource) {
+	public void updateNeighbor(Node neighbor, boolean isSource, String street1, String street2) {
 		//set point on map
-		Node n = neighbors.get(0);
-		map.setPoint(n, isSource);
-		/*		
+		map.setPoint(neighbor, isSource);
 		//update search boxes
-		List<String> wayIDs = n.getWayIDs();
-		String street1 = MapFactory.createWay(wayIDs.get(0)).getName();
-		String street2 = MapFactory.createWay(wayIDs.get(1)).getName();
 		if (isSource) {
-			box1.setText(street1);
-			box2.setText(street2);
+			box1.populateField(street1, true);
+			box2.populateField(street2, true);
 		} else {
-			box3.setText(street1);
-			box4.setText(street2);
-		}*/
+			box3.populateField(street1, true);
+			box4.populateField(street2, true);
+		}
 	}
+	
 
 	public void giveDirections(List<Way> path) {
 		map.setCalculatedRoute(path);

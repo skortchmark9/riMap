@@ -1,13 +1,16 @@
 package server;
 
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import backend.Constants;
-import backend.Util;
 import kdtree.KDimensionable;
+import maps.MapFactory;
+import maps.Node;
 import shared.NeighborsResponse;
 import shared.Response;
+import backend.Constants;
+import backend.Util;
 
 /**
  * 
@@ -64,7 +67,9 @@ class NeighborGetter {
 		@Override
 		public void run() {
 			_id = _threadCount.incrementAndGet();
-			Response resp = new NeighborsResponse(_owner._b.getNearestNeighbors(_numNeighbors, _location), _isSource);
+			Node n = _owner._b.getNearestNeighbors(_numNeighbors, _location).get(0);
+			List<String> intersectingStreets = MapFactory.getIntersectingStreets(n);
+			Response resp = new NeighborsResponse(n, _isSource, intersectingStreets.get(0), intersectingStreets.get(1));
 			if (_id == _threadCount.get()) {
 				_owner._responseQueue.add(resp);
 			}

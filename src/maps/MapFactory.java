@@ -56,11 +56,11 @@ public class MapFactory {
 			return createWay(wayID, wayInfo[0], startLoc, endLoc);
 		}
 	}
-	
+
 	public static void setTrafficMap(Map<String, Double> newMap) {
 		trafficMap = newMap;
 	}
-	
+
 	public static void cacheWay(Way way) {
 		ways.put(way.uniqueID, way);
 	}
@@ -80,6 +80,25 @@ public class MapFactory {
 			ways.put(wayID, resultWay);
 		}
 		return resultWay;
+	}
+
+	public static List<String> getIntersectingStreets(Node n) {
+		List<String> wayIDs = n.getWayIDs();
+		String s1 = "", s2 = "";
+		if (wayIDs.size() >= 1)
+			s1 = MapFactory.createWay(wayIDs.get(0)).getName();
+
+		for(int i = 1; i < wayIDs.size(); i++) {
+			String possible = MapFactory.createWay(wayIDs.get(i)).getName();
+			if (!possible.equals(s1)) {
+				s2 = possible;
+				break;
+			}
+		}
+		LinkedList<String> result = new LinkedList<>();
+		result.add(s1);
+		result.add(s2);
+		return result;
 	}
 
 	/**
@@ -124,7 +143,7 @@ public class MapFactory {
 			Util.out("Num Nodes", nodes.size());
 		}
 	}
-	
+
 	public static Map<String, Double> getTrafficMap() {
 		return trafficMap;
 	}
@@ -218,7 +237,7 @@ public class MapFactory {
 		return null;
 	}
 
-	
+
 	/** Attempts to create a KDTree from the nodes file we have. */
 	public static KDTree<Node> createKDTree() throws IOException {
 		long start = 0; //XXX: FOR DEBUGGING
@@ -255,7 +274,7 @@ public class MapFactory {
 		}
 		return new KDTree<Node>(nodeList);
 	}
-	
+
 	public static RadixTree createRadixTree() throws IOException {
 		return createRadixTree(null);
 	}
@@ -381,7 +400,7 @@ public class MapFactory {
 		}
 		return ways;
 	}
-	
+
 	/**
 	 *
 	 * @param wayID
@@ -391,9 +410,9 @@ public class MapFactory {
 		Way way = createWay(wayID);
 		String streetName;
 		if (way != null) {
-			streetName = way.getName();
+			streetName = way.getUniqueID();
 			Double val;
-			
+
 			synchronized (trafficMap) {
 				val = trafficMap.get(streetName);
 			}
@@ -404,7 +423,7 @@ public class MapFactory {
 		
 		return 1.0;
 	}
-	
+
 	public static void putTrafficValue(String street, Double val) {
 		synchronized (trafficMap) {
 			trafficMap.put(street, val);

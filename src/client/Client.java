@@ -185,7 +185,7 @@ public class Client {
 			//If the response is a neighbors list, then we'll send the list
 			NeighborsResponse nbrResp = (NeighborsResponse) resp;
 			Util.debug(nbrResp.toString());
-			_frontend.updateNeighbor(nbrResp.getNeighbors(), nbrResp.isSource());
+			_frontend.updateNeighbor(nbrResp.getNeighbor(), nbrResp.isSource(), nbrResp.getStreet1(), nbrResp.getStreet2());
 			break;
 		case PATH:
 			//If the response is a path of ways, we'll send it to the mapPane.

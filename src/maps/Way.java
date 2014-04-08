@@ -37,19 +37,20 @@ public class Way implements Edge<Node>, Serializable {
 	 * Gets the PathNode this WAY is pointing to - is its end coordinate.
 	 * 
 	 */
-//	@Override
 	@Override
 	public Node getTarget() {
 		return target;
 	}
 
-//	@Override
 	@Override
-	public String getName() {
+	public String getUniqueID() {
 		return uniqueID;
-	}	
+	}
+	
+	public String getName() {
+		return name;
+	}
 
-//	@Override
 	@Override
 	public double getWeight() {
 		return start.distanceTo(target) * getTraffic();

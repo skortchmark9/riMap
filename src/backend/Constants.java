@@ -32,7 +32,7 @@ public class Constants {
 	public static final double GEO_DIMENSION_FACTOR = 0.02;
 	public static final double MIN_ZOOM = 0.05; //x5 times more zoom out (from original submission)
 	public static final double MAX_ZOOM = 12.0;
-	public static final double MIN_RENDER_LENGTH = 2;
+	public static final double MIN_RENDER_LENGTH = -1;
 	public static final double ARROW_KEY_MOVEMENT = 0.04d;
 	
 	//Some colors

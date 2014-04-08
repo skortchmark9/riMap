@@ -44,7 +44,7 @@ public class PathFinder<K extends PathNode<T>, T extends KDimensionable> {
 			String movieTitle = null;
 			Edge<T> e = currentActor.getNeighbor(nextActor.getName());
 			if (e.getTarget().equals(nextActor.getValue())) {
-				movieTitle = e.getName();
+				movieTitle = e.getUniqueID();
 			}
 			if (movieTitle == null) {
 				return new LinkedList<Edge<T>>();
@@ -84,7 +84,7 @@ public class PathFinder<K extends PathNode<T>, T extends KDimensionable> {
 			//FIXME: Does this work? HASHING vs Strings as keys.
 			Edge<?> e = currentActor.getNeighbor(nextActor.getName());
 			if (e.getTarget().equals(nextActor)) {
-				movieTitle = e.getName();
+				movieTitle = e.getUniqueID();
 			}
 			//If the requisite edge isn't a neighbor, then there is no connection.
 			if (movieTitle == null) {
