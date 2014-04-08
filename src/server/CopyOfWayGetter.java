@@ -21,7 +21,7 @@ class CopyOfWayGetter extends Thread {
 	private ExecutorService _exec;
 	private Future<List<Way>> futureWays;
 	private volatile boolean _running;
-	
+
 	/**
 	 * @param owner
 	 */
@@ -29,21 +29,23 @@ class CopyOfWayGetter extends Thread {
 		_owner = owner;
 		_exec = Executors.newFixedThreadPool(2);
 	}
-	
+
 	public void run() {
 		_running = true;
 		while(_running) {
 			List<Way> ways = null;
-			try {
-				ways = futureWays.get();
-				if (ways != null)
-					_owner._responseQueue.add(new WayResponse(ways));
-			} catch (InterruptedException | ExecutionException e) {
-				continue; //Standard operating behavior
+			if (futureWays != null) {
+				try {
+					ways = futureWays.get();
+					if (ways != null)
+						_owner._responseQueue.add(new WayResponse(ways));
+				} catch (InterruptedException | ExecutionException e) {
+					continue; //Standard operating behavior
+				}
 			}
 		}
 	}
-	
+
 	public void close() {
 		_running = false;
 		_exec.shutdownNow();
@@ -54,7 +56,7 @@ class CopyOfWayGetter extends Thread {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param minLat
@@ -67,10 +69,10 @@ class CopyOfWayGetter extends Thread {
 		if (_running)
 			futureWays = _exec.submit(new WayWorker(minLat,maxLat, minLon, maxLon));
 	}
-	
+
 	class WayWorker implements Callable<List<Way>> {
 		double _minLat, _maxLat, _minLon, _maxLon;
-		
+
 		/**
 		 * 
 		 * @param minLat
@@ -90,5 +92,5 @@ class CopyOfWayGetter extends Thread {
 			return _owner._b.getWaysInRange(_minLat, _maxLat, _minLon, _maxLon);
 		}
 	}
-	
+
 }
