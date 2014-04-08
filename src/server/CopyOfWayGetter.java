@@ -2,6 +2,7 @@ package server;
 
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,7 +40,7 @@ class CopyOfWayGetter extends Thread {
 					ways = futureWays.get();
 					if (ways != null)
 						_owner._responseQueue.add(new WayResponse(ways));
-				} catch (InterruptedException | ExecutionException e) {
+				} catch (InterruptedException | CancellationException | ExecutionException e) {
 					continue; //Standard operating behavior
 				}
 			}
