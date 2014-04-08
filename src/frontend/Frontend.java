@@ -281,7 +281,8 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	}
 	
 	public void refreshMap() {
-		map.repaint();
+		if (map != null)
+			map.repaint();
 	}
 	
 

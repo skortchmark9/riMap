@@ -85,15 +85,18 @@ public class AutoFillField extends JTextField {
 		getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void changedUpdate(DocumentEvent e) {
-				requestAutocorrections();
+				if (e.getLength() == 1)
+					requestAutocorrections();
 			}
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				requestAutocorrections();
+				if (e.getLength() == 1)
+					requestAutocorrections();
 			}
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				requestAutocorrections();
+				if (e.getLength() == 1)
+					requestAutocorrections();
 			}
 		});
 
