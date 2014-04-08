@@ -156,7 +156,7 @@ public class Backend {
 		return ways;
 	}
 
-	public List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+	public synchronized List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
 		long start = System.currentTimeMillis();		
 		List<Way> results = MapFactory.getWaysInRange(minLat, maxLat, minLon, maxLon);
 		Util.debug("GETTING WAYS TOOK: ", System.currentTimeMillis() - start);
