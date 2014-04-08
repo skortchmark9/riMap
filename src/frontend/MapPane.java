@@ -101,13 +101,14 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				int[] end = geo2pixel(way.getTarget().getCoordinates());
 				
 				g2d.setColor(Constants.FG_COLOR);
+				/*
 				if (way.getTraffic() > 4)
 					g2d.setColor(Constants.HIGH_TRAFFIC);
 				else if (way.getTraffic() > 2) {
 					g2d.setColor(Constants.MED_TRAFFIC);
 				} else if (way.getTraffic() > 1){
 					g2d.setColor(Constants.LOW_TRAFFIC);
-				}
+				} */
 				//If the road is less than Constants.MIN_RENDER_LENGTH, don't paint it.
 				//if (Point.distance(start[0], start[1], end[0], end[1]) < Constants.MIN_RENDER_LENGTH)
 					//continue;
