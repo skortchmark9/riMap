@@ -48,12 +48,13 @@ public class MapFactory {
 		if (wayInfo == null) {
 			return null;
 		}
+		String name = wayInfo[0] == null ? "" : wayInfo[0];
 		Node startLoc = createNode(wayInfo[1]);
 		Node endLoc = createNode(wayInfo[2]);
 		if (startLoc == null || endLoc == null) {
 			return null;
 		} else {
-			return createWay(wayID, wayInfo[0], startLoc, endLoc);
+			return createWay(wayID, name, startLoc, endLoc);
 		}
 	}
 
@@ -359,11 +360,10 @@ public class MapFactory {
 	 * @param maxLon - the maxLon of the block
 	 * @return - 
 	 */
-	public static synchronized List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+	public static List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
 		Util.debug("Looking for Ways in Range");
 		Util.resetClock();
 
-			
 		if (wayArray == null) {
 			int size = (int) Math.ceil((Constants.MAXIMUM_LATITUDE - Constants.MINIMUM_LATITUDE) * 100);
 			wayArray = new HashMap<>(size);
@@ -372,31 +372,36 @@ public class MapFactory {
 		List<Way> ways = new LinkedList<>();
 		for(double i = minLat; i <= maxLat + 0.01; i+=0.01) {
 			for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
-				String searchCode = "/w/" + Util.getFirst4Digits(i) + "." + Util.getFirst4Digits(j); //lAT/LNG
-				Util.resetClock();
-				Util.debug("SC:", searchCode);
+				ways.addAll(getWaysSquare(i, j));
+			}
+		}
+		return ways;
+	}
 
-				List<String> wayIDsInRange = wayArray.get(searchCode);
-				if (wayIDsInRange !=null) {
-					for(String wayID : wayIDsInRange) {
-						ways.add(createWay(wayID));
+	static List<Way> getWaysSquare(double lat, double lon) {
+		List<Way> ways = new LinkedList<>();
+		String searchCode = "/w/" + Util.getFirst4Digits(lat) + "." + Util.getFirst4Digits(lon); //lAT/LNG
+		Util.resetClock();
+		Util.debug("SC:", searchCode);
+		List<String> wayIDsInRange = wayArray.get(searchCode);
+		if (wayIDsInRange !=null) {
+			for(String wayID : wayIDsInRange) {
+				ways.add(createWay(wayID));
+			}
+		} else {				
+			List<List<String>> chunk = new LinkedList<>();
+			chunk = Resources.waysFile.searchMultiples(searchCode, SearchType.WILDCARD, "id", "name", "start", "end");
+			List<String> wayIDsInBlock = new LinkedList<>();
+			for (List<String> wayInfo : chunk) {
+				if (wayInfo != null && !wayInfo.isEmpty()) {
+					Way possibleWay = createWay(wayInfo.get(0), wayInfo.get(1), wayInfo.get(2), wayInfo.get(3));
+					if (possibleWay != null) {
+						ways.add(possibleWay);
 					}
-				} else {				
-					List<List<String>> chunk = new LinkedList<>();
-					chunk = Resources.waysFile.searchMultiples(searchCode, SearchType.WILDCARD, "id", "name", "start", "end");
-					List<String> wayIDsInBlock = new LinkedList<>();
-					for (List<String> wayInfo : chunk) {
-						if (wayInfo != null && !wayInfo.isEmpty()) {
-							Way possibleWay = createWay(wayInfo.get(0), wayInfo.get(1), wayInfo.get(2), wayInfo.get(3));
-							if (possibleWay != null) {
-								ways.add(possibleWay);
-							}
-							wayIDsInBlock.add(wayInfo.get(0));
-						}
-					}
-					wayArray.put(searchCode, wayIDsInBlock);
+					wayIDsInBlock.add(wayInfo.get(0));
 				}
 			}
+			wayArray.put(searchCode, wayIDsInBlock);
 		}
 		return ways;
 	}
@@ -406,7 +411,7 @@ public class MapFactory {
 	 * @param wayID
 	 * @return
 	 */
-	public static Double getTrafficValue(String wayID) {
+	public static double getTrafficValue(String wayID) {
 		Way way = createWay(wayID);
 		String streetName;
 		if (way != null) {
@@ -418,9 +423,9 @@ public class MapFactory {
 			}
 			return (val == null) ? 1.0 : val;
 		}
-		
+
 		Util.debug("Could not find way: " + wayID);
-		
+
 		return 1.0;
 	}
 
