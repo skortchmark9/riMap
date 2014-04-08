@@ -539,8 +539,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			getFocus();
-			
 			Util.debug("Click registered!");
 			
 			requestClickNeighbor(e.getX(), e.getY(), clickSwitch);
@@ -559,11 +557,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * been created for the start node (i.e. if the start node was cleared).
 	 */
 	public Node getStart() {
-		return _source.node;
-	}
-	
-	public void getFocus() {
-
+		return (_source == null) ? null : _source.node;
 	}
 	
 	/**
@@ -574,19 +568,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * been created for the start node (i.e. if the start node was cleared).
 	 */
 	public Node getEnd() {
-		return _dest.node;
+		return (_dest == null) ? null : _dest.node;
 	}
-	
-	/**
-	 * @return
-	 * if both clickpoints have been defined on the map, i.e. both start and end have 
-	 * been created by clicking, this method returns true. false otherwise.
-	 */
-	public boolean hasPoints() {
-		return _source != null && _dest != null;
-	}
-	
-	
 	
 	public void setPoint(Node node, boolean isSource) {
 		if (isSource) {

@@ -153,7 +153,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		this.revalidate();		
 		box1.requestFocusInWindow();
 	}
-	
+
 	private void setControlPanelFocus(boolean yes) {
 		try {
 			controlPanel.setSelected(yes);
@@ -286,12 +286,12 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		map.requestFocusInWindow();
 		setControlPanelFocus(false);
 	}
-	
+
 	public void refreshMap() {
 		if (map != null)
 			map.repaint();
 	}
-	
+
 	public void giveDirections(List<Way> path) {
 		map.setCalculatedRoute(path);
 		//TODO: turn-by-turn directions
@@ -310,7 +310,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		default: return null;
 		}
 	}
-	
+
 	private void clear() {
 		box1.reset();
 		box2.reset();
@@ -344,25 +344,24 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		if (e.getSource() == getDirections) {
 			Node start;
 			Node end;
-			if (map.hasPoints()) {
+			String xs1S = box1.getText();
+			String xs2S = box2.getText();
+			String xs1E = box3.getText();
+			String xs2E = box4.getText();
+			start = MapFactory.createIntersection(xs1S, xs2S);
+			end = MapFactory.createIntersection(xs1E, xs2E);
+			if (start == null)
 				start = map.getStart();
+			if (end == null)
 				end = map.getEnd();
-			} else {
-				String xs1S = box1.getText();
-				String xs2S = box2.getText();
-				String xs1E = box3.getText();
-				String xs2E = box4.getText();
-				start = MapFactory.createIntersection(xs1S, xs2S);
-				end = MapFactory.createIntersection(xs1E, xs2E);
-				if (start == null || end == null) {
-					if (start == null)
-						guiMessage("Could not find intersection of: " + xs1S + " and " +  xs2S);
-					if (end == null)
-						guiMessage("Could not find intersection of: " + xs1E + " and " +  xs2E);
-					return;
-				}
-				map.setPoints(start, end); //draw points on map
+			if (start == null || end == null) {
+				if (start == null)
+					guiMessage("Could not find intersection of: " + xs1S + " and " +  xs2S);
+				if (end == null)
+					guiMessage("Could not find intersection of: " + xs1E + " and " +  xs2E);
+				return;
 			}
+			map.setPoints(start, end); //draw points on map
 			int timeOut = Constants.DEFAULT_REQUEST_TIMEOUT;
 			try {
 				timeOutSpinner.commitEdit();
