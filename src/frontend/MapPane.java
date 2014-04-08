@@ -101,7 +101,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				int[] end = geo2pixel(way.getTarget().getCoordinates());
 				
 				g2d.setColor(Constants.FG_COLOR);
-				if (way.getTraffic() > 3)
+				if (way.getTraffic() > 4)
 					g2d.setColor(Constants.HIGH_TRAFFIC);
 				else if (way.getTraffic() > 2) {
 					g2d.setColor(Constants.MED_TRAFFIC);
@@ -475,8 +475,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				_source.recalibrate();
 			if (_dest != null)
 				_dest.recalibrate();
-			
-			this.repaint(); // repaint for responsiveness
 			
 			//request all new ways in new range
 			_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);

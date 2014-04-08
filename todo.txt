@@ -13,9 +13,9 @@ MapFactory - should behave differently for client vs server.
 Used cached ways in client and save time on network calls
 Test traffic
 
-Make server cleanly disengage
-Fix bug with first click.
-think about traffic values.
+- Make server cleanly disengage
+- Fix bug with first click.
+- Sending all previous traffic values to new clients (clients start with traffic values up to that point)
 quit gracefully.
 
 

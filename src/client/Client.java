@@ -63,6 +63,9 @@ public class Client {
 	 * and then launch the GUI.
 	 */
 	public void start() {
+		_frontend = new Frontend(this);
+		new Thread(_frontend).start();
+
 		try {
 			//host is localhost or IP if an IP address is specified
 			InetAddress host = _IP.equals("localhost") ? InetAddress.getLocalHost() : InetAddress.getByName(_IP);
@@ -74,14 +77,14 @@ public class Client {
 			_output = new ObjectOutputStream(_socket.getOutputStream());
 			_input = new ObjectInputStream(_socket.getInputStream());
 			_running = true;
+			
+			_requests = new LinkedList<>();
+			
 			_thread = new ReceiveThread();
 			_thread.start();
-			_requests = new LinkedList<>();
 
 			Util.debug("creating new frontend");
 
-			_frontend = new Frontend(this);
-			new Thread(_frontend).start();
 
 			Util.debug("Frontend done\n","Attempting to connect to server now");
 			_frontend.setVisible(true);
@@ -217,7 +220,8 @@ public class Client {
 			break;
 		case TRAFFIC:
 			TrafficResponse tResp = (TrafficResponse) resp;
-			MapFactory.putTrafficValue(tResp.getName(), tResp.getVal());
+			MapFactory.putTrafficValue(tResp.getName(), tResp.getVal());//put traffic value i server side map
+			_frontend.refreshMap(); //repaint map pane
 			break;
 		default:
 			//We should never get here.

@@ -410,7 +410,7 @@ public class MapFactory {
 		Way way = createWay(wayID);
 		String streetName;
 		if (way != null) {
-			streetName = way.getUniqueID();
+			streetName = way.getName().toLowerCase();
 			Double val;
 
 			synchronized (trafficMap) {

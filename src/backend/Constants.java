@@ -9,7 +9,7 @@ import autocorrect.Ranker;
 public class Constants {
 	
 	//XXX DEBUG MODE
-	public static final boolean DEBUG_MODE = false; //XXX TURN THIS OFF BEFORE HANDIN / SYSTEM TESTS
+	public static final boolean DEBUG_MODE = true; //XXX TURN THIS OFF BEFORE HANDIN / SYSTEM TESTS
 	//XXX DEBUG MODE
 	
 	//Precompiled regex patterns to make split and replace faster. 
@@ -41,7 +41,7 @@ public class Constants {
 	public static final Color BG_COLOR = new Color(0,17,21);
 	public static final Color FG_COLOR = new Color(252, 251, 248);
 	//For indicating traffic
-	public static final Color LOW_TRAFFIC	= new Color(217, 255, 0);
+	public static final Color LOW_TRAFFIC	= new Color(233, 255, 0);
 	public static final Color HIGH_TRAFFIC	= new Color(255, 25, 0);
 	public static final Color MED_TRAFFIC	= new Color(255, 162, 0);
 	
