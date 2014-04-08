@@ -299,6 +299,14 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		default: return null;
 		}
 	}
+	
+	private void clear() {
+		box1.reset();
+		box2.reset();
+		box3.reset();
+		box4.reset();
+		map.clearClickPoints();
+	}
 
 	/**
 	 * Log a message about the GUI or the state of the program
@@ -353,7 +361,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 			client.requestPath(start, end, timeOut);
 
 		} else if (e.getSource() == clearPoints) {
-			map.clearClickPoints();
+			clear();
 		}
 	}
 }

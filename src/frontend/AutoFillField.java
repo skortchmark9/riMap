@@ -59,8 +59,6 @@ public class AutoFillField extends JTextField {
 		popup.setVisible(false);
 		popup.setBorder(BorderFactory.createEmptyBorder());
 
-
-
 		//We need this because of the focus juggling we do, we don't want to 
 		//highlight the text field every time we accept a selection. It would
 		//be awesome if we could deactivate the default focus behavior of the
@@ -87,6 +85,7 @@ public class AutoFillField extends JTextField {
 		getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void changedUpdate(DocumentEvent e) {
+				requestAutocorrections();
 			}
 			@Override
 			public void insertUpdate(DocumentEvent e) {
@@ -211,17 +210,16 @@ public class AutoFillField extends JTextField {
 	}
 	
 	public void populateField(String s, boolean suppressPopup) {
-		suppress = true;
+		suppress = suppressPopup;
+		setForeground(Color.BLACK);
 		setText(s);
 	}
-
 
 	/**
 	 * The popup contains the table of suggestions, so this will reveal them.
 	 * @param e - we don't want to suggest on the empty string, so we check.
 	 */
 	
-	//TODO: do we need this???
 	private void showPopup(DocumentEvent e) {
 		if(e.getDocument().getLength() > 0) {
 			initTableModel();
@@ -263,7 +261,15 @@ public class AutoFillField extends JTextField {
 	}
 
 	private void requestAutocorrections() {
-			client.requestAutocorrections(this.getText(), boxNo);
+			if (!this.getText().equals(initialText))
+				client.requestAutocorrections(this.getText(), boxNo);
+	}
+	
+	public void reset() {
+		setForeground(Color.DARK_GRAY);
+		populateField(initialText, true);
+		setForeground(Color.BLACK);
+		popped = false;
 	}
 
 
