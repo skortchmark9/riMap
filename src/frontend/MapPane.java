@@ -146,7 +146,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			g2d.drawOval(_source.screenCoords[0] - 5, _source.screenCoords[1] - 5, 10, 10);
 		}
 		if (_dest != null) {
-			
 			if (Constants.DEBUG_MODE) {
 				//Util.out("Target pixel coords:", "("+target.screenCoords[0]+",", target.screenCoords[1]+")");
 				Util.out("Target Node", _dest.node.toString());
@@ -553,15 +552,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			getFocus();
-			if (Constants.DEBUG_MODE)
-				Util.out("Click registered!");
-			if (clickSwitch) {
-				_source = new ClickNeighbor(e.getX(), e.getY());
-				clickSwitch = false;
-			} else {
-				_dest = new ClickNeighbor(e.getX(), e.getY());
-				clickSwitch = true;
-			}
+				Util.debug("Click registered!");
+			requestClickNeighbor(e.getX(), e.getY(), clickSwitch);
+			clickSwitch = !clickSwitch;
 			clearRoute();
 			repaint();
 		}
@@ -712,6 +705,12 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		this.repaint();
 	}
 	
+	private void requestClickNeighbor(int x, int y, boolean isSource) {
+		double[] geoCoords = pixel2geo(x, y);
+		KDStub p = new KDStub(geoCoords[0], geoCoords[1]);
+		_client.requestNearestNeighbors(1, p, isSource);
+	}
+	
 	/**
 	 * Private class representing the point a user clicks on
 	 * a screen.
@@ -732,11 +731,11 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		 * @param x - the x coordinate of the click on the screen.
 		 * @param y - the y coordinate of the click on the screen.
 		 */
-		private ClickNeighbor(int x, int y) {
-			double[] geoCoords = pixel2geo(x,y);
-			KDStub p = new KDStub(geoCoords[0], geoCoords[1]);
-			_client.requestNearestNeighbors(1, p, clickSwitch);
-		}
+//		private ClickNeighbor(int x, int y) {
+//			double[] geoCoords = pixel2geo(x,y);
+//			KDStub p = new KDStub(geoCoords[0], geoCoords[1]);
+//			_client.requestNearestNeighbors(1, p, clickSwitch);
+//		}
 		
 		/**
 		 * Construct a ClickNeighbor using an existing node.
@@ -745,6 +744,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		private ClickNeighbor(Node n) {
 			this.node = n;
 			screenCoords = geo2pixel(node.getCoordinates());
+		}
+		
+		private void setCoords() {
+			
 		}
 		
 		/**
