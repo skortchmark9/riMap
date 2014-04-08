@@ -8,15 +8,16 @@ Turn-by-turn directions
 
 JInternal frame.setMaxWidth.
 
-STERILIZE INPUT FROM TRAFFIC SERVER
 MapFactory - should behave differently for client vs server.
 Used cached ways in client and save time on network calls
 Test traffic
 
-- Make server cleanly disengage
-- Fix bug with first click.
-- Sending all previous traffic values to new clients (clients start with traffic values up to that point)
+Make server cleanly disengage
+Fix bug with first click.
+think about traffic values.
 quit gracefully.
+
+ENSURE THAT THE CLIENT NEVER CRASHES EVEN IF THE SERVER DISAPPEARS
 
 
 -Think of some nice display for calculated paths other than just highlighting the streets. (e.g. street names, turn-by-turn)
