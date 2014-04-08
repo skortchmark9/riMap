@@ -61,9 +61,9 @@ public class Server extends Thread {
 	public void serverDownMessage(String s) {
 		_clientPool.broadcast(new ServerStatus(false, s));
 	}
-
-	public void trafficUpdate(Map<String, Double> trafficMap) {
-		_clientPool.broadcast(new TrafficResponse(trafficMap));
+	
+	public void trafficUpdate(String name, Double val) {
+		_clientPool.broadcast(new TrafficResponse(name, val));
 	}
 
 
