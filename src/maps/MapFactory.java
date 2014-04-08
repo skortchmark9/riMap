@@ -297,9 +297,8 @@ public class MapFactory {
 		if ( l!= null) {
 			l.updateProgress("Done creating Radix Tree", 20);
 		}
-		if (Constants.DEBUG_MODE) {
-			Util.out("Done inserting names from list to Radix Tree.", "(Elapsed:", Util.timeSince(start) + ")");
-		}
+
+		Util.debug("Done inserting names from list to Radix Tree.", "(Elapsed:", Util.timeSince(start) + ")");
 
 		return rt;
 	}
@@ -307,10 +306,8 @@ public class MapFactory {
 
 	public static synchronized List<Way> getWaysInRangeFaster(double minLat, double maxLat, double minLon, double maxLon) {
 
-		if (Constants.DEBUG_MODE) {
-			Util.out("Looking for Ways in Range using THREADS");
-			Util.resetClock();
-		}
+		Util.debug("Looking for Ways in Range using THREADS");
+		Util.resetClock();
 
 		List<Way> ways = new LinkedList<>();
 		List<List<String>> wayInfoChunk = Collections.synchronizedList(new LinkedList<List<String>>());
@@ -344,10 +341,10 @@ public class MapFactory {
 	 * @return - 
 	 */
 	public static synchronized List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
-		if (Constants.DEBUG_MODE) {
-			Util.out("Looking for Ways in Range");
-			Util.resetClock();
-		}
+		Util.debug("Looking for Ways in Range");
+		Util.resetClock();
+
+			
 		if (wayArray == null) {
 			int size = (int) Math.ceil((Constants.MAXIMUM_LATITUDE - Constants.MINIMUM_LATITUDE) * 100);
 			wayArray = new HashMap<>(size);
@@ -358,9 +355,7 @@ public class MapFactory {
 			for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
 				String searchCode = "/w/" + Util.getFirst4Digits(i) + "." + Util.getFirst4Digits(j); //lAT/LNG
 				Util.resetClock();
-				if (Constants.DEBUG_MODE) {
-					Util.out("SC:", searchCode);
-				}
+				Util.debug("SC:", searchCode);
 
 				List<String> wayIDsInRange = wayArray.get(searchCode);
 				if (wayIDsInRange !=null) {
@@ -404,7 +399,9 @@ public class MapFactory {
 			}
 			return (val == null) ? 1.0 : val;
 		}
-		Util.err("Could not find way: " + wayID);
+		
+		Util.debug("Could not find way: " + wayID);
+		
 		return 1.0;
 	}
 	

@@ -60,21 +60,16 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		//set up dimensions
 		_pixelWidth = this.getPreferredSize().height;
 		_pixelHeight = this.getPreferredSize().width;
-		Util.out("w=", _pixelWidth);
-		Util.out("h=", _pixelHeight);
 		Corners.reposition(Constants.INITIAL_LAT, Constants.INITIAL_LON); //init to home depot (lol)
 		
-		if (Constants.DEBUG_MODE) {
-			Util.out("Corners:");
-			Util.out("\tTop Left:", "("+Corners.topLeft[0]+",", Corners.topLeft[1]+")");
-			Util.out("\tTop Right:", "("+Corners.topRight[0]+",", Corners.topRight[1]+")");
-			Util.out("\tBottom Right:", "("+Corners.bottomRight[0]+",", Corners.bottomRight[1]+")");
-			Util.out("\tBottom Left:", "("+Corners.bottomLeft[0]+",", Corners.bottomLeft[1]+")");
-		}
+		Util.debug("Corners:");
+		Util.debug("\tTop Left:", "("+Corners.topLeft[0]+",", Corners.topLeft[1]+")");
+		Util.debug("\tTop Right:", "("+Corners.topRight[0]+",", Corners.topRight[1]+")");
+		Util.debug("\tBottom Right:", "("+Corners.bottomRight[0]+",", Corners.bottomRight[1]+")");
+		Util.debug("\tBottom Left:", "("+Corners.bottomLeft[0]+",", Corners.bottomLeft[1]+")");
 		
 		initInteraction(); //initializes all interactions for the map view.
-		//new synchronous list for all ways in viewport (ways we need to render)
-		//renderedWays = Collections.synchronizedList(MapFactory.getWaysInRange(0, 0, 0, 0));
+		
 		_source = null;
 		_dest = null;
 		
@@ -125,22 +120,16 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			if (way != null) {
 				int[] start = geo2pixel(way.getStart().getCoordinates());
 				int[] end = geo2pixel(way.getTarget().getCoordinates());
-				
-				if (Constants.DEBUG_MODE) {
-					//Util.out("Start point:", "("+start[0]+",", start[1]+")");
-					//Util.out("End point:", "("+end[0]+",", end[1]+")");
-				}
+
 				g2d.drawLine(start[0], start[1], end[0], end[1]);
 			}
 		}
 		
 		//Render Click Points
 		if (_source != null) {
+
+			Util.debug("Source Node:", _source.node.toString());
 			
-			if (Constants.DEBUG_MODE) {
-				//Util.out("Source pixel coords:", "("+source.screenCoords[0]+",", source.screenCoords[1]+")");
-				Util.out("Source Node:", _source.node.toString());
-			}
 			g2d.setStroke(new BasicStroke(1));		
 			g2d.setColor(Color.GREEN);
 			g2d.drawOval(_source.screenCoords[0] - 5, _source.screenCoords[1] - 5, 10, 10);
