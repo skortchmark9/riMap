@@ -1,4 +1,6 @@
 package client;
+import java.awt.Dimension;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -103,7 +105,6 @@ public class Client {
 			}
 		}
 	}
-
 
 	/**
 	 * Shuts down the client closing all the connections.
@@ -223,6 +224,12 @@ public class Client {
 			throw new IllegalArgumentException("Unsupported Response type");
 		}
 	}
+	
+	public Dimension getFrameSize() {
+		return _frontend.getSize();
+	}
+	
+	
 
 	/**
 	 * A thread that will receive the messages sent by the server to
@@ -233,11 +240,12 @@ public class Client {
 			while(_running) {
 				try {
 					Response received = (Response) _input.readObject();
+					Util.debug("Response received");
 					processResponse(received);
 				} catch (IOException e) {
-					if (_running == false) {
+					if (_running == false || e instanceof EOFException) {
 						err("Error message:", e.getMessage());
-						out("Prob just closed the stream via client's kill()");
+						out("Input Stream Closed");
 						return;
 					}
 					err("ERROR reading line from socket or write to STD_OUT");

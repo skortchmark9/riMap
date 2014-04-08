@@ -46,6 +46,7 @@ import client.Client;
  * @author skortchm / emc3
  */
 public class Frontend extends JFrame implements ActionListener, Runnable {
+	private static final long serialVersionUID = 1L;
 	private AutoFillField box1, box2, box3, box4;
 	JButton getDirections, clearPoints;
 	JTextArea msgBox;

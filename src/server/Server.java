@@ -11,7 +11,6 @@ import java.util.Map;
 import shared.ServerStatus;
 import shared.TrafficResponse;
 import backend.Backend;
-import backend.Constants;
 import backend.Util;
 
 /**

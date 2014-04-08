@@ -1,7 +1,7 @@
 package kdtree;
 
 public class KDStub implements KDimensionable {
-
+	private static final long serialVersionUID = 1L;
 	double[] domain;
 
 	public KDStub(double x, double y) {

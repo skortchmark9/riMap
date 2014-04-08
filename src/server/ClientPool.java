@@ -6,7 +6,6 @@ package server;
 import java.util.LinkedList;
 
 import shared.Response;
-import shared.ServerStatus;
 
 /**
  * @author emc3
