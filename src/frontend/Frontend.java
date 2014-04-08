@@ -283,6 +283,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 			box3.populateField(street1, true);
 			box4.populateField(street2, true);
 		}
+		map.requestFocusInWindow();
 		setControlPanelFocus(false);
 	}
 	
