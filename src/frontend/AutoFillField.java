@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -215,6 +214,8 @@ public class AutoFillField extends JTextField {
 	 * The popup contains the table of suggestions, so this will reveal them.
 	 * @param e - we don't want to suggest on the empty string, so we check.
 	 */
+	
+	//TODO: do we need this???
 	private void showPopup(DocumentEvent e) {
 		if(e.getDocument().getLength() > 0) {
 			initTableModel();

@@ -2,10 +2,8 @@ package frontend;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
@@ -33,12 +31,10 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.text.DefaultCaret;
 
-import server.PathWayGetter;
 import maps.MapFactory;
 import maps.Node;
 import maps.Way;
 import backend.Constants;
-import backend.Util;
 import client.Client;
 
 /**
@@ -50,6 +46,7 @@ import client.Client;
  * @author skortchm / emc3
  */
 public class Frontend extends JFrame implements ActionListener, Runnable {
+	private static final long serialVersionUID = 1L;
 	private AutoFillField box1, box2, box3, box4;
 	JButton getDirections, clearPoints;
 	JTextArea msgBox;

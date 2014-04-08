@@ -7,15 +7,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.JTextArea;
-
 /**
  * @author emc3
  */
 public class Util {
 	
 	private static long START = 0; //the 'clock'
-	private static JTextArea msgBox; //the message box in the gui to which meaningful messages can be printed to the user
 	
 	/**
 	 * Better than System.out.println. Prints any number of things in a line to STDOUT.

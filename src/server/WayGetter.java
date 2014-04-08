@@ -1,11 +1,15 @@
 package server;
 
-import java.util.concurrent.Executor;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import shared.Response;
+import maps.Way;
 import shared.WayResponse;
-import backend.Constants;
 import backend.Util;
 
 /**
@@ -15,16 +19,18 @@ import backend.Util;
  */
 class WayGetter {
 	private final ClientHandler _owner;
-	private AtomicInteger _threadCount;
-	private Executor _exec;
+	private ThreadPoolExecutor _exec, _waitExec;
+	Future<List<Way>> _future;
+	private AtomicInteger _waitThreadCount;
 	
 	/**
 	 * @param owner
 	 */
 	public WayGetter(ClientHandler owner) {
 		_owner = owner;
-		_threadCount = new AtomicInteger(0);
-		_exec = Util.defaultThreadPool(Constants.THREADPOOL_CORE_SIZE, Constants.THREADPOOL_MAX_SIZE);
+		_exec = Util.defaultThreadPool(1, 1);
+		_waitExec = Util.defaultThreadPool(1, 1);
+		_waitThreadCount = new AtomicInteger(0);
 	}
 	
 	/**
@@ -35,8 +41,14 @@ class WayGetter {
 	 * @param maxLon
 	 */
 	void getWays(double minLat, double maxLat, double minLon, double maxLon) {
-		_exec.execute(new WayWorker(minLat, maxLat, minLon, maxLon));
+		if (_future != null) {
+			_future.cancel(true); //cancel future and interrupt routine
+			_exec.purge();
+			_waitExec.purge();
+		}
 		
+		_future = _exec.submit(new WayWorker(minLat, maxLat, minLon, maxLon));
+		_waitExec.execute(new WayWaiter());
 	}
 	
 	/**
@@ -44,9 +56,8 @@ class WayGetter {
 	 * @author emc3
 	 *
 	 */
-	private class WayWorker implements Runnable {
-		private int _id;
-		private double _minLat, _maxLat, _minLon, _maxLon;
+	class WayWorker implements Callable<List<Way>> {
+		double _minLat, _maxLat, _minLon, _maxLon;
 		
 		/**
 		 * 
@@ -61,15 +72,41 @@ class WayGetter {
 			_minLon = minLon;
 			_maxLon = maxLon;
 		}
+
+		@Override
+		public List<Way> call() throws Exception {
+			return _owner._b.getWaysInRange(_minLat, _maxLat, _minLon, _maxLon);
+		}
+	}
+	
+	
+	/**
+	 * A runnable which waits for the future to return.
+	 * If the future is interrupted, the thread simply quits.
+	 *  
+	 * @author emc3
+	 */
+	private class WayWaiter implements Runnable {
+		int _id;
+		
+		WayWaiter() {
+			_id = _waitThreadCount.incrementAndGet();
+		}
 		
 		@Override
 		public void run() {
-			_id = _threadCount.incrementAndGet();
-			Response resp = new WayResponse(_owner._b.getWaysInRange(_minLat, _maxLat, _minLon, _maxLon));
-			if (_id == _threadCount.get()) {
-				_owner._responseQueue.add(resp);
+			if (_future != null) {
+				try {
+					List<Way> ways = _future.get();
+					if (_id == _waitThreadCount.get())
+						_owner._responseQueue.add(new WayResponse(ways));
+				} catch (InterruptedException | CancellationException | ExecutionException e) {
+					//simply continue
+				}
+				_future = null;
 			}
 		}
+		
 	}
 	
 }

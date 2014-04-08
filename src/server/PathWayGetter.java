@@ -2,17 +2,18 @@ package server;
 
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import backend.Util;
-import shared.PathResponse;
 import maps.Node;
 import maps.Way;
+import shared.PathResponse;
+import backend.Util;
 
 /**
  * @author samkortchmar
@@ -23,19 +24,20 @@ public class PathWayGetter extends Thread {
 	ClientHandler _owner;
 	CallableWays _worker;
 	volatile boolean _running;
-	ExecutorService _executor;
+	ThreadPoolExecutor _executor;
 	Future<List<Way>> waysFuture;
 	int _timeout;
 
 	public PathWayGetter(ClientHandler owner) {
 		_owner = owner;
 		_running = true;
-		_executor = Executors.newSingleThreadExecutor();
+		_executor = Util.defaultThreadPool(1, 1);
 	}
 
 	public void findPath(Node start, Node end, int seconds) {
 		if (waysFuture != null) {
 			waysFuture.cancel(true);
+			_executor.purge();
 		}
 		_timeout = seconds;
 		waysFuture = _executor.submit(new CallableWays(start, end));
@@ -56,7 +58,7 @@ public class PathWayGetter extends Thread {
 					} else {
 						_owner._responseQueue.add(new PathResponse(ways));
 					}
-				} catch (InterruptedException e) {
+				} catch (InterruptedException | CancellationException e) {
 					continue;
 				} catch (ExecutionException e) {
 					//FIXME
@@ -65,7 +67,7 @@ public class PathWayGetter extends Thread {
 				} catch (TimeoutException e) {
 					_owner._responseQueue.add(new PathResponse("Timed out after: " + _timeout + " seconds"));
 				}
-				 waysFuture = null;
+				waysFuture = null;
 			}
 		}
 	}

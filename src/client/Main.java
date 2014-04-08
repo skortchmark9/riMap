@@ -6,8 +6,6 @@ import backend.Util;
 
 public class Main {
 
-	// Change the port number if the port number is already being used.
-	private static final int DEFAULT_PORT = 9850;
 	public static void main(String[] args) throws IOException {
 		
 		if (args.length != 2) {
