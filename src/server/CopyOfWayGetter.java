@@ -65,7 +65,8 @@ class CopyOfWayGetter extends Thread {
 	 * @param maxLon
 	 */
 	void getWays(double minLat, double maxLat, double minLon, double maxLon) {
-		futureWays.cancel(true);
+		if (futureWays != null)
+			futureWays.cancel(true);
 		if (_running)
 			futureWays = _exec.submit(new WayWorker(minLat,maxLat, minLon, maxLon));
 	}
