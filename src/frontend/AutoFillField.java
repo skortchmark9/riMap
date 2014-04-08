@@ -35,7 +35,7 @@ public class AutoFillField extends JTextField {
 	private String initialText;
 	private List<String> suggestions;
 	private final int boxNo;
-	private boolean popped, accepted = false;
+	private boolean popped, suppress = false;
 
 	public AutoFillField(Client client, String startField, int boxNo) {
 		super(10);
@@ -171,7 +171,7 @@ public class AutoFillField extends JTextField {
 					int selectedRow = searchTable.getSelectedRow();
 					if (selectedRow >= 0) {
 						String suggestion = (String) searchTable.getValueAt(selectedRow, 0);
-						accepted = true;
+						suppress = true;
 						setText(suggestion);
 						int end = getSelectionEnd();
 						setSelectionStart(end);
@@ -194,8 +194,8 @@ public class AutoFillField extends JTextField {
 
 	public void setSuggestions(List<String> suggestions) {
 		this.suggestions = suggestions;
-		if (accepted) {
-			accepted = false;
+		if (suppress) {
+			suppress = false;
 		} else {
 		showPopup();
 		}
@@ -210,6 +210,12 @@ public class AutoFillField extends JTextField {
 		//We need to juggle focus a little to select the appropriate row.
 		requestFocusInWindow();
 	}
+	
+	public void populateField(String s, boolean suppressPopup) {
+		suppress = true;
+		setText(s);
+	}
+
 
 	/**
 	 * The popup contains the table of suggestions, so this will reveal them.

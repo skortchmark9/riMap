@@ -10,6 +10,6 @@ import kdtree.KDimensionable;
  */
 public interface Edge<T extends KDimensionable> {
 	T getTarget();
-	String getName();
+	String getUniqueID();
 	double getWeight();
 }
