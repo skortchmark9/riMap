@@ -54,7 +54,7 @@ public class TrafficSocket extends Thread {
 							_server.trafficUpdate(MapFactory.getTrafficMap());
 						} catch(NumberFormatException e) {
 							if (Constants.DEBUG_MODE)
-								Util.err("Looks like server sent a funky value? (TrafficSocket.run())"); //notify but keep reading
+								Util.err("WARNING: Looks like the traffic server sent us a funky value (via TrafficSocket)"); //notify but keep reading
 						}
 					}
 				}

@@ -94,15 +94,18 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		//===================================
 		//Render Ways
 		//===================================
-		g2d.setColor(Constants.FG_COLOR);
 		g2d.setStroke(new BasicStroke(1));
 		for (Way way : renderedWays) {
 			if (way != null) {
 				int[] start = geo2pixel(way.getStart().getCoordinates());
 				int[] end = geo2pixel(way.getTarget().getCoordinates());
+				
+				g2d.setColor(Constants.FG_COLOR);
 				if (way.getTraffic() > 3)
 					g2d.setColor(Constants.HIGH_TRAFFIC);
-				else if (way.getTraffic() > 1 && way.getTraffic() < 3) {
+				else if (way.getTraffic() > 2) {
+					g2d.setColor(Constants.MED_TRAFFIC);
+				} else if (way.getTraffic() > 1){
 					g2d.setColor(Constants.LOW_TRAFFIC);
 				}
 				//If the road is less than Constants.MIN_RENDER_LENGTH, don't paint it.
@@ -127,7 +130,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		
 		//Render Click Points
 		if (_source != null) {
-
 			Util.debug("Source Node:", _source.node.toString());
 			
 			g2d.setStroke(new BasicStroke(1));		
@@ -135,10 +137,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			g2d.drawOval(_source.screenCoords[0] - 5, _source.screenCoords[1] - 5, 10, 10);
 		}
 		if (_dest != null) {
-			if (Constants.DEBUG_MODE) {
-				//Util.out("Target pixel coords:", "("+target.screenCoords[0]+",", target.screenCoords[1]+")");
-				Util.out("Target Node", _dest.node.toString());
-			}
+			Util.debug("Target Node", _dest.node.toString());
+			
 			g2d.setStroke(new BasicStroke(1));		
 			g2d.setColor(Color.RED);
 			g2d.drawOval(_dest.screenCoords[0] - 5, _dest.screenCoords[1] - 5, 10, 10);
@@ -147,14 +147,14 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		//render boundaries if in range
 		if (Util.boundariesInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1])) {
 			
-			if (Constants.DEBUG_MODE)
-				Util.out("Painting Boundaries");
+			Util.debug("Painting Boundaries");
 			
 			int topLeft[] = geo2pixel(new double[]{Constants.MAXIMUM_LATITUDE, Constants.MINIMUM_LONGITUDE}); //top left boundary corner
 			int topRight[] = geo2pixel(new double[]{Constants.MAXIMUM_LATITUDE, Constants.MAXIMUM_LONGITUDE}); //top right boundary corner
 			int bottomRight[] = geo2pixel(new double[]{Constants.MINIMUM_LATITUDE, Constants.MAXIMUM_LONGITUDE});
 			int bottomLeft[] = geo2pixel(new double[]{Constants.MINIMUM_LATITUDE, Constants.MINIMUM_LONGITUDE});
-			g2d.setColor(Color.ORANGE);
+			g2d.setStroke(new BasicStroke(5));
+			g2d.setColor(Color.DARK_GRAY);
 			g2d.drawLine(topLeft[0], topLeft[1], topRight[0], topRight[1]); //top boundary
 			g2d.drawLine(topRight[0], topRight[1], bottomRight[0], bottomRight[1]); //right boundary
 			g2d.drawLine(bottomLeft[0], bottomLeft[1], bottomRight[0], bottomRight[1]); //bottom boundary

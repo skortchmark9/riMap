@@ -41,8 +41,9 @@ public class Constants {
 	public static final Color BG_COLOR = new Color(0,17,21);
 	public static final Color FG_COLOR = new Color(252, 251, 248);
 	//For indicating traffic
-	public static final Color LOW_TRAFFIC = Color.GREEN;
-	public static final Color HIGH_TRAFFIC = Color.RED;
+	public static final Color LOW_TRAFFIC	= new Color(217, 255, 0);
+	public static final Color HIGH_TRAFFIC	= new Color(255, 25, 0);
+	public static final Color MED_TRAFFIC	= new Color(255, 162, 0);
 	
 	//Boundary lines on map
 	//To be set by initBoundaries() in backend.
