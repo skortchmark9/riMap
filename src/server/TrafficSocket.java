@@ -48,10 +48,11 @@ public class TrafficSocket extends Thread {
 				while ((line = _input.readLine()) != null) {
 					String[] respData = line.split("\t");
 					if (respData.length == 2) {
-						try {	
+						try {
+							String name = respData[0].toLowerCase();
 							Double val = Double.parseDouble(respData[1]);
-							MapFactory.putTrafficValue(respData[0].toLowerCase(), val); //store the traffic info in map factory.
-							_server.trafficUpdate(MapFactory.getTrafficMap());
+							MapFactory.putTrafficValue(name, val); //store the traffic info in map factory.
+							_server.trafficUpdate(name, val);
 						} catch(NumberFormatException e) {
 							if (Constants.DEBUG_MODE)
 								Util.err("WARNING: Looks like the traffic server sent us a funky value (via TrafficSocket)"); //notify but keep reading

@@ -216,8 +216,8 @@ public class Client {
 			_executor.submit(new CacheThread(wayResp.getWays()));
 			break;
 		case TRAFFIC:
-			TrafficResponse trafResp = (TrafficResponse) resp;
-			MapFactory.setTrafficMap(trafResp.getTraffic());
+			TrafficResponse tResp = (TrafficResponse) resp;
+			MapFactory.putTrafficValue(tResp.getName(), tResp.getVal());
 			break;
 		default:
 			//We should never get here.
