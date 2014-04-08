@@ -66,7 +66,6 @@ public class Client {
 		try {
 			//host is localhost or IP if an IP address is specified
 			_socket = new Socket(_hostName, _port);
-			
 			_output = new ObjectOutputStream(_socket.getOutputStream());
 			_input = new ObjectInputStream(_socket.getInputStream());
 			_running = true;
