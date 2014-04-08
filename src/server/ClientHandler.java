@@ -35,7 +35,7 @@ public class ClientHandler extends Thread {
 	private PathWayGetter _pwGetter;
 	private SuggestionGetter _sugGetter;
 	private NeighborGetter _nbrGetter;
-	private WayGetter _wayGetter;
+	private CopyOfWayGetter _wayGetter;
 
 	//they all share this response queue
 	ConcurrentLinkedQueue<Response> _responseQueue;
@@ -67,7 +67,8 @@ public class ClientHandler extends Thread {
 		_pwGetter.start();
 		_sugGetter = new SuggestionGetter(this);
 		_nbrGetter = new NeighborGetter(this);
-		_wayGetter = new WayGetter(this);
+		_wayGetter = new CopyOfWayGetter(this);
+		_wayGetter.start();
 
 
 		_pool.add(this);
