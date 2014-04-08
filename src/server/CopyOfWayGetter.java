@@ -22,6 +22,7 @@ class CopyOfWayGetter extends Thread {
 	private ExecutorService _exec;
 	private Future<List<Way>> futureWays;
 	private volatile boolean _running;
+	List<Way> ways;
 
 	/**
 	 * @param owner
@@ -34,8 +35,7 @@ class CopyOfWayGetter extends Thread {
 	public void run() {
 		_running = true;
 		while(_running) {
-			List<Way> ways = null;
-			if (futureWays != null) {
+			if (futureWays != null && !futureWays.isDone()) {
 				try {
 					ways = futureWays.get();
 					if (ways != null)
