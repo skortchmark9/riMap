@@ -42,7 +42,7 @@ public class Client {
 	private ObjectOutputStream _output;
 	private ObjectInputStream _input;
 	private ReceiveThread _thread;
-	private String _IP;
+	private String _hostName;
 	private Queue<Request> _requests;
 	ExecutorService _executor;
 	Frontend _frontend;
@@ -51,10 +51,10 @@ public class Client {
 	 * Constructs a Client with the given port.
 	 * @param port the port number the client will connect to
 	 */
-	public Client(String IPAddress, int port) {
+	public Client(String hostName, int port) {
 		_executor = Executors.newFixedThreadPool(5);
 		_port = port;
-		_IP = IPAddress;
+		_hostName = hostName;
 	}
 
 	/**
@@ -68,12 +68,7 @@ public class Client {
 
 		try {
 			//host is localhost or IP if an IP address is specified
-			InetAddress host = _IP.equals("localhost") ? InetAddress.getLocalHost() : InetAddress.getByName(_IP);
-			_socket = new Socket();
-			
-			//connect socket with a 1-second timeout
-			_socket.connect(new InetSocketAddress(host, _port), 1000);
-			
+			_socket = new Socket(_hostName, _port);
 			_output = new ObjectOutputStream(_socket.getOutputStream());
 			_input = new ObjectInputStream(_socket.getInputStream());
 			_running = true;
