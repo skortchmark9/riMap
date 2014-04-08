@@ -54,8 +54,7 @@ public class TrafficSocket extends Thread {
 							MapFactory.putTrafficValue(name, val); //store the traffic info in map factory.
 							_server.trafficUpdate(name, val);
 						} catch(NumberFormatException e) {
-							if (Constants.DEBUG_MODE)
-								Util.err("WARNING: Looks like the traffic server sent us a funky value (via TrafficSocket)"); //notify but keep reading
+							Util.err("WARNING: Looks like the traffic server sent us a funky value (via TrafficSocket)"); //notify but keep reading
 						}
 					}
 				}
