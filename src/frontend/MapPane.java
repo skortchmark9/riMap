@@ -646,14 +646,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		 */
 		private static void reposition(double lat, double lon) {
 			double height = Constants.GEO_DIMENSION_FACTOR / scale;
-			
 			double rat = (double)_pixelHeight / (double)_pixelWidth;
-			
-			Util.out("ratio =", rat);
-			
 			double width = height * rat;
-			
-			Util.out("Wid =", width);
 			
 			//Check to make sure move is in bounds
 			if (lat > Constants.MAXIMUM_LATITUDE + 0.002 || lat-height < Constants.MINIMUM_LATITUDE - 0.002 ||
