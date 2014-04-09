@@ -20,14 +20,14 @@ public class PathRequest implements Request {
 		_timeout = timeout;
 	}
 	
-	public PathRequest(Node source, Node dest, int timeout, String sxs1,String  sxs2, String dxs1, String dxs2) {
+	public PathRequest(Node source, Node dest, int timeout, String sxs1, String  sxs2, String dxs1, String dxs2) {
 		_source = source;
 		_dest = dest;
 		_timeout = timeout;
 		_sourceXS1 = sxs1.equals("Cross Street 1") ? "" : sxs1;
-		_sourceXS2 = sxs2.equals("Cross Street 2") ? "" : sxs1;
-		_destXS1 = dxs1.equals("Cross Street 1") ? "" : sxs1;
-		_destXS2 = dxs1.equals("Cross Street 2") ? "" : sxs1;
+		_sourceXS2 = sxs2.equals("Cross Street 2") ? "" : sxs2;
+		_destXS1 = dxs1.equals("Cross Street 1") ? "" : dxs1;
+		_destXS2 = dxs2.equals("Cross Street 2") ? "" : dxs2;
 	}
 	
 	public Node getSource() {
@@ -56,6 +56,9 @@ public class PathRequest implements Request {
 	
 	@Override
 	public String toString() {
-		return String.format("PathReq source = %s dest = %s timeout = %s", _source, _dest, _timeout);
+		return String.format("PathReq source = %s dest = %s timeout = %s\n"
+				+ "START xs1 = %s xs2 = %s"
+				+ "\nEND xs1 = %s xs2 = %s",
+				_source, _dest, _timeout, _sourceXS1, _sourceXS2, _destXS1, _destXS2);
 	}
 }
