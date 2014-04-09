@@ -292,9 +292,9 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 			map.repaint();
 	}
 
-	public void giveDirections(List<Way> path) {
+	public void giveDirections(List<Way> path, Node source, Node end) {
 		map.setCalculatedRoute(path);
-		//TODO: turn-by-turn directions
+		map.setPoints(source, end);
 	}
 
 	public void setWays(List<Way> ways) {
