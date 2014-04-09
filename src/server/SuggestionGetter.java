@@ -30,10 +30,10 @@ class SuggestionGetter {
 		_box3_threadCount = new AtomicInteger(0);
 		_box4_threadCount = new AtomicInteger(0);
 		
-		_box1_exec = Util.defaultThreadPool(2, 4);
-		_box2_exec = Util.defaultThreadPool(2, 4);
-		_box3_exec = Util.defaultThreadPool(2, 4);
-		_box4_exec = Util.defaultThreadPool(2, 4);
+		_box1_exec = Util.defaultThreadPool("Box 1", 2, 4);
+		_box2_exec = Util.defaultThreadPool("Box 2" ,2, 4);
+		_box3_exec = Util.defaultThreadPool("Box 3", 2, 4);
+		_box4_exec = Util.defaultThreadPool("Box 4", 2, 4);
 	}
 	
 	/**
