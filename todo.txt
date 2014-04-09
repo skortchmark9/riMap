@@ -5,7 +5,9 @@ validate autocorrect results
 
 Turn-by-turn directions
 
-JInternal frame.setMaxWidth. // .setResizable(false)
+- Intersections named the same thing in multiple places do not get direcitons properly... i.e. Charlesfield street & Brown University to wherever...
+	- e.g. George Street & Brown University.
+		- i.e. there are multiple George Street & Brown University intersections
 
 MapFactory - should behave differently for client vs server.
 Used cached ways in client and save time on network calls
