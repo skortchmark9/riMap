@@ -226,9 +226,6 @@ public class Client {
 			throw new IllegalArgumentException("Unsupported Response type");
 		}
 	}
-<<<<<<< HEAD
-
-=======
 	
 	private boolean matchesRange(double[] respCorners) {
 		if (_minLat == respCorners[0] &&
@@ -239,7 +236,6 @@ public class Client {
 		return false;
 	}
 	
->>>>>>> db28c1c4bfdd83a6eefcbdc0db4ab2166a781e4d
 	public Dimension getFrameSize() {
 		return _frontend.getSize();
 	}

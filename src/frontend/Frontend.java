@@ -55,6 +55,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	final Cursor defaultCursor = Cursor.getDefaultCursor();
 	final Cursor busyCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 	JInternalFrame controlPanel;
+	NotifierPopup notifier;
 
 	SimpleLoadingPane loadingScreen;
 	private JPanel loadingPanel;
@@ -201,10 +202,9 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		//from the event dispatching thread.
 		DefaultCaret caret = (DefaultCaret)msgBox.getCaret();
 		JScrollPane scrollPane = new JScrollPane(msgBox);
-		sidePanel.add(scrollPane);
+//		sidePanel.add(scrollPane);
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);		
 		guiMessage("Console: look here for messages");
-
 
 		//Lays out the components for the control panel. It's a mess because it
 		//was made with WindowBuilder.
@@ -258,9 +258,12 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 
 		//Create a control panel.
 		controlPanel = new JInternalFrame("Controls", false, false, false, false);
+		
 		controlPanel.add(sidePanel);
 		controlPanel.pack();
 		controlPanel.setVisible(true);
+		notifier = new NotifierPopup(controlPanel);
+
 	}
 
 	/**
@@ -333,12 +336,12 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	 * @param str - the string (message) to display to the user.
 	 */
 	public void guiMessage(String str) {
-		if (loading && loadingScreen != null) {
+		if (loading && loadingScreen != null)
 			loadingScreen.updateProgress(str);
-		} else {
-			if (msgBox == null) return;
+		if (msgBox != null)
 			msgBox.append(str + "\n");
-		}
+		if (notifier != null)
+			notifier.displayInformation(str, 3);
 	}
 
 	/**

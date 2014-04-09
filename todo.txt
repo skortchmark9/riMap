@@ -1,17 +1,11 @@
 SAVE NEWLINES IN BINARY SEARCH FILE.
-<<<<<<< HEAD
-=======
 Changing the wayCacheing to an array instead of a hashmap
 
 validate autocorrect results
 
 Turn-by-turn directions
 
-JInternal frame.setMaxWidth. // .setResizable(false)
->>>>>>> db28c1c4bfdd83a6eefcbdc0db4ab2166a781e4d
-
 MapFactory - should behave differently for client vs server.
-Used cached ways in client and save time on network calls
 
 Make server cleanly disengage
 quit gracefully.
@@ -27,3 +21,7 @@ ENSURE THAT THE CLIENT NEVER CRASHES EVEN IF THE SERVER DISAPPEARS
 -Think of some nice display for calculated paths other than just highlighting the streets. (e.g. street names, turn-by-turn)
 make the map load less ways if you resize.
 -Display fewer roads on zoom out
+
+fix tab selection autofillfield
+
+get rid of references to msg box in frontend
