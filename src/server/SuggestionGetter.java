@@ -16,7 +16,7 @@ import backend.Util;
 class SuggestionGetter {
 	private ClientHandler _owner;
 	private AtomicInteger _box1_threadCount, _box2_threadCount, _box3_threadCount, _box4_threadCount;
-	private Executor _box1_exec, _box2_exec, _box3_exec, _box4_exec;
+	private Executor _exec;
 	
 	/**
 	 * 
@@ -30,10 +30,7 @@ class SuggestionGetter {
 		_box3_threadCount = new AtomicInteger(0);
 		_box4_threadCount = new AtomicInteger(0);
 		
-		_box1_exec = Util.defaultThreadPool("Box 1", 2, 4);
-		_box2_exec = Util.defaultThreadPool("Box 2" ,2, 4);
-		_box3_exec = Util.defaultThreadPool("Box 3", 2, 4);
-		_box4_exec = Util.defaultThreadPool("Box 4", 2, 4);
+		_exec = Util.defaultThreadPool("Autocorrection Executor", 1, 4);
 	}
 	
 	/**
@@ -41,21 +38,8 @@ class SuggestionGetter {
 	 * @param input
 	 * @param boxNum
 	 */
-	void suggestFor(String input, int boxNum) {
-		switch (boxNum) {
-		case 1:
-			_box1_exec.execute(new SuggestionWorker(input, boxNum));
-			break;
-		case 2:
-			_box2_exec.execute(new SuggestionWorker(input, boxNum));
-			break;
-		case 3:
-			_box3_exec.execute(new SuggestionWorker(input, boxNum));
-			break;
-		case 4:
-			_box4_exec.execute(new SuggestionWorker(input, boxNum));
-			break;
-		}
+	void suggestFor(String input, int boxNum) {		
+		_exec.execute(new SuggestionWorker(input, boxNum));
 	}
 	
 	/**
