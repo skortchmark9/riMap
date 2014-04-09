@@ -5,7 +5,6 @@ import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,15 +22,11 @@ import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
-import javax.swing.JTextArea;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import javax.swing.text.DefaultCaret;
 
-import maps.MapFactory;
 import maps.Node;
 import maps.Way;
 import backend.Constants;
@@ -47,17 +42,18 @@ import client.Client;
  */
 public class Frontend extends JFrame implements ActionListener, Runnable {
 	private static final long serialVersionUID = 1L;
-	private AutoFillField box1, box2, box3, box4;
-	JButton getDirections, clearPoints;
-	JTextArea msgBox;
-	MapPane map;
-	Client client;
-	final Cursor defaultCursor = Cursor.getDefaultCursor();
-	final Cursor busyCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
-	JInternalFrame controlPanel;
-	NotifierPopup notifier;
-
-	SimpleLoadingPane loadingScreen;
+	//Boxes to input streetnames
+	private AutoFillField _box1, _box2, _box3, _box4;
+	//A button for getting directions and a button for clearing
+	private JButton _getDirections, _clear;
+	//The mapPane which displays the ways, paths, and points.
+	private MapPane _map;
+	//The client owner.
+	private Client _client;
+	//A floating controlPanel for user interactions
+	private JInternalFrame _controlPanel;
+	private NotifierPopup _notifier;
+	private SimpleLoadingPane loadingScreen;
 	private JPanel loadingPanel;
 	private JLabel lblTimeouts;
 	private JSpinner timeOutSpinner;
@@ -70,15 +66,14 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	 */	
 	public Frontend(Client client) {
 		super("MAPS");
-		this.client = client;
+		_client = client;
 		//Setting up the frame.
-		this.setTitle("MAPS - By Samuel Kortchmar and Eli Martinez Cohen");
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize());
-		//this.setExtendedState(Frame.MAXIMIZED_BOTH);
-		this.getContentPane().setLayout(new FlowLayout());
-		this.getContentPane().setBackground(Color.BLACK);
-		this.setCursor(busyCursor);
+		setTitle("MAPS - By Samuel Kortchmar and Eli Martinez Cohen");
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize());
+		getContentPane().setLayout(new FlowLayout());
+		getContentPane().setBackground(Color.BLACK);
+		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
 		//Setting up the loading screen's info.
 		JPanel boilerPlate = new JPanel();
@@ -106,21 +101,21 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		loadingPanel.add(boilerPlate, BorderLayout.NORTH);
 
 		//Adding the loading screen to the frame.
-		this.getContentPane().add(loadingPanel);
-		this.pack();
-		this.setVisible(true);
+		getContentPane().add(loadingPanel);
+		pack();
+		setVisible(true);
 		loadingPanel.requestFocusInWindow();
 	}
 
 	@Override
 	public void run() {
 		//Waiting for the backend to be done/server connection to be made.
-		while(!client.serverReady()) {}
+		while(!_client.serverReady()) {}
 
 		//Finished loading, removing the loading screen.
 		loading = false;
-		this.remove(loadingPanel);
-		this.setCursor(defaultCursor);
+		remove(loadingPanel);
+		setCursor(Cursor.getDefaultCursor());
 		//Initializing the rest of the Frontend.
 		initMainScreen();
 	}
@@ -137,31 +132,39 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 
 		//Creates the map pane. Wrapping it in backgroundPanel allows us to use
 		//a layoutManager to center it, even though JDesktopPane does not support one.
-		map = new MapPane(client);
-		map.setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100));
+		_map = new MapPane(_client);
+		_map.setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100));
 		JPanel backgroundPanel = new JPanel(new GridBagLayout());
 		backgroundPanel.setBackground(Color.BLACK);
-		backgroundPanel.add(map);
+		backgroundPanel.add(_map);
 		backgroundPanel.setBounds(0, 0, this.getWidth(), this.getHeight());
 
 
 		//Adds the controlPanel and Map/BackgroundPanel to the desktop.
-		desktop.add(controlPanel);
+		desktop.add(_controlPanel);
 		desktop.add(backgroundPanel);
 		setContentPane(desktop);
 		setControlPanelFocus(true);
-		this.revalidate();		
-		box1.requestFocusInWindow();
+		revalidate();		
+		_box1.requestFocusInWindow();
 	}
 
+	/**
+	 * Sets whether we want the control pane or the map to have the focus.
+	 * Used by MapPane to enable arrow key traversal.
+	 * @param yes -do we want it to have focus?
+	 */
 	private void setControlPanelFocus(boolean yes) {
 		try {
-			controlPanel.setSelected(yes);
+			_controlPanel.setSelected(yes);
 		} catch (PropertyVetoException e) {
 		}
 
 	}
 
+	/**
+	 * Creates the control panel which handles all user input (buttons & typing)
+	 */
 	private void createControlPanel() {
 		//The panel which holds the control box.
 		JPanel sidePanel = new JPanel();
@@ -176,35 +179,23 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		sidePanel.add(searchButtonsPanel);
 
 		//Initializing the autofill boxes.
-		box1 = new AutoFillField(client, "Cross Street 1", 1);
-		box2 = new AutoFillField(client, "Cross Street 2", 2);
-		box3 = new AutoFillField(client, "Cross Street 1", 3);
-		box4 = new AutoFillField(client, "Cross Street 2", 4);
+		_box1 = new AutoFillField(_client, "Cross Street 1", 1);
+		_box2 = new AutoFillField(_client, "Cross Street 2", 2);
+		_box3 = new AutoFillField(_client, "Cross Street 1", 3);
+		_box4 = new AutoFillField(_client, "Cross Street 2", 4);
 
 		//These are buttons for finding and removing paths
-		getDirections = new JButton("Get Directions");
-		getDirections.addActionListener(this);
+		_getDirections = new JButton("Get Directions");
+		_getDirections.addActionListener(this);
 
-		clearPoints = new JButton("Clear");
-		clearPoints.addActionListener(this);
+		_clear = new JButton("Clear");
+		_clear.addActionListener(this);
 
 
 		//This spinner is used to set the timeout duration for pwRequester.
 		timeOutSpinner = new JSpinner(new SpinnerNumberModel(Constants.DEFAULT_REQUEST_TIMEOUT, 0, 10, 1));
 		lblTimeouts = new JLabel("Timeout (s):");
 		lblTimeouts.setForeground(Constants.GLOW_IN_THE_DARK);
-
-		//console box to print messages to the user
-		msgBox = new JTextArea(5, 20);
-		msgBox.setMargin(new Insets(5,5,5,5));		
-		msgBox.setEditable(false);
-		//Note these lines are necessary because we don't handle appending text
-		//from the event dispatching thread.
-		DefaultCaret caret = (DefaultCaret)msgBox.getCaret();
-		JScrollPane scrollPane = new JScrollPane(msgBox);
-//		sidePanel.add(scrollPane);
-		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);		
-		guiMessage("Console: look here for messages");
 
 		//Lays out the components for the control panel. It's a mess because it
 		//was made with WindowBuilder.
@@ -219,18 +210,18 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 										.addPreferredGap(ComponentPlacement.RELATED)
 										.addComponent(timeOutSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 										.addPreferredGap(ComponentPlacement.RELATED)
-										.addComponent(getDirections, GroupLayout.PREFERRED_SIZE, 121, Short.MAX_VALUE)
+										.addComponent(_getDirections, GroupLayout.PREFERRED_SIZE, 121, Short.MAX_VALUE)
 										.addPreferredGap(ComponentPlacement.RELATED)
-										.addComponent(clearPoints, GroupLayout.PREFERRED_SIZE, 65, GroupLayout.PREFERRED_SIZE)
+										.addComponent(_clear, GroupLayout.PREFERRED_SIZE, 65, GroupLayout.PREFERRED_SIZE)
 										.addGap(10))
 										.addGroup(gl_searchButtonsPanel.createSequentialGroup()
 												.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING, false)
-														.addComponent(box3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-														.addComponent(box1, GroupLayout.DEFAULT_SIZE, 151, Short.MAX_VALUE))
+														.addComponent(_box3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+														.addComponent(_box1, GroupLayout.DEFAULT_SIZE, 151, Short.MAX_VALUE))
 														.addPreferredGap(ComponentPlacement.UNRELATED)
 														.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING, false)
-																.addComponent(box4, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-																.addComponent(box2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+																.addComponent(_box4, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																.addComponent(_box2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 																.addGap(17)))
 																.addContainerGap())
 				);
@@ -239,31 +230,34 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 				.addGroup(gl_searchButtonsPanel.createSequentialGroup()
 						.addContainerGap()
 						.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(box1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(box2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addComponent(_box1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(_box2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.BASELINE)
-										.addComponent(box3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-										.addComponent(box4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+										.addComponent(_box3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+										.addComponent(_box4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 										.addPreferredGap(ComponentPlacement.RELATED)
 										.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.BASELINE)
-												.addComponent(getDirections, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+												.addComponent(_getDirections, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 												.addComponent(lblTimeouts)
 												.addComponent(timeOutSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-												.addComponent(clearPoints, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+												.addComponent(_clear, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
 				);
 		gl_searchButtonsPanel.setAutoCreateContainerGaps(true);
 		gl_searchButtonsPanel.setAutoCreateGaps(true);
 		searchButtonsPanel.setLayout(gl_searchButtonsPanel);
 
 		//Create a control panel.
-		controlPanel = new JInternalFrame("Controls", false, false, false, false);
+		_controlPanel = new JInternalFrame("Controls", false, false, false, false);
 		
-		controlPanel.add(sidePanel);
-		controlPanel.pack();
-		controlPanel.setVisible(true);
-		notifier = new NotifierPopup(controlPanel);
-
+		_controlPanel.add(sidePanel);
+		_controlPanel.pack();
+		_controlPanel.setVisible(true);
+		
+		//This popup will show up under the control panel and display useful
+		//useful information to the user.
+		_notifier = new NotifierPopup(_controlPanel);
+		guiMessage("Look here for messages");
 	}
 
 	/**
@@ -276,56 +270,82 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	 */
 	public void updateNeighbor(Node neighbor, boolean isSource, String street1, String street2) {
 		//set point on map
-		map.setPoint(neighbor, isSource);
+		_map.setPoint(neighbor, isSource);
 		//update search boxes
 		if (isSource) {
-			box1.populateField(street1, true);
-			box2.populateField(street2, true);
+			_box1.populateField(street1, true);
+			_box2.populateField(street2, true);
 		} else {
-			box3.populateField(street1, true);
-			box4.populateField(street2, true);
+			_box3.populateField(street1, true);
+			_box4.populateField(street2, true);
 		}
-		map.requestFocusInWindow();
+		_map.requestFocusInWindow();
 		setControlPanelFocus(false);
 	}
 
+	/**
+	 * Repaints the map if it is available.
+	 */
 	public void refreshMap() {
-		if (map != null)
-			map.repaint();
+		if (_map != null)
+			_map.repaint();
 	}
 
+	/**
+	 * Passes info about paths to the mapPane.
+	 * @param path - the list of ways to be drawn as the path
+	 * @param source - the source node to be drawn as the start of the path
+	 * @param end - the end node to be drawn as the end of the path
+	 */
 	public void giveDirections(List<Way> path, Node source, Node end) {
-		map.setCalculatedRoute(path);
-		map.setPoints(source, end);
+		_map.setCalculatedRoute(path);
+		_map.setPoints(source, end);
+		//TODO implement turn by turn directions
 	}
 
+	/**
+	 * Sets the ways to be rendered on the map to be...
+	 * @param ways - the ways to be rendered.
+	 */
 	public void setWays(List<Way> ways) {
-		if (map != null && ways != null)
-		map.renderWays(ways);
+		if (_map != null && ways != null)
+		_map.renderWays(ways);
 	}
 	
+	/**
+	 * Adds the following ways to the maps existing renderedWaysList.
+	 * @param ways - some ways which perhaps contain incomplete data.
+	 */
 	public void addWays(List<Way> ways) {
-		if (map != null)
-			map.addWays(ways);
+		if (_map != null)
+			_map.addWays(ways);
 	}
 	
-
+	/**
+	 * Convenience method for returning the box of the given number.
+	 * @param num - the number of box to be requested. Can be 1-4.
+	 * @return
+	 */
 	public AutoFillField getBox(int num) {
 		switch (num) {
-		case 1: return box1;
-		case 2: return box2;
-		case 3: return box3;
-		case 4: return box4;
+		case 1: return _box1;
+		case 2: return _box2;
+		case 3: return _box3;
+		case 4: return _box4;
 		default: return null;
 		}
 	}
 
+	/**
+	 * Resets the autofill boxes and 
+	 */
 	private void clear() {
-		box1.reset();
-		box2.reset();
-		box3.reset();
-		box4.reset();
-		map.clearClickPoints();
+		//Resets boxes 1-4
+		for(int i = 1; i <= 4; i++) {
+			getBox(i).reset();
+		}
+		//Ckears the points on the map.
+		_map.clearClickPoints();
 	}
 
 	/**
@@ -334,15 +354,19 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	 * or not Dijkstra's was able to find a path to connect the nodes.
 	 * 
 	 * @param str - the string (message) to display to the user.
+	 * @param time - the time to display the message for (only used by notifier.
 	 */
-	public void guiMessage(String str) {
+	public void guiMessage(String str, int time) {
 		if (loading && loadingScreen != null)
 			loadingScreen.updateProgress(str);
-		if (msgBox != null)
-			msgBox.append(str + "\n");
-		if (notifier != null)
-			notifier.displayInformation(str, 3);
+		if (_notifier != null)
+			_notifier.displayInformation(str, time);
 	}
+	
+	public void guiMessage(String str) {
+		guiMessage(str, 3);
+	}
+
 
 	/**
 	 * Handles the various buttons' actions from the GUI
@@ -350,24 +374,24 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		//Get Directions from the Screen points (defined by clicking)
-		if (e.getSource() == getDirections) {
+		if (e.getSource() == _getDirections) {
 			Node start;
 			Node end;
-			String xs1S = box1.getText();
-			String xs2S = box2.getText();
-			String xs1E = box3.getText();
-			String xs2E = box4.getText();
-			start = map.getStart();
-			end = map.getEnd();
+			String xs1S = _box1.getText();
+			String xs2S = _box2.getText();
+			String xs1E = _box3.getText();
+			String xs2E = _box4.getText();
+			start = _map.getStart();
+			end = _map.getEnd();
 			int timeOut = Constants.DEFAULT_REQUEST_TIMEOUT;
 			try {
 				timeOutSpinner.commitEdit();
 				timeOut = (int) timeOutSpinner.getValue();
 			} catch (ParseException e1) {
 			}
-			client.requestPath(start, end, timeOut, xs1S, xs2S, xs1E, xs2E);
+			_client.requestPath(start, end, timeOut, xs1S, xs2S, xs1E, xs2E);
 
-		} else if (e.getSource() == clearPoints) {
+		} else if (e.getSource() == _clear) {
 			clear();
 		}
 	}

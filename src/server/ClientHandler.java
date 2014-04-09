@@ -134,13 +134,12 @@ public class ClientHandler extends Thread {
 			//We check if there are intersections to be found
 			Node source =  MapFactory.createIntersection(pReq.getCrossStreet(true, 1), pReq.getCrossStreet(true, 2));
 			Node dest = MapFactory.createIntersection(pReq.getCrossStreet(false, 1), pReq.getCrossStreet(false, 2));
-			if (source == null)
+			if (source == null || source == dest)
 				source = pReq.getSource();
-			if (dest == null)
+			if (dest == null || source == dest)
 				dest = pReq.getDest();
 			_pwGetter.findPath(source, dest, pReq.getTimeout());
 			break;
-
 		default:
 			//not much we can do with an invalid request
 			throw new IllegalArgumentException("Unsupported request type");

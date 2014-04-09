@@ -23,5 +23,9 @@ make the map load less ways if you resize.
 -Display fewer roads on zoom out
 
 fix tab selection autofillfield
+Fix buttons in Control panel
 
-get rid of references to msg box in frontend
+Cosmetic stuff
+Public/private methods
+package design
+testing

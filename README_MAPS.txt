@@ -9,7 +9,7 @@ Elias Martinez Cohen <emc3>
 ==========================================
 
 * Stars:
-	KDTree and other stuff came from Elias's (<emc3>) Stars project. This went virtually unmodified except for one small change in how the KDTree was built.
+	KDTree and other stuff came from Elias's (<emc3>) Stars project. This went virtually unmodified except for one change in how the KDTree was built - the constructor only sorts K times and therefore helps us build the tree very quickly.
 * Autocorrect:
 	We used Sam's autocorrect (<skortchm>). We didn't have to change it much.
 * Bacon:
@@ -32,11 +32,8 @@ Elias Martinez Cohen <emc3>
 	- The mapfactory controls most of the pieces of the different project to work together. It is a very powerful class. Its responsibilities include creating new KDTree, creating new RadixTree for autocorrect, and Querying the binary search files (BSFs) for info. It also is set up to split the BSF searches into blocks so that in the future threading would become easier. We did not have time to implement such a sophisticated threading structure but we will try to do so for Traffic.
 
 ==========================================
-* NOTE: Some tests involving ASCII characters have been deleted because of problems with ant building them.
-
-==========================================
 
 * OPTIMIZATIONS:
 	We implemented various cacheing schemes:
-		- In BSF, we cache the position of newlines to make searching for line stars and ends faster. These positions are stored in a Guava TreeSet.
+		- In BSF, we cache the position of newlines to make searching for line stars and ends faster. These positions are stored in a Guava TreeSet. The TreeSet allows us to create ranges that define the length of a line. The gaps between the ranges represent newlines.
 		- In MapFactory, when we load Ways & Nodes from disk (from resource files) we also cache these in a HashMap. The idea here is that every time we need to go to disk to get a Way or a Node, we first check the HashMap to see if we have already grabbed the node and/or way info. This way we can get way/node info we have already cached in O(1) instead of however long it takes to Binary Search the file.
