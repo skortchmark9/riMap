@@ -42,7 +42,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private ClickNeighbor _dest;
 	private Client _client;
 	private boolean clickSwitch = true;
-	//private ExecutorService executor;
 	
 	/**
 	 * Construct a MapPane linked to the given backend.

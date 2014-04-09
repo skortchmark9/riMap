@@ -165,7 +165,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		});
 		
 		
-		this.revalidate();		
+		revalidate();		
 		_box1.requestFocusInWindow();
 	}
 
@@ -198,6 +198,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		JPanel searchButtonsPanel = new JPanel();
 		searchButtonsPanel.setOpaque(false);
 		sidePanel.add(searchButtonsPanel);
+		_notifier = new NotifierPopup(sidePanel);
 
 		//Initializing the autofill boxes.
 		_box1 = new AutoFillField(_client, "Cross Street 1", 1);
@@ -275,9 +276,6 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		_controlPanel.pack();
 		_controlPanel.setVisible(true);
 		
-		//This popup will show up under the control panel and display useful
-		//useful information to the user.
-		guiMessage("Look here for messages");
 	}
 
 	/**
@@ -364,7 +362,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		for(int i = 1; i <= 4; i++) {
 			getBox(i).reset();
 		}
-		//Ckears the points on the map.
+		//Clears the points on the map.
 		_map.clearClickPoints();
 	}
 
