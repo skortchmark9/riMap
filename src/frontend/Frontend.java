@@ -85,7 +85,6 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		boilerPlate.setBorder(BorderFactory.createEmptyBorder(300, 100, 100, 100));
 		boilerPlate.setOpaque(false);
 
-
 		//Making our names look dope.
 		String[] titles = {"       MAPS", "BY ELIAS MARTINEZ COHEN", "AND SAMUEL V. KORTCHMAR"};
 		for(int i = 0; i < titles.length; i++ ) {
@@ -258,7 +257,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		searchButtonsPanel.setLayout(gl_searchButtonsPanel);
 
 		//Create a control panel.
-		controlPanel = new JInternalFrame("Controls", true, false, false, false);
+		controlPanel = new JInternalFrame("Controls", false, false, false, false);
 		controlPanel.add(sidePanel);
 		controlPanel.pack();
 		controlPanel.setVisible(true);

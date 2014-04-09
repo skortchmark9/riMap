@@ -42,7 +42,6 @@ class CopyOfWayGetter extends Thread {
 					if (ways != null)
 						_owner._responseQueue.add(new WayResponse(ways));
 				} catch (InterruptedException | CancellationException | ExecutionException e) {
-					e.printStackTrace();
 					continue; //Standard operating behavior
 				}
 			}

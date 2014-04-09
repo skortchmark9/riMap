@@ -4,13 +4,14 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 import kdtree.KDimensionable;
 import maps.MapFactory;
@@ -63,6 +64,7 @@ public class Client {
 	 * and then launch the GUI.
 	 */
 	public void start() {
+		UIManager.put("swing.boldMetal", Boolean.FALSE);
 		_frontend = new Frontend(this);
 		new Thread(_frontend).start();
 
@@ -72,9 +74,9 @@ public class Client {
 			_output = new ObjectOutputStream(_socket.getOutputStream());
 			_input = new ObjectInputStream(_socket.getInputStream());
 			_running = true;
-			
+
 			_requests = new LinkedList<>();
-			
+
 			_thread = new ReceiveThread();
 			_thread.start();
 
@@ -153,7 +155,7 @@ public class Client {
 	public void requestPath(Node start, Node end, int timeout) {
 		request(new PathRequest(start, end, timeout));
 	}
-	
+
 	public void requestPath(Node start, Node end, int timeout, String xs1S, String xs2S, String xs1E, String xs2E) {
 		request(new PathRequest(start, end, timeout, xs1S, xs2S, xs1E, xs2E));
 	}
@@ -219,11 +221,11 @@ public class Client {
 			throw new IllegalArgumentException("Unsupported Response type");
 		}
 	}
-	
+
 	public Dimension getFrameSize() {
 		return _frontend.getSize();
 	}
-	
+
 	/**
 	 * A thread that will receive the messages sent by the server to
 	 * display to the user.
