@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +16,6 @@ import backend.Util;
 
 /**
  * @author samkortchmar
- * Should be changed probably
  */
 public class PathWayGetter extends Thread {
 
@@ -25,13 +23,14 @@ public class PathWayGetter extends Thread {
 	CallableWays _worker;
 	volatile boolean _running;
 	ThreadPoolExecutor _executor;
-	Future<List<Way>> waysFuture;
+	Future<PathResponse> waysFuture;
 	int _timeout;
 
 	public PathWayGetter(ClientHandler owner) {
+		super("PathWayGetter");
 		_owner = owner;
 		_running = true;
-		_executor = Util.defaultThreadPool(1, 1);
+		_executor = Util.defaultThreadPool("PathWayGetter", 2, 2);
 	}
 
 	public void findPath(Node start, Node end, int seconds) {
@@ -44,6 +43,7 @@ public class PathWayGetter extends Thread {
 	}
 
 	public void close() {
+		_executor.shutdown();
 		_running = false;
 	}
 
@@ -52,19 +52,16 @@ public class PathWayGetter extends Thread {
 		while(_running) {
 			if (waysFuture != null) {
 				try {
-					List<Way> ways = waysFuture.get(_timeout, TimeUnit.SECONDS);
-					if (ways.isEmpty()) {
-						_owner._responseQueue.add(new PathResponse("Could not find a path."));
-					} else {
-						_owner._responseQueue.add(new PathResponse(ways));
-					}
+					PathResponse result = waysFuture.get(_timeout, TimeUnit.SECONDS);
+					_owner._responseQueue.add(result);
 				} catch (InterruptedException | CancellationException e) {
+					e.printStackTrace();
 					continue;
 				} catch (ExecutionException e) {
-					//FIXME
 					Util.err("ERROR: Execution Exception in PathWayGetter...not sure why");
-					e.printStackTrace();
 				} catch (TimeoutException e) {
+					waysFuture.cancel(true);
+					waysFuture = null;
 					_owner._responseQueue.add(new PathResponse("Timed out after: " + _timeout + " seconds"));
 				}
 				waysFuture = null;
@@ -72,9 +69,7 @@ public class PathWayGetter extends Thread {
 		}
 	}
 
-
-
-	class CallableWays implements Callable<List<Way>> {
+	class CallableWays implements Callable<PathResponse> {
 		Node start, end;
 
 		public CallableWays(Node start, Node end) {
@@ -83,8 +78,18 @@ public class PathWayGetter extends Thread {
 		}
 
 		@Override
-		public List<Way> call() {
-			return _owner._b.getPath(start, end);
+		public PathResponse call() {
+			if (start == null && end == null)
+				return new PathResponse("Could not find either location");
+			else if (start == null) {
+				return new PathResponse("Could not find start location");
+			} else if (end == null) {
+				return new PathResponse("Could not find end location");
+			} else {
+			List<Way> path = _owner._b.getPath(start, end);
+			return path.isEmpty() ? new PathResponse("Could not find a path") :
+									new PathResponse(path, start, end);
+			}
 		}
 	}
 }
