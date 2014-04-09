@@ -154,7 +154,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			int bottomRight[] = geo2pixel(new double[]{Constants.MINIMUM_LATITUDE, Constants.MAXIMUM_LONGITUDE});
 			int bottomLeft[] = geo2pixel(new double[]{Constants.MINIMUM_LATITUDE, Constants.MINIMUM_LONGITUDE});
 			g2d.setStroke(new BasicStroke(5));
-			g2d.setColor(Color.DARK_GRAY);
+			g2d.setColor(Color.GRAY);
 			g2d.drawLine(topLeft[0], topLeft[1], topRight[0], topRight[1]); //top boundary
 			g2d.drawLine(topRight[0], topRight[1], bottomRight[0], bottomRight[1]); //right boundary
 			g2d.drawLine(bottomLeft[0], bottomLeft[1], bottomRight[0], bottomRight[1]); //bottom boundary
@@ -431,14 +431,15 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * @param mousePos - the mouse point to zoom in towards
 	 */
 	private void zoomIn(Point mousePos) {
+		double zoomFactor = 1.05;
 		if (scale < Constants.MAX_ZOOM) {
-			scale *= 1.1;
+			scale *= zoomFactor;
 			
 			if (Constants.DEBUG_MODE)
 				Util.out("New Scale:", scale);
 			
-			int newX = (int)Math.ceil((mousePos.x*(1.1-1) - 1));
-			int newY = (int)Math.ceil((mousePos.y*(1.1-1) - 1));
+			int newX = (int)Math.ceil((mousePos.x*(zoomFactor-1) - 1));
+			int newY = (int)Math.ceil((mousePos.y*(zoomFactor-1) - 1));
 			
 			double[] newAnchor = pixel2geo(newX, newY);
 			Corners.reposition(newAnchor[0], newAnchor[1]); //reposition all corners with new coords
@@ -460,13 +461,14 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * @param mousePos - the mousePoint to zoom out from
 	 */
 	private void zoomOut(Point mousePos) {
+		double zoomFactor = 0.95;
 		if (scale > Constants.MIN_ZOOM) {
-			scale *= 0.9;
+			scale *= zoomFactor;
 			if (Constants.DEBUG_MODE)
 				Util.out("New Scale:", scale);
 			
-			int newX = (int)Math.ceil((mousePos.x*(0.9-1) - 1));
-			int newY = (int)Math.ceil((mousePos.y*(0.9-1) - 1));
+			int newX = (int)Math.ceil((mousePos.x*(zoomFactor-1) - 1));
+			int newY = (int)Math.ceil((mousePos.y*(zoomFactor-1) - 1));
 			double[] newAnchor = pixel2geo(newX, newY);
 			Corners.reposition(newAnchor[0], newAnchor[1]); //reposition all corners with new coords
 			
