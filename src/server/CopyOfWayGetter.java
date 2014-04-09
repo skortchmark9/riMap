@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import maps.Way;
@@ -19,7 +19,7 @@ import backend.Util;
  */
 class CopyOfWayGetter extends Thread {
 	private final ClientHandler _owner;
-	private ExecutorService _exec;
+	private ThreadPoolExecutor _exec;
 	private Future<List<Way>> futureWays;
 	private volatile boolean _running;
 	List<Way> ways;
@@ -42,7 +42,7 @@ class CopyOfWayGetter extends Thread {
 					if (ways != null)
 						_owner._responseQueue.add(new WayResponse(ways));
 				} catch (InterruptedException | CancellationException | ExecutionException e) {
-					e.printStackTrace();
+					//e.printStackTrace();
 					continue; //Standard operating behavior
 				}
 			}
@@ -68,8 +68,11 @@ class CopyOfWayGetter extends Thread {
 	 * @param maxLon
 	 */
 	void getWays(double minLat, double maxLat, double minLon, double maxLon) {
-		if (futureWays != null)
+		if (futureWays != null) {
 			futureWays.cancel(true);
+			_exec.purge();
+		}
+		
 		if (_running)
 			futureWays = _exec.submit(new WayWorker(minLat,maxLat, minLon, maxLon));
 	}
