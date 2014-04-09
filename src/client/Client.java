@@ -94,7 +94,7 @@ public class Client {
 			run();
 		}
 		catch (IOException ex) {
-			err("ERROR: Can't connect to server");
+			Util.err("ERROR: Can't connect to server");
 		}
 	}
 
@@ -116,7 +116,7 @@ public class Client {
 	 * Shuts down the client closing all the connections.
 	 */
 	public void kill() {
-		out("Attempting to kill client.");
+		Util.out("Attempting to kill client.");
 		_running = false;
 		try {
 			_input.close();
@@ -124,8 +124,8 @@ public class Client {
 			_socket.close();
 			_thread.join();
 		} catch (IOException | InterruptedException e) {
-			if (e instanceof IOException) err("ERROR closing streams and/or socket");
-			else err("ERROR joining receive thread");
+			if (e instanceof IOException) Util.err("ERROR closing streams and/or socket");
+			else Util.err("ERROR joining receive thread");
 			e.printStackTrace();
 		}
 	}
@@ -272,36 +272,15 @@ public class Client {
 					processResponse(received);
 				} catch (IOException e) {
 					if (_running == false || e instanceof EOFException) {
-						err("Error message:", e.getMessage());
-						out("Input Stream Closed");
+						Util.err("Error message:", e.getMessage());
+						Util.out("Input Stream Closed");
 						return;
 					}
-					err("ERROR reading line from socket or write to STD_OUT");
-					e.printStackTrace();
+					Util.err("ERROR reading line from socket or write to STD_OUT");
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
 				}
 			}
 		}
-	}
-
-	/**	
-	 * Utilities for printing.
-	 * @param strs
-	 */
-	void out(Object...strs) {
-		System.out.println(composeString(strs));
-	}
-
-	void err(Object...strs) {
-		System.err.println(composeString(strs));
-	}
-
-	String composeString(Object...strs) {
-		String s = "" + strs[0];
-		for (int i = 1; i < strs.length; i++) {
-			s += (strs[i] +" ");
-		}
-		return s;
 	}
 }

@@ -52,7 +52,7 @@ public class Util {
 	
 	public static void debug(Object...varg) {
 		if (!Constants.DEBUG_MODE)
-			return; //only continue if debug mode is off
+			return; //only continue if debug mode is on
 		String str = "";
 		for (Object o : varg) {
 			if (str.equals(""))
