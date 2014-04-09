@@ -86,11 +86,19 @@ public class MapFactory {
 	public static List<String> getIntersectingStreets(Node n) {
 		List<String> wayIDs = n.getWayIDs();
 		String s1 = "", s2 = "";
-		if (wayIDs.size() >= 1)
-			s1 = MapFactory.createWay(wayIDs.get(0)).getName();
+		
+		if (wayIDs.size() >= 1) {
+			Way way1 = MapFactory.createWay(wayIDs.get(0));
+			if (way1 != null)
+				s1 = way1.getName();
+		}
 
 		for(int i = 1; i < wayIDs.size(); i++) {
-			String possible = MapFactory.createWay(wayIDs.get(i)).getName();
+			Way way2 = MapFactory.createWay(wayIDs.get(i));
+			if (way2 == null)
+				continue;
+			
+			String possible = way2.getName();
 			if (!possible.equals(s1)) {
 				s2 = possible;
 				break;
