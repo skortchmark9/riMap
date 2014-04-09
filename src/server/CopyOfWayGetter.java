@@ -5,12 +5,12 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import shared.WayResponse;
 import maps.Way;
+import shared.WayResponse;
+import backend.Util;
 
 /**
  * 
@@ -28,8 +28,9 @@ class CopyOfWayGetter extends Thread {
 	 * @param owner
 	 */
 	public CopyOfWayGetter(ClientHandler owner) {
+		super("CopyOfWayGetter");
 		_owner = owner;
-		_exec = Executors.newFixedThreadPool(2);
+		_exec = Util.defaultThreadPool("CopyOfWayGetter", 2, 2);
 	}
 
 	public void run() {
@@ -41,6 +42,7 @@ class CopyOfWayGetter extends Thread {
 					if (ways != null)
 						_owner._responseQueue.add(new WayResponse(ways));
 				} catch (InterruptedException | CancellationException | ExecutionException e) {
+					e.printStackTrace();
 					continue; //Standard operating behavior
 				}
 			}
