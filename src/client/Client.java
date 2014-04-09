@@ -52,7 +52,7 @@ public class Client {
 	 * @param port the port number the client will connect to
 	 */
 	public Client(String hostName, int port) {
-		_executor = Executors.newFixedThreadPool(5);
+		_executor = Executors.newFixedThreadPool(2);
 		_port = port;
 		_hostName = hostName;
 	}
@@ -147,6 +147,7 @@ public class Client {
 	public void requestWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
 		Util.debug("Requesting Ways");
 		request(new WayRequest(minLat, maxLat, minLon, maxLon));
+		_frontend.addWays(MapFactory.getLocalWaysInRange(minLat, maxLat, minLon, maxLon));
 	}
 
 	public void requestPath(Node start, Node end, int timeout) {
@@ -156,15 +157,6 @@ public class Client {
 	public void requestPath(Node start, Node end, int timeout, String xs1S, String xs2S, String xs1E, String xs2E) {
 		request(new PathRequest(start, end, timeout, xs1S, xs2S, xs1E, xs2E));
 	}
-
-	/*	
-	public void removeAllResponses(ResponseType type) {
-		Iterator<Response>  itr = _responses.iterator();
-		while(itr.hasNext()) {
-			if (itr.next().getType() == type)
-				itr.remove();
-		}
-	}*/
 
 	public boolean serverReady() {
 		return _serverReady;
@@ -224,7 +216,6 @@ public class Client {
 			_frontend.refreshMap(); //repaint map pane
 			break;
 		default:
-			//We should never get here.
 			throw new IllegalArgumentException("Unsupported Response type");
 		}
 	}
@@ -233,8 +224,6 @@ public class Client {
 		return _frontend.getSize();
 	}
 	
-	
-
 	/**
 	 * A thread that will receive the messages sent by the server to
 	 * display to the user.

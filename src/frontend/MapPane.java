@@ -212,6 +212,11 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		this.repaint();
 	}
 	
+	public void addWays(List<Way> ways) {
+		renderedWays.addAll(ways);
+		repaint();
+	}
+	
 	/**
 	 * Sets the calculated route to be drawn over the map.
 	 * @param route - the list of ways to be drawn.

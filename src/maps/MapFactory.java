@@ -29,7 +29,7 @@ public class MapFactory {
 
 	private static Map<String, Node> nodes = new HashMap<>(65000);
 	private static Map<String, Way> ways = new HashMap<>(35000);
-	private static Map<String, List<String>> wayArray;
+	private static Map<String, List<String>> wayArray = new HashMap<>(1000);
 	private static Map<String, Double> trafficMap = new HashMap<>();
 	/**
 	 * Creates a way from the wayID. Attempts to find a cached way if one
@@ -388,12 +388,34 @@ public class MapFactory {
 		}
 		return ways;
 	}
+	
+	public static List<Way> getLocalWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+		List<Way> ways = new LinkedList<>();
+		for(double i = minLat; i <= maxLat + 0.01; i+=0.01) {
+			for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
+				ways.addAll(getLocalWays(i, j));
+			}
+		}
+		return ways;
+	}
+	
+	static List<Way> getLocalWays(double lat, double lon) {
+		List<Way> wayList = new LinkedList<>();
+		String searchCode = "/w/" + Util.getFirst4Digits(lat) + "." + Util.getFirst4Digits(lon); //lAT/LNG
+		List<String> wayIDsInRange = wayArray.get(searchCode);
+		if (wayIDsInRange != null) {
+			for(String wayID : wayIDsInRange) {
+				Way way = ways.get(wayID);
+				if (way != null) 
+					wayList.add(way);
+			}
+		}
+		return wayList;
+	}
 
 	static List<Way> getWaysSquare(double lat, double lon) {
 		List<Way> ways = new LinkedList<>();
 		String searchCode = "/w/" + Util.getFirst4Digits(lat) + "." + Util.getFirst4Digits(lon); //lAT/LNG
-		Util.resetClock();
-		Util.debug("SC:", searchCode);
 		List<String> wayIDsInRange = wayArray.get(searchCode);
 		if (wayIDsInRange !=null) {
 			for(String wayID : wayIDsInRange) {
