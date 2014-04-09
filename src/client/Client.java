@@ -277,7 +277,7 @@ public class Client {
 						Util.out("Input Stream Closed");
 						return;
 					} else if (e instanceof SocketException) {
-						err("Server unavailable. Please try again later");
+						Util.err("Server unavailable. Please try again later");
 						break;
 					}
 					Util.err("ERROR reading line from socket or write to STD_OUT");

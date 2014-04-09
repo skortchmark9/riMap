@@ -215,7 +215,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 
 
 		//This spinner is used to set the timeout duration for pwRequester.
-		timeOutSpinner = new JSpinner(new SpinnerNumberModel(Constants.DEFAULT_REQUEST_TIMEOUT, 0, 10, 1));
+		timeOutSpinner = new JSpinner(new SpinnerNumberModel(Constants.DEFAULT_REQUEST_TIMEOUT, 1, 10, 1));
 		lblTimeouts = new JLabel("Timeout (s):");
 		lblTimeouts.setForeground(Constants.GLOW_IN_THE_DARK);
 
