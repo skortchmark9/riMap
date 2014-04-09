@@ -42,12 +42,10 @@ public class Server extends Thread {
 		try {
 			while(_running) {
 				Util.debug("Waiting for new client connection...");
-
 				Socket clientConn = _socket.accept(); //blocks waiting for connections
-
-				Util.debug("-- NEW CONNECTION ACCEPTED --");
+				
 				new ClientHandler(_clientPool, clientConn, _backend).start();
-				Util.out("--New client connection!");
+				Util.out("-- New client connected --");
 			}
 		} catch (IOException e) {
 			//handle
