@@ -1,12 +1,7 @@
 package server;
 
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import maps.Way;
@@ -29,7 +24,7 @@ class WayGetter {
 	 */
 	public WayGetter(ClientHandler owner) {
 		_owner = owner;
-		_exec = Util.defaultThreadPool(2, 4);
+		_exec = Util.defaultThreadPool("Way Getter", 2, 4);
 		_threadCount = new AtomicInteger(0);
 	}
 	
@@ -80,6 +75,7 @@ class WayGetter {
 
 		@Override
 		public void run() {
+			
 			_id = _threadCount.incrementAndGet();
 			List<Way> ways = _owner._b.getWaysInRange(_minLat, _maxLat, _minLon, _maxLon);
 			if (_id == _threadCount.get()) {
