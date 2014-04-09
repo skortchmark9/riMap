@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -275,6 +276,9 @@ public class Client {
 						err("Error message:", e.getMessage());
 						out("Input Stream Closed");
 						return;
+					} else if (e instanceof SocketException) {
+						err("Server unavailable. Please try again later");
+						break;
 					}
 					err("ERROR reading line from socket or write to STD_OUT");
 					e.printStackTrace();
