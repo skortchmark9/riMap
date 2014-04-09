@@ -47,6 +47,8 @@ public class Client {
 	private Queue<Request> _requests;
 	ExecutorService _executor;
 	Frontend _frontend;
+	
+	private double _minLat, _maxLat, _minLon, _maxLon; //we use these to check the recent-ness of the waysinrange response
 
 	/**
 	 * Constructs a Client with the given port.
@@ -148,6 +150,7 @@ public class Client {
 
 	public void requestWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
 		Util.debug("Requesting Ways");
+		_minLat = minLat; _maxLat = maxLat; _minLon = minLon; _maxLon = maxLon;
 		request(new WayRequest(minLat, maxLat, minLon, maxLon));
 		_frontend.addWays(MapFactory.getLocalWaysInRange(minLat, maxLat, minLon, maxLon));
 	}
@@ -209,8 +212,10 @@ public class Client {
 			//tell the front end to tell the map to render the new ways
 			Util.debug("Got ways");
 			WayResponse wayResp = (WayResponse) resp;
-			_frontend.setWays(wayResp.getWays());
-			_executor.submit(new CacheThread(wayResp.getWays()));
+			if (matchesRange(wayResp.getMinMaxLatLon())) {
+				_frontend.setWays(wayResp.getWays());
+				_executor.submit(new CacheThread(wayResp.getWays()));
+			}
 			break;
 		case TRAFFIC:
 			TrafficResponse tResp = (TrafficResponse) resp;
@@ -221,7 +226,20 @@ public class Client {
 			throw new IllegalArgumentException("Unsupported Response type");
 		}
 	}
+<<<<<<< HEAD
 
+=======
+	
+	private boolean matchesRange(double[] respCorners) {
+		if (_minLat == respCorners[0] &&
+			_maxLat == respCorners[1] &&
+			_minLon == respCorners[2] &&
+			_maxLon == respCorners[3])
+			return true;
+		return false;
+	}
+	
+>>>>>>> db28c1c4bfdd83a6eefcbdc0db4ab2166a781e4d
 	public Dimension getFrameSize() {
 		return _frontend.getSize();
 	}

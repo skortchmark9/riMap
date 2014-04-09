@@ -1,10 +1,26 @@
 SAVE NEWLINES IN BINARY SEARCH FILE.
+<<<<<<< HEAD
+=======
+Changing the wayCacheing to an array instead of a hashmap
+
+validate autocorrect results
+
+Turn-by-turn directions
+
+JInternal frame.setMaxWidth. // .setResizable(false)
+>>>>>>> db28c1c4bfdd83a6eefcbdc0db4ab2166a781e4d
 
 MapFactory - should behave differently for client vs server.
 Used cached ways in client and save time on network calls
 
 Make server cleanly disengage
 quit gracefully.
+
+When server is not running and client launches, display informative message / wait for server connection
+
+- Create a new type of Response for initial response from server containing:
+	a.) traffic data up to that point
+	b.) the initial set of ways for the client (and perhaps some extra)
 
 ENSURE THAT THE CLIENT NEVER CRASHES EVEN IF THE SERVER DISAPPEARS
 

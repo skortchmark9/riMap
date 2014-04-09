@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import maps.Way;
@@ -19,10 +19,9 @@ import backend.Util;
  */
 class CopyOfWayGetter extends Thread {
 	private final ClientHandler _owner;
-	private ExecutorService _exec;
-	private Future<List<Way>> futureWays;
+	private ThreadPoolExecutor _exec;
+	private Future<WayResponse> futureWays;
 	private volatile boolean _running;
-	List<Way> ways;
 
 	/**
 	 * @param owner
@@ -35,13 +34,18 @@ class CopyOfWayGetter extends Thread {
 
 	public void run() {
 		_running = true;
+		WayResponse resp;
 		while(_running) {
 			if (futureWays != null && !futureWays.isDone()) {
 				try {
-					ways = futureWays.get();
-					if (ways != null)
-						_owner._responseQueue.add(new WayResponse(ways));
+					resp = futureWays.get();
+					if (resp != null)
+						_owner._responseQueue.add(resp);
 				} catch (InterruptedException | CancellationException | ExecutionException e) {
+<<<<<<< HEAD
+=======
+					//e.printStackTrace();
+>>>>>>> db28c1c4bfdd83a6eefcbdc0db4ab2166a781e4d
 					continue; //Standard operating behavior
 				}
 			}
@@ -67,13 +71,16 @@ class CopyOfWayGetter extends Thread {
 	 * @param maxLon
 	 */
 	void getWays(double minLat, double maxLat, double minLon, double maxLon) {
-		if (futureWays != null)
+		if (futureWays != null) {
 			futureWays.cancel(true);
+			_exec.purge();
+		}
+		
 		if (_running)
-			futureWays = _exec.submit(new WayWorker(minLat,maxLat, minLon, maxLon));
+			futureWays = _exec.submit(new WayWorker(minLat, maxLat, minLon, maxLon));
 	}
 
-	class WayWorker implements Callable<List<Way>> {
+	class WayWorker implements Callable<WayResponse> {
 		double _minLat, _maxLat, _minLon, _maxLon;
 
 		/**
@@ -91,8 +98,9 @@ class CopyOfWayGetter extends Thread {
 		}
 
 		@Override
-		public List<Way> call() throws Exception {
-			return _owner._b.getWaysInRange(_minLat, _maxLat, _minLon, _maxLon);
+		public WayResponse call() throws Exception {
+			List<Way> ways = _owner._b.getWaysInRange(_minLat, _maxLat, _minLon, _maxLon);
+			return new WayResponse(ways, _minLat, _maxLat, _minLon, _maxLon);
 		}
 	}
 
