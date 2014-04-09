@@ -189,7 +189,6 @@ public class Backend {
 			List<Way> ways = getInitialWays();
 			Util.debug("!! NUM INIT WAYS:", ways.size());
 			_server.broadcastClientConnection(ways, MapFactory.getTrafficMap(), Constants.MINIMUM_LATITUDE, Constants.MAXIMUM_LATITUDE, Constants.MINIMUM_LONGITUDE, Constants.MAXIMUM_LONGITUDE);
-			sendStatusMessage("Ways Found.");
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
