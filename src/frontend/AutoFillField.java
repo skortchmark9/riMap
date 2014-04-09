@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -98,6 +100,20 @@ public class AutoFillField extends JTextField {
 				if (e.getLength() == 1)
 					requestAutocorrections();
 			}
+		});
+		
+		this.addMouseListener(new MouseListener() {
+			@Override public void mousePressed(MouseEvent e) {
+				selectAll();
+			}
+			
+			//Dont need these methods...
+			@Override public void mouseClicked(MouseEvent e) {
+				selectAll();
+			}
+			@Override public void mouseReleased(MouseEvent e) {}
+			@Override public void mouseEntered(MouseEvent e) {}
+			@Override public void mouseExited(MouseEvent e) {}
 		});
 
 		//Key Bindings For Field
@@ -216,26 +232,6 @@ public class AutoFillField extends JTextField {
 		suppress = suppressPopup;
 		setForeground(Color.BLACK);
 		setText(s);
-	}
-
-	/**
-	 * The popup contains the table of suggestions, so this will reveal them.
-	 * @param e - we don't want to suggest on the empty string, so we check.
-	 */
-	
-	private void showPopup(DocumentEvent e) {
-		if(e.getDocument().getLength() > 0) {
-			initTableModel();
-			if(!popup.isVisible()) { 
-				popup.show(this, 4, (getHeight() - 4));
-				popup.setVisible(true);
-			}
-			//We need to juggle focus a little to select the appropriate row.
-			requestFocusInWindow();
-		}
-		else {
-			popup.setVisible(false);
-		}
 	}
 
 	/**
