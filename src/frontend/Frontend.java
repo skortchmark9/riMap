@@ -298,8 +298,15 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	}
 
 	public void setWays(List<Way> ways) {
+		if (map != null && ways != null)
 		map.renderWays(ways);
 	}
+	
+	public void addWays(List<Way> ways) {
+		if (map != null)
+			map.addWays(ways);
+	}
+	
 
 	public AutoFillField getBox(int num) {
 		switch (num) {
