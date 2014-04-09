@@ -6,7 +6,6 @@ package shared;
 import java.util.List;
 import java.util.Map;
 
-import shared.Response.ResponseType;
 import maps.Way;
 
 /**
@@ -14,6 +13,7 @@ import maps.Way;
  *
  */
 public class ClientConnectionResponse implements Response {
+	private static final long serialVersionUID = 1L;
 	private final List<Way> _ways;
 	private final Map<String, Double> _trafficMap;
 	private final double _minLat, _maxLat, _minLon, _maxLon;
