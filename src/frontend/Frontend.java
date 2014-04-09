@@ -277,7 +277,6 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		
 		//This popup will show up under the control panel and display useful
 		//useful information to the user.
-		_notifier = new NotifierPopup(_controlPanel);
 		guiMessage("Look here for messages");
 	}
 
