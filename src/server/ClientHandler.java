@@ -132,7 +132,7 @@ public class ClientHandler extends Thread {
 			PathRequest pReq = (PathRequest) req;
 			Util.out(pReq.toString());
 			//We check if there are intersections to be found
-			Node source = MapFactory.createIntersection(pReq.getCrossStreet(true, 1), pReq.getCrossStreet(true, 2));
+			Node source =  MapFactory.createIntersection(pReq.getCrossStreet(true, 1), pReq.getCrossStreet(true, 2));
 			Node dest = MapFactory.createIntersection(pReq.getCrossStreet(false, 1), pReq.getCrossStreet(false, 2));
 			if (source == null)
 				source = pReq.getSource();
