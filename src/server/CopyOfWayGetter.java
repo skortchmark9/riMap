@@ -42,7 +42,6 @@ class CopyOfWayGetter extends Thread {
 					if (resp != null)
 						_owner._responseQueue.add(resp);
 				} catch (InterruptedException | CancellationException | ExecutionException e) {
-					//e.printStackTrace();
 					continue; //Standard operating behavior
 				}
 			}
@@ -55,8 +54,6 @@ class CopyOfWayGetter extends Thread {
 		try {
 			_exec.awaitTermination(3, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 

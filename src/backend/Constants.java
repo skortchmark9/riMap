@@ -46,7 +46,6 @@ public class Constants {
 	public static final Color MED_TRAFFIC	= new Color(255, 162, 0);
 	
 	//Boundary lines on map
-	//To be set by initBoundaries() in backend.
 	public static double MINIMUM_LATITUDE = 40.1581762;
 	public static double MAXIMUM_LATITUDE = 42.0952906;
 	public static double MINIMUM_LONGITUDE = -73.7485663;

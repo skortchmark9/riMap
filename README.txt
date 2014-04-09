@@ -8,12 +8,26 @@ Elias Martinez Cohen <emc3>
 
 ==========================================
 
-* Stars:
-	KDTree and other stuff came from Elias's (<emc3>) Stars project. This went virtually unmodified except for one small change in how the KDTree was built.
-* Autocorrect:
-	We used Sam's autocorrect (<skortchm>). We didn't have to change it much.
-* Bacon:
-	We used Sam's bacon project, but we basically re-wrote the whole thing so the BinarySearchFile class really does not resemble anything we have handed in before. We spent a lot of time making binary search as fast and awesome as possible. In fact we probably spent the most time optimizing and debugging and modding the BinarySearchFile class.
+* PROTOCOL:
+
+Our protocol for sending information between the server and client is simple but powerful. The backbone of the communication is two interfaces - Request and Response. All client requests are wrapped in Request objects and all server responses are wrapped in Response objects. A server doesn't necessarily need to receive a Request in order to receive a Response (& vice versa), but usually that's how it works. Both interfaces expose an enum which allows them to be processed appropriately. The following table attempts to detail pairs of Requests and Responses.
+Requests & Responses
+-----------------------------------------------------------------------------------------
+	Request Name	Enum			Response Name	Enum			|
+	Autocorrect	AUTO_CORRECTIONS	Autocorrect	AUTO_CORRECTIONS	|
+	Neighbors	NEAREST_NEIGHBORS	Neighbors	NEAREST_NEIGHBORS	|
+	Path		PATH			Path		PATH			|
+	Way		WAYS			Way		WAYS			|
+						Traffic		TRAFFIC			|
+						ServerStatus	SERVER_STATUS		|
+						ClientConnectionCLIENT_CONNECT		|
+-----------------------------------------------------------------------------------------
+The first four are fairly self-explanatory. The last 3 Responses are issued without prompting by the server
+to inform clients about 1.) Traffic conditions received from the traffic bot.
+			2.) Server health and backend readiness.
+			3.) Initialization information for the client.
+
+Requests and Responses, when generated, are added to a queue which is constantly serviced by a receiving/pushing thread. Variants of these threads on the client/server side call readObject or writeObject. When reading objects, we must cast them to Requests or Responses immediately, and then pass them to other methods for processing.
 
 ==========================================
 
@@ -27,13 +41,17 @@ Elias Martinez Cohen <emc3>
 	- Pretty major bug we realized just before handin: The BSF method scanForwards is working harder than it should. We literally found this bug 15 minutes before handin. Will fix 4 traffic.
 
 ==========================================
+* DESIGN DETAILS
 
-* DESIGN:
-	- The mapfactory controls most of the pieces of the different project to work together. It is a very powerful class. Its responsibilities include creating new KDTree, creating new RadixTree for autocorrect, and Querying the binary search files (BSFs) for info. It also is set up to split the BSF searches into blocks so that in the future threading would become easier. We did not have time to implement such a sophisticated threading structure but we will try to do so for Traffic.
+After Maps, our project actually didn't require many changes to its underlying projects. For example, Djikstra's algorithm was easily modified to account for traffic by simply multiplying the distance of a way by its traffic value, which we've stored in a hashmap. Similarly, the chatroom from lab 6 provided much of the structure for our Client/Server handling and connections.
+
+In maps, we already had a reasonably clean break between our backend and our frontend - the bridge was a static called MapFactory. We still use MapFactory, but almost all of its functionality has been moved to the server side of things.
 
 ==========================================
 
+
+
 * OPTIMIZATIONS:
 	We implemented various cacheing schemes:
-		- In BSF, we cache the position of newlines to make searching for line stars and ends faster. These positions are stored in a Guava TreeSet.
+		- In BSF, we cache the position of newlines to make searching for line stars and ends faster. These positions are stored in a Guava TreeSet. The TreeSet allows us to create ranges that define the length of a line. The gaps between the ranges represent newlines.
 		- In MapFactory, when we load Ways & Nodes from disk (from resource files) we also cache these in a HashMap. The idea here is that every time we need to go to disk to get a Way or a Node, we first check the HashMap to see if we have already grabbed the node and/or way info. This way we can get way/node info we have already cached in O(1) instead of however long it takes to Binary Search the file.

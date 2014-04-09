@@ -1,7 +1,6 @@
 package frontend;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -151,14 +150,12 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		
 		//Render Click Points
 		if (_source != null) {
-			Util.debug("Source Node:", _source.node.toString());
 			
 			g2d.setStroke(new BasicStroke(1));		
 			g2d.setColor(Color.GREEN);
 			g2d.drawOval(_source.screenCoords[0] - 5, _source.screenCoords[1] - 5, 10, 10);
 		}
 		if (_dest != null) {
-			Util.debug("Target Node", _dest.node.toString());
 			
 			g2d.setStroke(new BasicStroke(1));		
 			g2d.setColor(Color.RED);

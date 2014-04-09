@@ -11,6 +11,8 @@ import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.swing.UIManager;
+
 import kdtree.KDimensionable;
 import maps.MapFactory;
 import maps.Node;
@@ -23,7 +25,6 @@ import shared.NeighborsResponse;
 import shared.PathRequest;
 import shared.PathResponse;
 import shared.Request;
-import shared.Request.RequestType;
 import shared.Response;
 import shared.ServerStatus;
 import shared.TrafficResponse;
@@ -69,6 +70,7 @@ public class Client {
 	 * and then launch the GUI.
 	 */
 	public void start() {
+		UIManager.put("swing.boldMetal", Boolean.FALSE);
 		_frontend = new Frontend(this);
 		new Thread(_frontend).start();
 
@@ -78,9 +80,9 @@ public class Client {
 			_output = new ObjectOutputStream(_socket.getOutputStream());
 			_input = new ObjectInputStream(_socket.getInputStream());
 			_running = true;
-			
+
 			_requests = new LinkedList<>();
-			
+
 			_thread = new ReceiveThread();
 			_thread.start();
 
@@ -134,11 +136,7 @@ public class Client {
 	 * @throws IOException 
 	 */
 	public void request(Request r) {
-		if (r.getType() == RequestType.EXIT) {
-			this.kill();
-		} else {
 			_requests.add(r);
-		}
 	}
 
 	public void requestAutocorrections(String input, int boxNo) {
@@ -160,7 +158,7 @@ public class Client {
 	public void requestPath(Node start, Node end, int timeout) {
 		request(new PathRequest(start, end, timeout));
 	}
-	
+
 	public void requestPath(Node start, Node end, int timeout, String xs1S, String xs2S, String xs1E, String xs2E) {
 		request(new PathRequest(start, end, timeout, xs1S, xs2S, xs1E, xs2E));
 	}
