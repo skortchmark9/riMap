@@ -10,7 +10,6 @@ Turn-by-turn directions
 		- i.e. there are multiple George Street & Brown University intersections
 
 MapFactory - should behave differently for client vs server.
-Used cached ways in client and save time on network calls
 
 Make server cleanly disengage
 quit gracefully.

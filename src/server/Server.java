@@ -6,8 +6,11 @@ package server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 import java.util.Map;
 
+import maps.Way;
+import shared.ClientConnectionResponse;
 import shared.ServerStatus;
 import shared.TrafficResponse;
 import backend.Backend;
@@ -54,6 +57,10 @@ public class Server extends Thread {
 
 	public void serverOKMessage(String s) {
 		_clientPool.broadcast(new ServerStatus(true, s));
+	}
+	
+	public void broadcastClientConnection(List<Way> ways, Map<String, Double> trafficMap, double minLat, double maxLat, double minLon, double maxLon) {
+		_clientPool.broadcast(new ClientConnectionResponse(ways, trafficMap, minLat, maxLat, minLon, maxLon));
 	}
 	
 	public void serverDownMessage(String s) {

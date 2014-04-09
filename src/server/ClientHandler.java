@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import maps.MapFactory;
 import maps.Node;
 import shared.AutocorrectRequest;
+import shared.ClientConnectionResponse;
 import shared.NeighborsRequest;
 import shared.PathRequest;
 import shared.Request;
@@ -19,6 +20,7 @@ import shared.Response;
 import shared.ServerStatus;
 import shared.WayRequest;
 import backend.Backend;
+import backend.Constants;
 import backend.Util;
 
 /**
@@ -65,12 +67,14 @@ public class ClientHandler extends Thread {
 		_output = new ObjectOutputStream(_client.getOutputStream());
 		_input = new ObjectInputStream(_client.getInputStream());
 
+		//pwGetter and wayGetter are special because they are their own threads
 		_pwGetter = new PathWayGetter(this);
 		_pwGetter.start();
-		_sugGetter = new SuggestionGetter(this);
-		_nbrGetter = new NeighborGetter(this);
 		_wayGetter = new CopyOfWayGetter(this);
 		_wayGetter.start();
+		
+		_sugGetter = new SuggestionGetter(this);
+		_nbrGetter = new NeighborGetter(this);
 
 		_pool.add(this);
 	}
@@ -170,8 +174,16 @@ public class ClientHandler extends Thread {
 		@Override
 		public void run() {
 			try {
+				if (_b.isDone()) {
+					//if backend finished some time in the past, send the client connection response.
+					_output.writeObject(new ClientConnectionResponse(_b.getInitialWays(), MapFactory.getTrafficMap(), Constants.MINIMUM_LATITUDE, Constants.MAXIMUM_LATITUDE, Constants.MINIMUM_LONGITUDE, Constants.MAXIMUM_LONGITUDE));
+					_output.flush();
+				} 
+				//if backend is not yet done, it will send the client connection response 
+				//when it finishes initializing.
 				_output.writeObject(new ServerStatus(_b.isDone()));
 				_output.flush();
+				
 				while (_running) {
 					if (!_responseQueue.isEmpty()) {
 						_output.writeObject(_responseQueue.poll());

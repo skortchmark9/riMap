@@ -1,7 +1,5 @@
 package shared;
 
-import java.util.List;
-
 import maps.Node;
 
 /**

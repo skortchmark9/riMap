@@ -4,10 +4,9 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,8 +14,10 @@ import java.util.concurrent.Executors;
 import kdtree.KDimensionable;
 import maps.MapFactory;
 import maps.Node;
+import maps.Way;
 import shared.AutocorrectRequest;
 import shared.AutocorrectResponse;
+import shared.ClientConnectionResponse;
 import shared.NeighborsRequest;
 import shared.NeighborsResponse;
 import shared.PathRequest;
@@ -28,6 +29,7 @@ import shared.ServerStatus;
 import shared.TrafficResponse;
 import shared.WayRequest;
 import shared.WayResponse;
+import backend.Constants;
 import backend.Util;
 import frontend.Frontend;
 
@@ -48,7 +50,9 @@ public class Client {
 	Frontend _frontend;
 	
 	private double _minLat, _maxLat, _minLon, _maxLon; //we use these to check the recent-ness of the waysinrange response
-
+	private List<Way> _tempWays;
+	
+	
 	/**
 	 * Constructs a Client with the given port.
 	 * @param port the port number the client will connect to
@@ -220,6 +224,15 @@ public class Client {
 			MapFactory.putTrafficValue(tResp.getName(), tResp.getVal());//put traffic value i server side map
 			_frontend.refreshMap(); //repaint map pane
 			break;
+		case CLIENT_CONNECT:
+			ClientConnectionResponse ccResp = (ClientConnectionResponse) resp;
+			Constants.MINIMUM_LATITUDE = ccResp.getMinLat();
+			Constants.MAXIMUM_LATITUDE = ccResp.getMaxLat();
+			Constants.MINIMUM_LONGITUDE = ccResp.getMinLon();
+			Constants.MAXIMUM_LONGITUDE = ccResp.getMaxLon();
+			MapFactory.setTrafficMap(ccResp.getTrafficMap());
+			_tempWays = ccResp.getWays(); //store for later
+			break;
 		default:
 			throw new IllegalArgumentException("Unsupported Response type");
 		}
@@ -236,6 +249,16 @@ public class Client {
 	
 	public Dimension getFrameSize() {
 		return _frontend.getSize();
+	}
+	
+	public LinkedList<Way> getAndNullInitialWays() {
+		if (_tempWays != null) {
+			LinkedList<Way> l = new LinkedList<>(_tempWays);
+			_tempWays = null;
+			return l;
+		} else {
+			return new LinkedList<>();
+		}
 	}
 	
 	/**

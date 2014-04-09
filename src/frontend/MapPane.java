@@ -54,7 +54,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		_client = client;
 		this.setBackground(Constants.BG_COLOR);
 		this.setPreferredSize(_client.getFrameSize());
-		this.setMaximumSize(getPreferredSize());
+		this.setSize(this.getPreferredSize());
+		this.setMaximumSize(this.getPreferredSize());
 		this.setFocusable(true);
 		
 		//set up dimensions
@@ -74,16 +75,36 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		_dest = null;
 		
 		//set up & request new ways
-		renderedWays = new LinkedList<>();
-		_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
-		
+		renderedWays = _client.getAndNullInitialWays();
 		calculatedRoute = new LinkedList<>();
 		
 		this.repaint(); //paint the initial set of ways
 		this.requestFocusInWindow();
 		
+		//request full set of ways
+		_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
+		
 		if (Constants.DEBUG_MODE)
 			Util.memLog();
+	}
+	
+	/**
+	 * This method is intended to resize the map pane.
+	 * however it does not work.
+	 * @param d - the new dimension of its parent, ye olde JFrame called Frontend 
+	 */
+	public void updatePixelDimension(Dimension d) {
+		/*
+		
+		//resize this pane
+		this.setPreferredSize(d);
+		
+		//set instances to new vals
+		_pixelWidth = this.getPreferredSize().width;
+		_pixelHeight = this.getPreferredSize().height;
+		Corners.reposition(Corners.topLeft[0], Corners.topLeft[1]);
+		
+		*/
 	}
 
 	@Override
@@ -617,8 +638,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 								bottomLeft	= new double[2], 
 								bottomRight = new double[2];
 		
-		private static double pixelW, pixelH;
-		
 		/**
 		 * Gives the top left corner a new location and
 		 * repositions all corners based on the zoom scale.
@@ -628,6 +647,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		 */
 		private static void reposition(double lat, double lon) {
 			double height = Constants.GEO_DIMENSION_FACTOR / scale;
+			Util.out("PHeighT:", _pixelHeight, "\nPWidtH:", _pixelWidth);
 			double rat = (double)_pixelHeight / (double)_pixelWidth;
 			double width = height * rat;
 			

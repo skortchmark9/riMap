@@ -4,6 +4,7 @@ import graph.Edge;
 import graph.PathFinder;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -171,6 +172,12 @@ public class Backend {
 			return null;
 		}
 	}
+	
+	public List<Way> getInitialWays() {
+		sendStatusMessage("Finding Ways...");
+		//TODO: is this too wide?
+		return MapFactory.getWaysInRange(Constants.INITIAL_LAT - Constants.GEO_DIMENSION_FACTOR, Constants.INITIAL_LAT, Constants.INITIAL_LON, Constants.INITIAL_LON + (Constants.GEO_DIMENSION_FACTOR*2));
+	}
 
 	public class BackendInitializer extends Thread {
 
@@ -180,6 +187,10 @@ public class Backend {
 			initKDTree();
 			initAutoCorrect();
 			initBoundaries();
+			List<Way> ways = getInitialWays();
+			Util.debug("!! NUM INIT WAYS:", ways.size());
+			_server.broadcastClientConnection(ways, MapFactory.getTrafficMap(), Constants.MINIMUM_LATITUDE, Constants.MAXIMUM_LATITUDE, Constants.MINIMUM_LONGITUDE, Constants.MAXIMUM_LONGITUDE);
+			sendStatusMessage("Ways Found.");
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {

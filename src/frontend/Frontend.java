@@ -2,6 +2,7 @@ package frontend;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagLayout;
@@ -9,6 +10,8 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.beans.PropertyVetoException;
 import java.text.ParseException;
 import java.util.List;
@@ -31,7 +34,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.text.DefaultCaret;
 
-import maps.MapFactory;
 import maps.Node;
 import maps.Way;
 import backend.Constants;
@@ -150,6 +152,23 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		desktop.add(backgroundPanel);
 		setContentPane(desktop);
 		setControlPanelFocus(true);
+		
+		//create a new resize listener
+		this.addComponentListener(new ComponentListener() {
+			
+			@Override
+			public void componentResized(ComponentEvent e) {
+				Dimension d = getPreferredSize();
+				map.updatePixelDimension(d);
+			}
+			
+			/* Don't need to define these methods... */
+			@Override public void componentMoved(ComponentEvent e) {}
+			@Override public void componentShown(ComponentEvent e) {}
+			@Override public void componentHidden(ComponentEvent e) {}
+		});
+		
+		
 		this.revalidate();		
 		box1.requestFocusInWindow();
 	}
@@ -158,6 +177,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		try {
 			controlPanel.setSelected(yes);
 		} catch (PropertyVetoException e) {
+			//yep
 		}
 
 	}

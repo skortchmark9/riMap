@@ -18,6 +18,7 @@ public interface Response extends Serializable {
 		WAYS, //Wraps a list of ways for the map pane to render.
 		PATH, //Wraps a list of ways for the map pane to draw as a path.
 		SERVER_STATUS, //Wraps a message to be displayed on the GUI.
+		CLIENT_CONNECT,
 		TRAFFIC //Wraps the hashmap of traffic
 	}
 	ResponseType getType();
