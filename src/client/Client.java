@@ -197,7 +197,7 @@ public class Client {
 			if (pathResp.getPath().isEmpty()) {
 				_frontend.guiMessage(pathResp.getMsg());
 			} else {
-				_frontend.giveDirections(pathResp.getPath());
+				_frontend.giveDirections(pathResp.getPath(), pathResp.getStart(), pathResp.getEnd());
 				_executor.submit(new CacheThread(pathResp.getPath()));
 			}
 			break;
