@@ -155,7 +155,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 			@Override
 			public void componentResized(ComponentEvent e) {
 				Dimension d = getPreferredSize();
-				map.updatePixelDimension(d);
+				_map.updatePixelDimension(d);
 			}
 			
 			/* Don't need to define these methods... */
@@ -166,7 +166,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		
 		
 		this.revalidate();		
-		box1.requestFocusInWindow();
+		_box1.requestFocusInWindow();
 	}
 
 	/**
