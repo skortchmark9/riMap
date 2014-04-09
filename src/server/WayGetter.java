@@ -79,7 +79,7 @@ class WayGetter {
 			_id = _threadCount.incrementAndGet();
 			List<Way> ways = _owner._b.getWaysInRange(_minLat, _maxLat, _minLon, _maxLon);
 			if (_id == _threadCount.get()) {
-				_owner._responseQueue.add(new WayResponse(ways));
+				_owner._responseQueue.add(new WayResponse(ways, _minLat, _maxLat, _minLon, _maxLon));
 			}
 		}
 	}
