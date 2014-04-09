@@ -19,7 +19,6 @@ public interface Request extends Serializable {
 		NEAREST_NEIGHBORS, //A search for nearest neighbors - used for clicking.
 		WAYS, //A search for ways - rendering the lines on the map.
 		PATH, //A search for a path - rendering a path between points on map.
-		EXIT //A special request - causes the client to exit.
 	}
 	RequestType getType();
 }

@@ -218,25 +218,6 @@ public class AutoFillField extends JTextField {
 		setText(s);
 	}
 
-	/**
-	 * The popup contains the table of suggestions, so this will reveal them.
-	 * @param e - we don't want to suggest on the empty string, so we check.
-	 */
-	
-	private void showPopup(DocumentEvent e) {
-		if(e.getDocument().getLength() > 0) {
-			initTableModel();
-			if(!popup.isVisible()) { 
-				popup.show(this, 4, (getHeight() - 4));
-				popup.setVisible(true);
-			}
-			//We need to juggle focus a little to select the appropriate row.
-			requestFocusInWindow();
-		}
-		else {
-			popup.setVisible(false);
-		}
-	}
 
 	/**
 	 * Moves up to the previous search result.

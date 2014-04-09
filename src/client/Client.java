@@ -11,7 +11,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 
 import kdtree.KDimensionable;
 import maps.MapFactory;
@@ -23,7 +22,6 @@ import shared.NeighborsResponse;
 import shared.PathRequest;
 import shared.PathResponse;
 import shared.Request;
-import shared.Request.RequestType;
 import shared.Response;
 import shared.ServerStatus;
 import shared.TrafficResponse;
@@ -132,11 +130,7 @@ public class Client {
 	 * @throws IOException 
 	 */
 	public void request(Request r) {
-		if (r.getType() == RequestType.EXIT) {
-			this.kill();
-		} else {
 			_requests.add(r);
-		}
 	}
 
 	public void requestAutocorrections(String input, int boxNo) {

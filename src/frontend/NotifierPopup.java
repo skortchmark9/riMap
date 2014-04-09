@@ -14,6 +14,7 @@ import backend.Util;
 
 public class NotifierPopup extends JPopupMenu implements ActionListener {
 	
+	private static final long serialVersionUID = 1L;
 	JComponent _parent;
 	Timer _timer;
 	
