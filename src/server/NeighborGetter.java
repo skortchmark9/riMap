@@ -29,7 +29,7 @@ class NeighborGetter {
 	NeighborGetter(ClientHandler owner) {
 		_owner = owner;
 		_threadCount = new AtomicInteger(0);
-		_exec = Util.defaultThreadPool(Constants.THREADPOOL_CORE_SIZE, Constants.THREADPOOL_MAX_SIZE);
+		_exec = Util.defaultThreadPool("Neighbor Getter", Constants.THREADPOOL_CORE_SIZE, Constants.THREADPOOL_MAX_SIZE);
 	}
 	
 	
