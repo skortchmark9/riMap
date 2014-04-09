@@ -7,6 +7,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 /**
  * @author emc3
  */
@@ -192,7 +194,10 @@ public class Util {
 		return false;
 	}
 
-	public static ThreadPoolExecutor defaultThreadPool(int core, int max) {
-		return new ThreadPoolExecutor(core, max, Constants.THREADPOOL_TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+	public static ThreadPoolExecutor defaultThreadPool(String name, int core, int max) {
+		ThreadPoolExecutor result = new ThreadPoolExecutor(core, max, Constants.THREADPOOL_TIMEOUT,
+				TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), 
+				new ThreadFactoryBuilder().setNameFormat(name + "-pool %d").build());
+		return result;
 	}
 }
