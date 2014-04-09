@@ -90,9 +90,9 @@ public class ClientHandler extends Thread {
 				req = (Request) _input.readObject();
 				processRequest(req);
 			}
-			Util.out("Running has ceased. Killing this client handler.");
+			Util.out("Running has ceased. Goodbye.");
 		} catch(IOException | ClassNotFoundException e) {
-			Util.err("User has exited.");
+			Util.out("-- Client exited. --");
 		} finally {
 			kill();
 		}
