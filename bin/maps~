@@ -1,0 +1,3 @@
+#! /bin/bash
+
+java -cp derived/CS032_Maps.jar:lib/*  maps.Main $*
