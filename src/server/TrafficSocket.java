@@ -69,7 +69,8 @@ public class TrafficSocket extends Thread {
 	
 	/**
 	 * Persistently tries to connect to the 
-	 * traffic bot.
+	 * traffic bot. 
+	 * Also notifies the clients if the connection status changes.
 	 */
 	private void keepTryingToConnect() {
 		boolean first = true;
