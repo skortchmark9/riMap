@@ -397,6 +397,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private void zoomOut() {
 		//only zoom out if we are before threshold
 		if (scale > Constants.MIN_ZOOM && this.hasFocus()) {
+			//_client.deselectControls();
 			double oldGeoWidth = Constants.GEO_DIMENSION_FACTOR / scale; //get the old width
 			scale *= 0.8; //decrement scale
 			double newGeoWidth = Constants.GEO_DIMENSION_FACTOR / scale; //get new width
@@ -419,6 +420,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private void zoomIn() {
 		//only zoom in if we are before threshold
 		if (scale < Constants.MAX_ZOOM && this.hasFocus()) {
+			//_client.deselectControls();
 			double oldGeoWidth = Constants.GEO_DIMENSION_FACTOR / scale; //get the old width
 			scale *= 1.2; //decrement scale
 			double newGeoWidth = Constants.GEO_DIMENSION_FACTOR / scale; //get new width
