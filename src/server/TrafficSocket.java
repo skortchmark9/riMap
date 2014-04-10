@@ -19,38 +19,16 @@ public class TrafficSocket extends Thread {
 	private int _port;
 	private Socket _socket;
 	private BufferedReader _input;
-	private boolean _connect = false;
+	private boolean _connected = false;
 	private Server _server;
 	
 	/**
 	 * Default constructor
 	 */
 	public TrafficSocket(int port, Server server) {
-		int num_attempts = 0;
-		while(!_connect) {
-			num_attempts++;
-			try {
-				_server = server;
-				_port = port;
-				_socket = new Socket("localhost", _port);
-				_input = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
-				if (num_attempts > 1)
-					_server.serverOKMessage("Established Connection to traffic server!");
-				_connect = true;
-			} catch (IOException e) {
-				if (num_attempts == 1) {
-					Util.err("WARNING: Unable to connect to traffic bot. Continuing without traffic data.");
-					_server.trafficUpdate("", 0.0, false);
-				}
-				_connect = false;
-				try {
-					Thread.sleep(10000); //try to connect again in 10 seconds
-					Util.out("Attempting to reconnect to traffic bot...");
-				} catch (InterruptedException e1) {
-					Util.err("ERROR connecting to traffic bot. Traffic data will be unavailable.");
-				}
-			}
-		}
+			_server = server;
+			_port = port;
+			keepTryingToConnect();
 	}
 	
 	/**
@@ -58,7 +36,7 @@ public class TrafficSocket extends Thread {
 	 * puts the data in MapFactory's trafficMap.
 	 */
 	public void run() {
-		if(_connect) {
+		while(_connected) {
 			try {
 				String line;
 				while ((line = _input.readLine()) != null) {
@@ -75,10 +53,44 @@ public class TrafficSocket extends Thread {
 					}
 				}
 			} catch (IOException e) {
-				Util.err("Connection dropped by traffic bot");
-				_server.trafficUpdate("", 0.0, false);
-			} finally {
-				kill(); //kill when finished
+				Util.err("ERROR: Connection dropped by traffic bot");
+				_connected = false;
+				try {
+					_input.close();
+					_socket.close();
+				} catch (IOException e1) {
+					Util.err("ERROR closing traffic socket and input stream.");
+				}
+				keepTryingToConnect();
+			}
+		}
+	}
+	
+	/**
+	 * Persistently tries to connect to the 
+	 * traffic bot.
+	 */
+	private void keepTryingToConnect() {
+		boolean first = true;
+		while(!_connected) {
+			try {
+				_socket = new Socket("localhost", _port);
+				_input = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
+				_connected = true;
+			} catch (IOException e) {
+				//tell clients traffic data is not avail (only on first go)
+				if (first) {
+					Util.err("WARNING: Unable to connect to traffic bot. Continuing without traffic data.");
+					_server.trafficUpdate("", 0.0, false);
+					first = false;
+				}
+				
+				//sleep for a bit and then try to reconnect.
+				try {
+					Thread.sleep(10000); //try to connect again in 10 seconds
+				} catch (InterruptedException e1) {
+					Util.err("ERROR connecting to traffic bot.");
+				}
 			}
 		}
 	}
@@ -90,8 +102,9 @@ public class TrafficSocket extends Thread {
 			Util.debug("Killing traffic socket...");
 			
 			try {
-				_socket.close();
+				_connected = false;
 				_input.close();
+				_socket.close();
 			} catch (IOException e) {
 				//do nothing with this, just exit
 			}
