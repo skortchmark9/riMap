@@ -290,9 +290,8 @@ public class Client {
 			LinkedList<Way> l = new LinkedList<>(_tempWays);
 			_tempWays = null;
 			return l;
-		} else {
-			return new LinkedList<>();
 		}
+		return new LinkedList<>();
 	}
 	
 	/**

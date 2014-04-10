@@ -43,7 +43,7 @@ public class NotifierPopup extends JPopupMenu implements ActionListener {
 		removeAll();
 		JMenuItem item = add(information);
 		item.setPreferredSize(new Dimension(_parent.getWidth(), 20));
-		show(_parent, 0, (_parent.getHeight()));
+		show(_parent, 0, _parent.getHeight());
 		setVisible(true);
 		if (time > 0) {
 			_timer.setInitialDelay(time * 1000);

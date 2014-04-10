@@ -69,7 +69,7 @@ public class Backend {
 		long start = 0; //FOR DEBUGGING
 		if (Constants.DEBUG_MODE) {
 			start = Util.resetClock();
-			Util.out("Start KD Build");
+			Util.debug("Start KD Build");
 			Util.memLog();
 		}
 		sendStatusMessage("Starting KD Build");
