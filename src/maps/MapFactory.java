@@ -29,8 +29,10 @@ public class MapFactory {
 
 	private static Map<String, Node> nodes = new HashMap<>(65000);
 	private static Map<String, Way> ways = new HashMap<>(35000);
+	//TODO init to a better number
 	private static Map<String, List<String>> wayArray = new HashMap<>(1000);
 	private static Map<String, Double> trafficMap = new HashMap<>();
+	private static Map<String, Integer> roadLengthMap;
 	/**
 	 * Creates a way from the wayID. Attempts to find a cached way if one
 	 * doesn't exist. If not, searches the waysFile.
@@ -286,6 +288,27 @@ public class MapFactory {
 		}
 		return new KDTree<Node>(nodeList);
 	}
+	
+	public static RadixTree createRadixTreeAndInitRoadLengths() throws IOException {
+		List<List<String>> names;
+		names = Resources.indexFile.readChunks("name", "nodes");
+		RadixTree rt = new RadixTree();
+		for(List<String> nameAndNodes : names) {
+			String lastWord = "";
+			String nameField = nameAndNodes.get(0);
+			for (String word : Constants.spaces.split(nameField)) {
+				if (word.length() > 0) {
+					word = word.toLowerCase();
+					rt.insert(word, lastWord);
+					lastWord = word;
+				}
+			}
+			roadLengthMap = new HashMap<String, Integer>(29223);
+			String nodes = nameAndNodes.get(1);
+			roadLengthMap.put(nameField, nodes.length() / 23);
+		}
+		return rt;
+	}
 
 	public static RadixTree createRadixTree() throws IOException {
 		return createRadixTree(null);
@@ -330,7 +353,6 @@ public class MapFactory {
 		}
 
 		Util.debug("Done inserting names from list to Radix Tree.", "(Elapsed:", Util.timeSince(start) + ")");
-
 		return rt;
 	}
 
@@ -374,7 +396,6 @@ public class MapFactory {
 	public static List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
 		Util.debug("Looking for Ways in Range");
 		Util.resetClock();
-
 		if (wayArray == null) {
 			int size = (int) Math.ceil((Constants.MAXIMUM_LATITUDE - Constants.MINIMUM_LATITUDE) * 100);
 			wayArray = new HashMap<>(size);

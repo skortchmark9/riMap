@@ -49,7 +49,6 @@ public class ClientHandler extends Thread {
 	 * Default constructor.
 	 * Sets up this handler to be ready to receive requests 
 	 * from and write responses to the client.
-	 * 
 	 * @param pool - the shared pool of currently running client handlers on this server.
 	 * @param clientSocket - the connection to the client
 	 * @param backend - the backend which will compute and return the results of the requests sent from the client.
