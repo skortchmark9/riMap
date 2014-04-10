@@ -64,18 +64,18 @@ class CopyOfWayGetter extends Thread {
 	 * @param minLon
 	 * @param maxLon
 	 */
-	void getWays(double minLat, double maxLat, double minLon, double maxLon) {
+	void getWays(double minLat, double maxLat, double minLon, double maxLon, double zoom) {
 		if (futureWays != null) {
 			futureWays.cancel(true);
 			_exec.purge();
 		}
 		
 		if (_running)
-			futureWays = _exec.submit(new WayWorker(minLat, maxLat, minLon, maxLon));
+			futureWays = _exec.submit(new WayWorker(minLat, maxLat, minLon, maxLon, zoom));
 	}
 
 	class WayWorker implements Callable<WayResponse> {
-		double _minLat, _maxLat, _minLon, _maxLon;
+		double _minLat, _maxLat, _minLon, _maxLon, _zoom;
 
 		/**
 		 * 
@@ -84,16 +84,17 @@ class CopyOfWayGetter extends Thread {
 		 * @param minLon
 		 * @param maxLon
 		 */
-		public WayWorker(double minLat, double maxLat, double minLon, double maxLon) {
+		public WayWorker(double minLat, double maxLat, double minLon, double maxLon, double zoom) {
 			_minLat = minLat;
 			_maxLat = maxLat;
 			_minLon = minLon;
 			_maxLon = maxLon;
+			_zoom = zoom;
 		}
 
 		@Override
 		public WayResponse call() throws Exception {
-			List<Way> ways = _owner._b.getWaysInRange(_minLat, _maxLat, _minLon, _maxLon);
+			List<Way> ways = _owner._b.getWaysInRange(_minLat, _maxLat, _minLon, _maxLon, _zoom);
 			return new WayResponse(ways, _minLat, _maxLat, _minLon, _maxLon);
 		}
 	}

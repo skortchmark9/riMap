@@ -149,10 +149,10 @@ public class Client {
 		request(new NeighborsRequest(i, kd, isSource));
 	}
 
-	public void requestWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+	public void requestWaysInRange(double minLat, double maxLat, double minLon, double maxLon, double zoom) {
 		Util.debug("Requesting Ways");
 		_minLat = minLat; _maxLat = maxLat; _minLon = minLon; _maxLon = maxLon;
-		request(new WayRequest(minLat, maxLat, minLon, maxLon));
+		request(new WayRequest(minLat, maxLat, minLon, maxLon, zoom));
 		_frontend.addWays(MapFactory.getLocalWaysInRange(minLat, maxLat, minLon, maxLon));
 	}
 

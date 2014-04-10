@@ -8,13 +8,14 @@ package shared;
 public class WayRequest implements Request {
 	
 	private static final long serialVersionUID = 1L;
-	private final double _minLat, _maxLat, _minLon, _maxLon;
+	private final double _minLat, _maxLat, _minLon, _maxLon, _zoom;
 	
-	public WayRequest(double minLat, double maxLat, double minLong, double maxLong) {
+	public WayRequest(double minLat, double maxLat, double minLong, double maxLong, double zoom) {
 		_minLat = minLat;
 		_maxLat = maxLat;
 		_minLon = minLong;
 		_maxLon = maxLong;
+		_zoom = zoom;
 	}
 	public double getMinLat() {
 		return _minLat;
@@ -27,6 +28,9 @@ public class WayRequest implements Request {
 	}
 	public double getMaxLon() {
 		return _maxLon;
+	}
+	public double getZoom() {
+		return _zoom;
 	}
 	@Override
 	public RequestType getType() {
