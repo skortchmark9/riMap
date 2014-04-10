@@ -5,14 +5,12 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.beans.PropertyVetoException;
-import java.text.ParseException;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -33,6 +31,7 @@ import javax.swing.SwingConstants;
 import maps.Node;
 import maps.Way;
 import backend.Constants;
+import backend.Util;
 import client.Client;
 
 /**
@@ -55,12 +54,15 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	private Client _client;
 	//A floating controlPanel for user interactions
 	private JInternalFrame _controlPanel;
-	private NotifierPopup _notifier;
+	private NotifierPopup _notifier, _trafficBar;
 	private SimpleLoadingPane loadingScreen;
 	private JPanel loadingPanel;
 	private JLabel lblTimeouts;
 	private JSpinner timeOutSpinner;
 	boolean loading = true;
+	
+	JDesktopPane _desktop;
+	private JPanel _bgPanel;
 
 	/**
 	 * Main constructor.<br>
@@ -129,24 +131,26 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		createControlPanel();
 
 		//Initializes a JDesktopPane to hold the control panel and the map.
-		JDesktopPane desktop = new JDesktopPane();
-		desktop.setVisible(true);
-		desktop.setOpaque(false);
+		_desktop = new JDesktopPane();
+		_desktop.setVisible(true);
+		_desktop.setOpaque(false);
 
 		//Creates the map pane. Wrapping it in backgroundPanel allows us to use
 		//a layoutManager to center it, even though JDesktopPane does not support one.
 		_map = new MapPane(_client);
 		_map.setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100));
-		JPanel backgroundPanel = new JPanel(new GridBagLayout());
-		backgroundPanel.setBackground(Color.BLACK);
-		backgroundPanel.add(_map);
-		backgroundPanel.setBounds(0, 0, this.getWidth(), this.getHeight());
+		//JPanel backgroundPanel = new JPanel(new GridBagLayout());
+		_bgPanel = new JPanel();
+		_bgPanel.setBackground(Color.BLACK);
+		_bgPanel.setLayout(null);
+		_bgPanel.add(_map);
+		_bgPanel.setBounds(0, 0, this.getWidth(), this.getHeight());
 
 
 		//Adds the controlPanel and Map/BackgroundPanel to the desktop.
-		desktop.add(_controlPanel);
-		desktop.add(backgroundPanel);
-		setContentPane(desktop);
+		_desktop.add(_controlPanel);
+		_desktop.add(_bgPanel);
+		setContentPane(_desktop);
 		setControlPanelFocus(true);
 		
 		//create a new resize listener
@@ -154,7 +158,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 			
 			@Override
 			public void componentResized(ComponentEvent e) {
-				Dimension d = getPreferredSize();
+				Dimension d = getSize();
 				_map.updatePixelDimension(d);
 			}
 			
@@ -392,7 +396,8 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	public void actionPerformed(ActionEvent e) {
 		//Get Directions from the Screen points (defined by clicking)
 		if (e.getSource() == _getDirections) {
-			Node start;
+			trafficConnection(true);
+/*			Node start;
 			Node end;
 			String xs1S = _box1.getText();
 			String xs2S = _box2.getText();
@@ -407,10 +412,27 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 			} catch (ParseException e1) {
 			}
 			_client.requestPath(start, end, timeOut, xs1S, xs2S, xs1E, xs2E);
+*/
 
 		} else if (e.getSource() == _clear) {
 			clear();
+			//trafficConnection(false);
 		}
 	}
-}
 
+	public void trafficConnection(boolean status) {
+		if (status) {
+			if (_trafficBar != null) {
+				_trafficBar.setColor(Color.green);
+				_trafficBar.displayInformation("Regained connection with traffic server");
+			}
+		} else {
+			Util.out("Showing traffic status bar");
+			_trafficBar = new NotifierPopup(_desktop);
+			_trafficBar.setColor(Color.RED);
+			_trafficBar.displayInformation("Traffic server unavailable");
+			_desktop.add(_trafficBar);
+		}
+		
+	}
+}
