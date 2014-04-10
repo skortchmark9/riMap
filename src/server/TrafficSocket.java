@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 import maps.MapFactory;
-import backend.Constants;
 import backend.Util;
 
 /**
@@ -19,7 +18,7 @@ public class TrafficSocket extends Thread {
 	private int _port;
 	private Socket _socket;
 	private BufferedReader _input;
-	private boolean _connected = false;
+	private volatile boolean _connected = false;
 	private Server _server;
 	
 	/**
@@ -28,7 +27,6 @@ public class TrafficSocket extends Thread {
 	public TrafficSocket(int port, Server server) {
 			_server = server;
 			_port = port;
-			keepTryingToConnect();
 	}
 	
 	/**
@@ -36,6 +34,7 @@ public class TrafficSocket extends Thread {
 	 * puts the data in MapFactory's trafficMap.
 	 */
 	public void run() {
+		keepTryingToConnect();
 		while(_connected) {
 			try {
 				String line;
@@ -98,13 +97,18 @@ public class TrafficSocket extends Thread {
 	/**
 	 * Kills & cleans up the resources of this socket.
 	 */
-	private void kill() {
-			Util.debug("Killing traffic socket...");
+	void kill() {
+			Util.debug("Killing traffic socket");
 			
 			try {
 				_connected = false;
-				_input.close();
-				_socket.close();
+				
+				if (_input != null)
+					_input.close();
+				
+				if (_socket != null)
+					_socket.close();
+				
 			} catch (IOException e) {
 				//do nothing with this, just exit
 			}

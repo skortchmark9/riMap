@@ -79,9 +79,13 @@ public class Server extends Thread {
 	 * @throws IOException if any socket is invalid.
 	 */
 	public void kill() throws IOException {
+		Util.debug("Killing Server");
+		
 		_running = false;
 		_clientPool.killall();
-		_socket.close();
+		
+		if (_socket != null)
+			_socket.close();
 	}
 
 }

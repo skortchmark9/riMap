@@ -66,15 +66,16 @@ public class Main {
 		//Listen for "exit" or empty line to quit server
 		Scanner scanner = new Scanner(System.in);
 		String line = null;
+		Util.out("Enter blank line or \'exit\' to quit server.");
 		while (scanner.hasNextLine()) {
 			line = scanner.nextLine();
 			if (line.length() == 0 || line.equalsIgnoreCase("exit")) {
-				break;
+				trafficSocket.kill();
+				server.kill();
+				scanner.close();
+				System.exit(0);
 			}
-			Util.out("Enter blank line or \'exit\' to quit server.");
 		}
-		server.kill();
-		scanner.close();
 	}
 
 	
