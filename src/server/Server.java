@@ -67,8 +67,8 @@ public class Server extends Thread {
 		_clientPool.broadcast(new ServerStatus(false, s));
 	}
 	
-	public void trafficUpdate(String name, Double val) {
-		_clientPool.broadcast(new TrafficResponse(name, val));
+	public void trafficUpdate(String name, Double val, boolean status) {
+		_clientPool.broadcast(new TrafficResponse(name, val, status));
 	}
 
 
