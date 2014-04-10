@@ -32,24 +32,38 @@ public class NotifierPopup extends JPopupMenu implements ActionListener {
 		displayInformation(information, 2);
 	}
 	
+	public void setColor(Color c) {
+		setBackground(c);
+		setForeground(c);
+	}
+	
+	public void displayInformationForever(String information) {
+		displayInformation(information, -1);
+	}
+	
 	public void displayInformation(String information, int time) {
-		_timer.setInitialDelay(time * 1000);
-		_timer.setRepeats(false);
 		removeAll();
 		JMenuItem item = add(information);
 		item.setPreferredSize(new Dimension(_parent.getWidth(), 20));
 		show(_parent, 0, (_parent.getHeight()));
 		setVisible(true);
-		_timer.start();
+		if (time > 0) {
+			_timer.setInitialDelay(time * 1000);
+			_timer.setRepeats(false);
+			_timer.start();
+		}
+	}
+	
+	public void hidePopup() {
+		_timer.stop();
+		setVisible(false);
+		repaint();		
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		_timer.stop();
-		setVisible(false);
+		hidePopup();
 		Util.out("Timer fired");
-		repaint();
-		
 	}
 
 }
