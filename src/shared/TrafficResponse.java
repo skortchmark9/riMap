@@ -3,8 +3,9 @@ package shared;
 
 public class TrafficResponse implements Response {
 	private static final long serialVersionUID = 1L;
-	String _name;
-	Double _val;
+	private final String _name;
+	private final Double _val;
+	private final boolean _status;
 	
 	/**
 	 * Default constructor.
@@ -13,9 +14,10 @@ public class TrafficResponse implements Response {
 	 * @param name - the name of the way whose traffic info is being updated
 	 * @param val - the amount of traffic on the way
 	 */
-	public TrafficResponse(String name, Double val) {
+	public TrafficResponse(String name, Double val, boolean trafficStatus) {
 		_name = name;
 		_val = val;
+		_status = trafficStatus;
 	}
 
 	@Override
@@ -37,6 +39,10 @@ public class TrafficResponse implements Response {
 	 */
 	public Double getVal() {
 		return _val;
+	}
+
+	public boolean getStatus() {
+		return _status;
 	}
 
 }
