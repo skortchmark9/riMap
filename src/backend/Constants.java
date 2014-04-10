@@ -53,7 +53,7 @@ public class Constants {
 	
 	public static final int DEFAULT_REQUEST_TIMEOUT = 5;
 	
-	public static final int BufferLength = 520;
+	public static final int BufferLength = 1024;
 	public static final int TabBufferLength = 256;
 	
 	/**
