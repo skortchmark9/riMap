@@ -10,8 +10,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.Timer;
 
-import backend.Util;
-
 public class NotifierPopup extends JPopupMenu implements ActionListener {
 	
 	private static final long serialVersionUID = 1L;
@@ -63,7 +61,6 @@ public class NotifierPopup extends JPopupMenu implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		hidePopup();
-		Util.debug("Timer fired");
 	}
 
 }

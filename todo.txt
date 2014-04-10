@@ -2,26 +2,14 @@ Need to do:
 - RAF copies for each Client Handler * ELIAS (w/ SAM?)
 	- make newline hashmap static * ELIAS (w/ SAM?)
 - fix buttons in control panel * SAM
-- display fewer roads on zoom out // naive * SAM
 - turn-by-turn * SAM
 - fix tab selection for autofillfields * SAM
-- ensure client never crashes even if server disconnects * ELIAS
-- Maker 
-- display connection status messages (waiting for server, server has disconnected, traffic unavailable, etc.) * ELIAS
-- - (tomorrow) - -
-- test with 5-10 clients
-	- 4 clients running + 2 lcients requesting long path is sufficient
 - systems tests on backend 
 - jUnit testing 
 - commenting, public/private methods, package design 
 
 Cool Features (Not necessary):
- - Periodically check if traffic bot goes up after it has been unavail
- 	- same goes for client / server connection
- 	- "quit gracefully"
  - save newlines in binary search file
- - displaying fewer roads on zoom out // clever
- - validate autocorrect results
 
 
 

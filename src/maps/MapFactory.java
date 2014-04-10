@@ -41,14 +41,14 @@ public class MapFactory {
 	private static Map<String, List<String>> wayArray = new HashMap<>(1000); //SearchCode, WayIDs within search code bounds
 	private static Map<String, Double> trafficMap = new HashMap<>();
 	private static Map<String, Integer> roadLengthMap;
-		
-	
-	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////\\\\\\\\\\\\\\\\\CREATING WAYS/////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////\\\\\\\\\\\\\\\\\CREATING WAYS/////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 	//NOTE that these methods are all highly overloaded, but they all have the same purpose.
-	
+
 	/**
 	 * Creates a way from the wayID. Attempts to find a cached way if one
 	 * doesn't exist. If not, searches the waysFile.
@@ -92,7 +92,7 @@ public class MapFactory {
 		}
 		return resultWay;
 	}
-	
+
 	/**
 	 * Creates a way if we don't have the actual nodes, but only their names
 	 * @param wayID - the wayID we are searching for. 
@@ -118,10 +118,10 @@ public class MapFactory {
 		return resultWay;
 	}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////\\\\\\\\\\\\\\\\\CREATING NODES/////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////\\\\\\\\\\\\\\\\\CREATING NODES/////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-	
+
 	//NOTE that these methods are all highly overloaded, but they all have the same purpose.
 
 	/**
@@ -171,9 +171,9 @@ public class MapFactory {
 			return createNode(nodeID, nodeInfo[0], nodeInfo[1], nodeInfo[2]);
 		}
 	}
-	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////\\\\\\\\\\\\\\\\\CREATING INTERSECTIONS/////////\\\\\\\\\\\\\\\\\\\\\\\\\
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////\\\\\\\\\\\\\\\\\CREATING INTERSECTIONS/////////\\\\\\\\\\\\\\\\\\\\\\\\\
 
 
 	/** Creates an intersection from two street names.
@@ -215,7 +215,7 @@ public class MapFactory {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Given a node, this method attempts to find the two
 	 * cross streets that define it. Something worth noting
@@ -227,7 +227,7 @@ public class MapFactory {
 	public static List<String> getIntersectingStreets(Node n) {
 		List<String> wayIDs = n.getWayIDs();
 		String s1 = "", s2 = "";
-		
+
 		if (wayIDs.size() >= 1) {
 			Way way1 = MapFactory.createWay(wayIDs.get(0));
 			if (way1 != null)
@@ -238,7 +238,7 @@ public class MapFactory {
 			Way way2 = MapFactory.createWay(wayIDs.get(i));
 			if (way2 == null)
 				continue;
-			
+
 			String possible = way2.getName();
 			if (!possible.equals(s1)) {
 				s2 = possible;
@@ -253,11 +253,11 @@ public class MapFactory {
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////\\\\\\\INFRASTRUCTURE TREE CREATION/////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\	
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////\\\\\\\INFRASTRUCTURE TREE CREATION/////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\	
 
 
-	
+
 	/**
 	 * Basic method for creating a RadixTree - the data structure that powers autocorrects.
 	 * @return - Radix Tree - populated from the nodes file in Resources.
@@ -270,7 +270,7 @@ public class MapFactory {
 			Util.memLog();
 			start = Util.resetClock();
 		}
-		
+
 		List<List<String>> names = Resources.indexFile.readChunks("name");
 
 		if (Constants.DEBUG_MODE) {
@@ -294,8 +294,8 @@ public class MapFactory {
 		Util.debug("Done inserting names from list to Radix Tree.", "(Elapsed:", Util.timeSince(start) + ")");
 		return rt;
 	}
-	
-	
+
+
 	/**
 	 * More complicated method because it does two things simultaneously it 
 	 * creates a RadixTree - the data structure that powers autocorrects. Because
@@ -326,7 +326,7 @@ public class MapFactory {
 		}
 		return rt;
 	}
-	
+
 	/** Attempts to create a KDTree from the nodes file we have. */
 	public static KDTree<Node> createKDTree() throws IOException {
 		long start = 0; //XXX: FOR DEBUGGING
@@ -364,10 +364,10 @@ public class MapFactory {
 		return new KDTree<Node>(nodeList);
 	}
 
-	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////\\\\\\\FETCHING WAYS/////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\	
-	
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////\\\\\\\FETCHING WAYS/////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\	
+
 	/**
 	 * Gets all the ways within a given lat-lng range. Threaded, to allow 
 	 * quick access and loading of ways while keeping the GUI responding.
@@ -379,15 +379,15 @@ public class MapFactory {
 	 */
 	public static List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon, double zoom) {
 		List<Way> ways = new LinkedList<>();
-			for(double i = minLat; i <= maxLat + 0.01; i+=0.01) {
-				for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
-					ways.addAll(getWaysSquare(i, j, zoom));
-				}
+		for(double i = minLat; i <= maxLat + 0.01; i+=0.01) {
+			for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
+				ways.addAll(getWaysSquare(i, j, zoom));
 			}
+		}
 		return ways;
 	}
 
-	
+
 	/**
 	 * A helper for getWaysInRange that looks at the lat and long of a smaller
 	 * block and filters out ways via the zoom.
@@ -425,22 +425,24 @@ public class MapFactory {
 		return ways;
 	}
 
-	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////\\\\\\\ZOOM-FILTERING////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\	
 
-	
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////\\\\\\\ZOOM-FILTERING////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\	
+
+
 	/**
-	 * Method used to determine if a road should be painted
-	 * @param way
-	 * @param zoom
-	 * @return
+	 * Method used to determine if a road should be painted once we begin to filter
+	 * zoomed out ways. We only start filtering when we zoom out past a given point.
+	 * @param way -  Is it long enough to be worth drawing?
+	 * @param zoom - the current level of zoom we are at.
+	 * @return - a boolean determining if the road is long enough or not.
 	 */
 	static boolean longRoad(Way way, double zoom) {
+		//Don't draw a way if its null!
 		if (way == null) {
 			return false;
-		} else if (zoom >= 1) {
-			return true;
+		} else if (zoom >= Constants.ZOOM_FILTERING_THRESHOLD) {
+			return true; //No need to filter if we are in pretty tight
 		} else {
 			Integer numNodes = null;
 			if (roadLengthMap != null) {
@@ -449,55 +451,78 @@ public class MapFactory {
 			if (numNodes == null) {
 				return false;
 			}
-			return numNodes * zoom > 1;
+			return numNodes * zoom > 1; //Zooming in makes it more likely to be
+			//drawn - we don't want to lose any detail
 		}
 	}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////\\\\\\\\\\CACHEING///////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\	
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////\\\\\\\\\\CACHEING///////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\	
 
-public static void cacheBlock(String searchCode, List<String> wayIDs) {
-List<String> oldList = wayArray.get(searchCode);
-if (oldList == null || oldList.size() < wayIDs.size())
-wayArray.put(searchCode, wayIDs);
-}
-
-public static void cacheWay(Way way) {
-ways.put(way.uniqueID, way);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////\\\\\\\\\\CLIENT///////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\	
-
-
-public static List<Way> getLocalWaysInRange(double minLat, double maxLat, double minLon, double maxLon, double zoom) {
-	List<Way> ways = new LinkedList<>();
-	for(double i = minLat; i <= maxLat + 0.01; i+=0.01) {
-		for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
-			ways.addAll(getLocalWays(i, j, zoom));
-		}
-	}
-	return ways;
-}
-
-
-static List<Way> getLocalWays(double lat, double lon, double zoom) {
-	List<Way> wayList = new LinkedList<>();
-	String searchCode = "/w/" + Util.getFirst4Digits(lat) + "." + Util.getFirst4Digits(lon); //lAT/LNG
-	List<String> wayIDsInRange = wayArray.get(searchCode);
-	if (wayIDsInRange != null) {
-		for(String wayID : wayIDsInRange) {
-			Way way = ways.get(wayID);
-			if (longRoad(way, zoom)) 
-				wayList.add(way);
-		}
-	}
-	return wayList;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////\\\\\\\\\\TRAFFIC///////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\	
 	
+	/**
+	 * This method is used to safely cache new information the client has without
+	 * replacing older, better information if it exists
+	 * @param searchCode - the generated searchCode to store the blocks under.
+	 * @param wayIDs - the wayIDs to store in the hashmap.
+	 */
+	public static void cacheBlock(String searchCode, List<String> wayIDs) {
+		List<String> oldList = wayArray.get(searchCode);
+		if (oldList == null || oldList.size() < wayIDs.size())
+			wayArray.put(searchCode, wayIDs);
+	}
+
+	/**
+	 * This method is used to safely cache new information the client has without
+	 * replacing older, better information if it exists
+	 * @param searchCode - the generated searchCode to store the blocks under.
+	 * @param wayIDs - the wayIDs to store in the hashmap.
+	 */
+	public static void cacheWay(Way way) {
+		ways.put(way.uniqueID, way);
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////\\\\\\\\\\CLIENT///////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\	
+
+
+	/**
+	 * This class attempts to get ways locally from an existing cache.
+	 * @param minLat - the minimum latitude to search.
+	 * @param maxLat - the maximum latitude to search.
+	 * @param minLon - the minimum longitude to search.
+	 * @param maxLon - the maximum longitude to search.
+	 * @param zoom - the zoom to be considered if we do zoom-filtering
+	 * @return
+	 */
+	public static List<Way> getLocalWaysInRange(double minLat, double maxLat, double minLon, double maxLon, double zoom) {
+		List<Way> ways = new LinkedList<>();
+		for(double i = minLat; i <= maxLat + 0.01; i+=0.01) {
+			for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
+				ways.addAll(getLocalWays(i, j, zoom));
+			}
+		}
+		return ways;
+	}
+
+
+	static List<Way> getLocalWays(double lat, double lon, double zoom) {
+		List<Way> wayList = new LinkedList<>();
+		String searchCode = "/w/" + Util.getFirst4Digits(lat) + "." + Util.getFirst4Digits(lon); //lAT/LNG
+		List<String> wayIDsInRange = wayArray.get(searchCode);
+		if (wayIDsInRange != null) {
+			for(String wayID : wayIDsInRange) {
+				Way way = ways.get(wayID);
+				if (longRoad(way, zoom)) 
+					wayList.add(way);
+			}
+		}
+		return wayList;
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////\\\\\\\\\\TRAFFIC///////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\	
+
 	/**
 	 *
 	 * @param wayID
@@ -520,11 +545,11 @@ static List<Way> getLocalWays(double lat, double lon, double zoom) {
 
 		return 1.0;
 	}
-	
+
 	public static void setTrafficMap(Map<String, Double> newMap) {
 		trafficMap = newMap;
 	}
-	
+
 	public static Map<String, Double> getTrafficMap() {
 		return trafficMap;
 	}
