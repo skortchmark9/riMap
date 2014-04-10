@@ -63,6 +63,7 @@ public class Client {
 		_executor = Executors.newFixedThreadPool(2);
 		_port = port;
 		_hostName = hostName;
+		_running = false;
 	}
 
 	/**
@@ -74,28 +75,49 @@ public class Client {
 		UIManager.put("swing.boldMetal", Boolean.FALSE);
 		_frontend = new Frontend(this);
 		new Thread(_frontend).start();
+		
+		int num_attempts = 0;
+		while(!_running) {
+			
+			if (num_attempts > 7) {
+				Util.err("ERROR: Server unavailable. Max number of reconnection attempts reached.");
+				return;
+			}
+			num_attempts++;
+			
+			try {
+				//host is localhost or IP if an IP address is specified
+				_socket = new Socket(_hostName, _port);
+				_output = new ObjectOutputStream(_socket.getOutputStream());
+				_input = new ObjectInputStream(_socket.getInputStream());
+				
+				_running = true;
 
-		try {
-			//host is localhost or IP if an IP address is specified
-			_socket = new Socket(_hostName, _port);
-			_output = new ObjectOutputStream(_socket.getOutputStream());
-			_input = new ObjectInputStream(_socket.getInputStream());
-			_running = true;
+				_requests = new LinkedList<>();
 
-			_requests = new LinkedList<>();
+				_thread = new ReceiveThread();
+				_thread.start();
 
-			_thread = new ReceiveThread();
-			_thread.start();
-
-			Util.debug("creating new frontend");
+				Util.debug("creating new frontend");
 
 
-			Util.debug("Frontend done\n","Attempting to connect to server now");
-			_frontend.setVisible(true);
-			run();
-		}
-		catch (IOException ex) {
-			Util.err("ERROR: Can't connect to server");
+				Util.debug("Frontend done\n","Attempting to connect to server now");
+				_frontend.setVisible(true);
+				run();
+			}
+			catch (IOException ex) {
+				Util.out("ERROR: Can't connect to server");
+				_frontend.guiMessage("Server unavailable!");
+				try {
+					Thread.sleep(2500);
+					_frontend.guiMessage("Attempting to reconnect...");
+					Thread.sleep(2500);
+				} catch (InterruptedException e) {
+					Util.err("ERROR trying to reconnect to server");
+					kill();
+					return;
+				}
+			}
 		}
 	}
 
@@ -213,6 +235,8 @@ public class Client {
 			//tell the front end to tell the map to render the new ways
 			Util.debug("Got ways");
 			WayResponse wayResp = (WayResponse) resp;
+			
+			//TODO: maybe turn back on
 			if (matchesRange(wayResp.getMinMaxLatLon())) {
 				_frontend.setWays(wayResp.getWays());
 				_executor.submit(new CacheThread(wayResp.getWays()));
@@ -220,8 +244,13 @@ public class Client {
 			break;
 		case TRAFFIC:
 			TrafficResponse tResp = (TrafficResponse) resp;
-			MapFactory.putTrafficValue(tResp.getName(), tResp.getVal());//put traffic value i server side map
-			_frontend.refreshMap(); //repaint map pane
+			if (tResp.getStatus()) {
+				MapFactory.putTrafficValue(tResp.getName(), tResp.getVal());//put traffic value i server side map
+				_frontend.trafficConnection(true); //tell GUI that the traffic connection is solid
+				_frontend.refreshMap(); //repaint map pane
+			} else {
+				_frontend.trafficConnection(false); //tell GUI traffic connection is bad
+			}
 			break;
 		case CLIENT_CONNECT:
 			ClientConnectionResponse ccResp = (ClientConnectionResponse) resp;
