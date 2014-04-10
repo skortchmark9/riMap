@@ -19,6 +19,6 @@ public class MapFactoryTest {
 		double minLon = Constants.INITIAL_LON;
 		double maxLat = minLat + Constants.GEO_DIMENSION_FACTOR;
 		double maxLon = minLon + Constants.GEO_DIMENSION_FACTOR;
-		System.out.println(MapFactory.getWaysInRange(minLat, maxLat, minLon, maxLon));
+		System.out.println(MapFactory.getWaysInRange(minLat, maxLat, minLon, maxLon, 1));
 	}
 }

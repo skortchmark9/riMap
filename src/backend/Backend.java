@@ -114,7 +114,7 @@ public class Backend {
 		sendStatusMessage("Building Autocorrections");
 		RadixTree rt; //we store our words in a RadixTree rather than a Trie.
 		try {
-			rt = MapFactory.createRadixTree();
+			rt = MapFactory.createRadixTreeAndInitRoadLengths();
 			if (rt.isEmpty()) {
 				Util.err("ERROR: Could not instantiate AutoCorrectEngine");
 				return;
@@ -156,9 +156,9 @@ public class Backend {
 		return ways;
 	}
 
-	public List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+	public List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon, double zoom) {
 		long start = System.currentTimeMillis();		
-		List<Way> results = MapFactory.getWaysInRange(minLat, maxLat, minLon, maxLon);
+		List<Way> results = MapFactory.getWaysInRange(minLat, maxLat, minLon, maxLon, zoom);
 		Util.debug("GETTING WAYS TOOK: ", System.currentTimeMillis() - start);
 		return results;
 	}
@@ -175,7 +175,7 @@ public class Backend {
 	public List<Way> getInitialWays() {
 		sendStatusMessage("Finding Ways...");
 		//TODO: is this too wide?
-		return MapFactory.getWaysInRange(Constants.INITIAL_LAT - Constants.GEO_DIMENSION_FACTOR, Constants.INITIAL_LAT, Constants.INITIAL_LON, Constants.INITIAL_LON + (Constants.GEO_DIMENSION_FACTOR*2));
+		return MapFactory.getWaysInRange(Constants.INITIAL_LAT - Constants.GEO_DIMENSION_FACTOR, Constants.INITIAL_LAT, Constants.INITIAL_LON, Constants.INITIAL_LON + (Constants.GEO_DIMENSION_FACTOR*2), 1);
 	}
 
 	public class BackendInitializer extends Thread {

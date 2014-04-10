@@ -126,7 +126,7 @@ public class ClientHandler extends Thread {
 
 		case WAYS:
 			WayRequest wReq = (WayRequest) req;
-			_wayGetter.getWays(wReq.getMinLat(), wReq.getMaxLat(), wReq.getMinLon(), wReq.getMaxLon()); //start a new worker thread in the getter
+			_wayGetter.getWays(wReq.getMinLat(), wReq.getMaxLat(), wReq.getMinLon(), wReq.getMaxLon(), wReq.getZoom()); //start a new worker thread in the getter
 			break;
 		case PATH:
 			PathRequest pReq = (PathRequest) req;

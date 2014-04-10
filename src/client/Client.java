@@ -151,11 +151,16 @@ public class Client {
 		request(new NeighborsRequest(i, kd, isSource));
 	}
 
-	public void requestWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+	public void requestWaysInRange(double minLat, double maxLat, double minLon, double maxLon, double zoom) {
 		Util.debug("Requesting Ways");
 		_minLat = minLat; _maxLat = maxLat; _minLon = minLon; _maxLon = maxLon;
+<<<<<<< HEAD
 		request(new WayRequest(minLat, maxLat, minLon, maxLon));
 		_localPainter.execute(new LocalRenderThread(_frontend, minLat, maxLat, minLon, maxLon));
+=======
+		request(new WayRequest(minLat, maxLat, minLon, maxLon, zoom));
+		_frontend.addWays(MapFactory.getLocalWaysInRange(minLat, maxLat, minLon, maxLon));
+>>>>>>> df39694592e75685f85a20f8f32e99f4ef6752da
 	}
 
 	public void requestPath(Node start, Node end, int timeout) {
