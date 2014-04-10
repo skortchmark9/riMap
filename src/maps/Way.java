@@ -51,7 +51,7 @@ public class Way implements Edge<Node>, Serializable {
 		return name;
 	}
 	
-	public double getDistanceInMiles() {
+	public double getDistanceInKM() {
 		  double theDistance = (Math.sin(Math.toRadians(start.getCoordinates()[0])) *
 		            Math.sin(Math.toRadians(target.getCoordinates()[0])) +
 		            Math.cos(Math.toRadians(start.getCoordinates()[0])) *
@@ -61,7 +61,7 @@ public class Way implements Edge<Node>, Serializable {
 	}
 	
 	public double getTime(int speed) {
-		return getDistanceInMiles() * getTraffic() / speed;
+		return getDistanceInKM() * getTraffic() / speed;
 	}
 
 	@Override

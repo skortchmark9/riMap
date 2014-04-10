@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.beans.PropertyVetoException;
+import java.text.ParseException;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -59,6 +60,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	private JPanel loadingPanel;
 	private JLabel lblTimeouts;
 	private JSpinner timeOutSpinner;
+	private DirectionsPopup _directionPopup;
 	boolean loading = true;
 	
 	JDesktopPane _desktop;
@@ -123,6 +125,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		setCursor(Cursor.getDefaultCursor());
 		//Initializing the rest of the Frontend.
 		initMainScreen();
+		_directionPopup = new DirectionsPopup(_controlPanel);
 	}
 
 	void initMainScreen() {
@@ -145,7 +148,6 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		_bgPanel.setLayout(null);
 		_bgPanel.add(_map);
 		_bgPanel.setBounds(0, 0, this.getWidth(), this.getHeight());
-
 
 		//Adds the controlPanel and Map/BackgroundPanel to the desktop.
 		_desktop.add(_controlPanel);
@@ -321,7 +323,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	public void giveDirections(List<Way> path, Node source, Node end) {
 		_map.setCalculatedRoute(path);
 		_map.setPoints(source, end);
-		//TODO implement turn by turn directions
+		_directionPopup.showPopup(path, DirectionsPopup.DRIVING);
 	}
 
 	/**
@@ -397,7 +399,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		//Get Directions from the Screen points (defined by clicking)
 		if (e.getSource() == _getDirections) {
 			trafficConnection(true);
-/*			Node start;
+			Node start;
 			Node end;
 			String xs1S = _box1.getText();
 			String xs2S = _box2.getText();
@@ -412,11 +414,10 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 			} catch (ParseException e1) {
 			}
 			_client.requestPath(start, end, timeOut, xs1S, xs2S, xs1E, xs2E);
-*/
+
 
 		} else if (e.getSource() == _clear) {
 			clear();
-			//trafficConnection(false);
 		}
 	}
 
