@@ -5,7 +5,6 @@ import java.util.List;
 
 import maps.MapFactory;
 import maps.Way;
-import backend.Util;
 
 public class CacheThread implements Runnable {
 	
