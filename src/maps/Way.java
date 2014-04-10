@@ -50,6 +50,19 @@ public class Way implements Edge<Node>, Serializable {
 	public String getName() {
 		return name;
 	}
+	
+	public double getDistanceInMiles() {
+		  double theDistance = (Math.sin(Math.toRadians(start.getCoordinates()[0])) *
+		            Math.sin(Math.toRadians(target.getCoordinates()[0])) +
+		            Math.cos(Math.toRadians(start.getCoordinates()[0])) *
+		            Math.cos(Math.toRadians(target.getCoordinates()[0])) *
+		            Math.cos(Math.toRadians(start.getCoordinates()[1] - target.getCoordinates()[1])));
+		    return new Double((Math.toDegrees(Math.acos(theDistance))) * 69.09 * 1.6093);
+	}
+	
+	public double getTime(int speed) {
+		return getDistanceInMiles() * getTraffic() / speed;
+	}
 
 	@Override
 	public double getWeight() {
