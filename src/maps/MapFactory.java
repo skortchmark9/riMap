@@ -26,9 +26,9 @@ import frontend.LoadingPane;
 public class MapFactory {
 
 	private static Map<String, Node> nodes = new HashMap<>(65000);
-	private static Map<String, Way> ways = new HashMap<>(35000);
+	private static Map<String, Way> ways = new HashMap<>(35000); //way IDs mapped to way objects
 	//TODO init to a better number
-	private static Map<String, List<String>> wayArray = new HashMap<>(1000);
+	private static Map<String, List<String>> wayArray = new HashMap<>(1000); //SearchCode, WayIDs within search code bounds
 	private static Map<String, Double> trafficMap = new HashMap<>();
 	private static Map<String, Integer> roadLengthMap;
 	/**
@@ -60,6 +60,12 @@ public class MapFactory {
 
 	public static void setTrafficMap(Map<String, Double> newMap) {
 		trafficMap = newMap;
+	}
+	
+	public static void cacheBlock(String searchCode, List<String> wayIDs) {
+		List<String> oldList = wayArray.get(searchCode);
+		if (oldList == null || oldList.size() < wayIDs.size())
+			wayArray.put(searchCode, wayIDs);
 	}
 
 	public static void cacheWay(Way way) {
@@ -355,34 +361,6 @@ public class MapFactory {
 		return rt;
 	}
 
-
-	public static synchronized List<Way> getWaysInRangeFaster(double minLat, double maxLat, double minLon, double maxLon) {
-
-		Util.debug("Looking for Ways in Range using THREADS");
-		Util.resetClock();
-
-		List<Way> ways = new LinkedList<>();
-		List<List<String>> wayInfoChunk = Collections.synchronizedList(new LinkedList<List<String>>());
-		ExecutorService executor = Executors.newFixedThreadPool(4);
-		for(double i = minLat; i <= maxLat + 0.01; i+=0.01) {
-			for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
-				String searchCode = "/w/" + Util.getFirst4Digits(i) + "." + Util.getFirst4Digits(j);
-				SearchMultipleWorker worker = new SearchMultipleWorker(wayInfoChunk, searchCode);
-				executor.execute(worker);
-			}
-		}
-		executor.shutdown(); //tell executor to finish all submitted tasks
-		while(!executor.isTerminated()) {} //wait for all tasks to complete
-		for (List<String> wayInfo : wayInfoChunk) {
-			if (wayInfo != null && !wayInfo.isEmpty()) {
-				Way possibleWay = createWay(wayInfo.get(0), wayInfo.get(1), wayInfo.get(2), wayInfo.get(3));
-				if (possibleWay != null)
-					ways.add(possibleWay);
-			}
-		}
-		return ways;
-	}
-
 	/**
 	 * Gets all the ways within a given lat-lng range. Threaded, to allow 
 	 * quick access and loading of ways while keeping the GUI responding.
@@ -409,24 +387,25 @@ public class MapFactory {
 		return ways;
 	}
 	
-	public static List<Way> getLocalWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+	public static List<Way> getLocalWaysInRange(double minLat, double maxLat, double minLon, double maxLon, double zoom) {
 		List<Way> ways = new LinkedList<>();
 		for(double i = minLat; i <= maxLat + 0.01; i+=0.01) {
 			for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
-				ways.addAll(getLocalWays(i, j));
+				ways.addAll(getLocalWays(i, j, zoom));
 			}
 		}
 		return ways;
 	}
 	
-	static List<Way> getLocalWays(double lat, double lon) {
+	static List<Way> getLocalWays(double lat, double lon, double zoom) {
 		List<Way> wayList = new LinkedList<>();
+		Util.out("WAYARRAY SIZE: ", wayArray.size());
 		String searchCode = "/w/" + Util.getFirst4Digits(lat) + "." + Util.getFirst4Digits(lon); //lAT/LNG
 		List<String> wayIDsInRange = wayArray.get(searchCode);
 		if (wayIDsInRange != null) {
 			for(String wayID : wayIDsInRange) {
 				Way way = ways.get(wayID);
-				if (way != null) 
+				if (longRoad(way, zoom)) 
 					wayList.add(way);
 			}
 		}
@@ -443,7 +422,10 @@ public class MapFactory {
 		} else if (zoom >= 1) {
 			return true;
 		} else {
-			Integer numNodes = roadLengthMap.get(way.getName());
+			Integer numNodes = null;
+			if (roadLengthMap != null) {
+				numNodes = roadLengthMap.get(way.getName());
+			}
 			if (numNodes == null) {
 				return true;
 			}
