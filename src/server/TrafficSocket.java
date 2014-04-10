@@ -19,21 +19,37 @@ public class TrafficSocket extends Thread {
 	private int _port;
 	private Socket _socket;
 	private BufferedReader _input;
-	private boolean _connect = true;
+	private boolean _connect = false;
 	private Server _server;
 	
 	/**
 	 * Default constructor
 	 */
 	public TrafficSocket(int port, Server server) {
-		try {
-			_server = server;
-			_port = port;
-			_socket = new Socket("localhost", _port);
-			_input = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
-		} catch (IOException e) {
-			Util.err("ERROR connnecting to traffic bot. Please check the port number.");
-			_connect = false;
+		int num_attempts = 0;
+		while(!_connect) {
+			num_attempts++;
+			try {
+				_server = server;
+				_port = port;
+				_socket = new Socket("localhost", _port);
+				_input = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
+				if (num_attempts > 1)
+					_server.serverOKMessage("Established Connection to traffic server!");
+				_connect = true;
+			} catch (IOException e) {
+				if (num_attempts == 1) {
+					Util.err("WARNING: Unable to connect to traffic bot. Continuing without traffic data.");
+					_server.trafficUpdate("", 0.0, false);
+				}
+				_connect = false;
+				try {
+					Thread.sleep(10000); //try to connect again in 10 seconds
+					Util.out("Attempting to reconnect to traffic bot...");
+				} catch (InterruptedException e1) {
+					Util.err("ERROR connecting to traffic bot. Traffic data will be unavailable.");
+				}
+			}
 		}
 	}
 	
@@ -52,15 +68,17 @@ public class TrafficSocket extends Thread {
 							String name = respData[0].toLowerCase();
 							Double val = Double.parseDouble(respData[1]);
 							MapFactory.putTrafficValue(name, val); //store the traffic info in map factory.
-							_server.trafficUpdate(name, val);
+							_server.trafficUpdate(name, val, true);
 						} catch(NumberFormatException e) {
-							Util.err("WARNING: Looks like the traffic server sent us a funky value (via TrafficSocket)"); //notify but keep reading
+							Util.err("WARNING: traffic server sent a funky value"); //notify but keep reading
 						}
 					}
 				}
-				kill(); //kill this socket when done with reading
 			} catch (IOException e) {
-				Util.err("ERROR IO exception (prob bad read of traffic info from server).");
+				Util.err("Connection dropped by traffic bot");
+				_server.trafficUpdate("", 0.0, false);
+			} finally {
+				kill(); //kill when finished
 			}
 		}
 	}
@@ -68,12 +86,14 @@ public class TrafficSocket extends Thread {
 	/**
 	 * Kills & cleans up the resources of this socket.
 	 */
-	private void kill() throws IOException {
-			if (Constants.DEBUG_MODE) {
-				Util.out("Killing traffic socket...");
+	private void kill() {
+			Util.debug("Killing traffic socket...");
+			
+			try {
+				_socket.close();
+				_input.close();
+			} catch (IOException e) {
+				//do nothing with this, just exit
 			}
-			_socket.close();
-			_input.close();
 	}
-
 }
