@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -81,7 +82,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		this.requestFocusInWindow();
 		
 		//request full set of ways
-		_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
+		_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1], scale);
 		
 		if (Constants.DEBUG_MODE)
 			Util.memLog();
@@ -108,6 +109,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
+		g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
+
 		
 		//===================================
 		//Render Ways
@@ -128,8 +131,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				}
 				//If the road is less than Constants.MIN_RENDER_LENGTH, don't paint it.
 				if (scale < 0.8) 
-					if (Math.abs(start[0] - start[1]) <= Constants.MIN_RENDER_LENGTH &&
-						Math.abs(end[0] - end[1]) <= Constants.MIN_RENDER_LENGTH)
+					if (Math.pow(start[0] - start[1], 2) +
+						Math.pow(end[0] - end[1], 2) <= Constants.MIN_RENDER_LENGTH)
 					continue;
 				g2d.drawLine(start[0], start[1], end[0], end[1]);
 			}
@@ -321,7 +324,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				recalibrateMap(newLat, Corners.topLeft[1]);
 
 				//request new ways in range
-				_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
+				_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1], scale);
 				repaint();
 			}
 		});
@@ -340,7 +343,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				recalibrateMap(Corners.topLeft[0], newLon);
 				
 				//request new ways in range
-				_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
+				_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1], scale);
 				repaint();
 			}
 		});
@@ -358,7 +361,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				double newLat = Corners.topLeft[0] - ((Constants.GEO_DIMENSION_FACTOR / scale) / 10); //TODO: 0.04 as a constant?
 				recalibrateMap(newLat, Corners.topLeft[1]);
 				//request new ways in range
-				_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
+				_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1], scale);
 				repaint();
 			}
 		});
@@ -376,7 +379,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				double newLon = Corners.topLeft[1] - ((Constants.GEO_DIMENSION_FACTOR / scale) / 10); //TODO: 0.04 as a constant?
 				recalibrateMap(Corners.topLeft[0], newLon);
 				//request new ways in range
-				_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
+				_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1], scale);
 				repaint();
 			}
 		});
@@ -410,7 +413,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			recalibrateMap(newLat, newLon); //reposition all corners with new coords
 			
 			//request all new ways in new range
-			_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
+			_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1], scale);
 			this.repaint();
 		}
 	}
@@ -508,7 +511,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				_dest.recalibrate();
 			
 			//request all new ways in new range
-			_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
+			_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1], scale);
 			this.repaint();
 		}
 	}
@@ -563,7 +566,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				_dest.recalibrate();
 
 			//request new ways in view
-			_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1]);
+			_client.requestWaysInRange(Corners.bottomLeft[0], Corners.topLeft[0], Corners.topLeft[1], Corners.topRight[1], scale);
 			repaint();
 		}
 		

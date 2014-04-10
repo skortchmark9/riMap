@@ -21,9 +21,7 @@ import backend.Resources;
 import backend.Util;
 import frontend.LoadingPane;
 /**
- * 
  * @author emc3 / skortchm
- *
  */
 public class MapFactory {
 
@@ -292,6 +290,7 @@ public class MapFactory {
 	public static RadixTree createRadixTreeAndInitRoadLengths() throws IOException {
 		List<List<String>> names;
 		names = Resources.indexFile.readChunks("name", "nodes");
+		roadLengthMap = new HashMap<String, Integer>(29223);
 		RadixTree rt = new RadixTree();
 		for(List<String> nameAndNodes : names) {
 			String lastWord = "";
@@ -303,10 +302,10 @@ public class MapFactory {
 					lastWord = word;
 				}
 			}
-			roadLengthMap = new HashMap<String, Integer>(29223);
 			String nodes = nameAndNodes.get(1);
 			roadLengthMap.put(nameField, nodes.length() / 23);
 		}
+		Util.out("RLM: ", roadLengthMap.size());
 		return rt;
 	}
 
@@ -396,6 +395,11 @@ public class MapFactory {
 	public static synchronized List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
 		Util.debug("Looking for Ways in Range");
 		Util.resetClock();
+		if (wayArray == null) {
+			int size = (int) Math.ceil((Constants.MAXIMUM_LATITUDE - Constants.MINIMUM_LATITUDE) * 100);
+			wayArray = new HashMap<>(size);
+		}
+
 		List<Way> ways = new LinkedList<>();
 			if (wayArray == null) {
 				int size = (int) Math.ceil((Constants.MAXIMUM_LATITUDE - Constants.MINIMUM_LATITUDE) * 100);
@@ -435,34 +439,48 @@ public class MapFactory {
 	}
 
 	static List<Way> getWaysSquare(double lat, double lon) {
+		return getWaysSquare(lat, lon, 1);
+	}
+	
+	static boolean longRoad(Way way, double zoom) {
+		if (way == null) {
+			return false;
+		} else if (zoom >= 1) {
+			return true;
+		} else {
+			Integer numNodes = roadLengthMap.get(way.getName());
+			if (numNodes == null) {
+				return true;
+			}
+			return numNodes * zoom > 1;
+		}
+	}
+		
+	static List<Way> getWaysSquare(double lat, double lon, double zoom) {
 		List<Way> ways = new LinkedList<>();
 		String searchCode = "/w/" + Util.getFirst4Digits(lat) + "." + Util.getFirst4Digits(lon); //lAT/LNG
-		List<String> wayIDsInRange;
-		
-		wayIDsInRange = wayArray.get(searchCode); //already synched on wayArray
-		
+		List<String> wayIDsInRange = wayArray.get(searchCode);
+		Way possibleWay;
 		if (wayIDsInRange !=null) {
 			for(String wayID : wayIDsInRange) {
-				ways.add(createWay(wayID));
+				possibleWay = createWay(wayID);
+				if (longRoad(possibleWay, zoom))
+					ways.add(possibleWay);
 			}
 		} else {				
 			List<List<String>> chunk = new LinkedList<>();
-			
-			
 			chunk = Resources.waysFile.searchMultiples(searchCode, SearchType.WILDCARD, "id", "name", "start", "end");
-			
 			List<String> wayIDsInBlock = new LinkedList<>();
 			for (List<String> wayInfo : chunk) {
 				if (wayInfo != null && !wayInfo.isEmpty()) {
-					Way possibleWay = createWay(wayInfo.get(0), wayInfo.get(1), wayInfo.get(2), wayInfo.get(3));
-					if (possibleWay != null) {
+					possibleWay = createWay(wayInfo.get(0), wayInfo.get(1), wayInfo.get(2), wayInfo.get(3));
+					if (longRoad(possibleWay, zoom)) {
 						ways.add(possibleWay);
 					}
 					wayIDsInBlock.add(wayInfo.get(0));
 				}
 			}
-			
-			wayArray.put(searchCode, wayIDsInBlock); //already synched on wayArray
+			wayArray.put(searchCode, wayIDsInBlock);
 		}
 		return ways;
 	}

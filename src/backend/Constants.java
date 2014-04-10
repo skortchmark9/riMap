@@ -9,7 +9,7 @@ import autocorrect.Ranker;
 public class Constants {
 	
 	//XXX DEBUG MODE
-	public static final boolean DEBUG_MODE = false; //XXX TURN THIS OFF BEFORE HANDIN / SYSTEM TESTS
+	public static final boolean DEBUG_MODE = true; //XXX TURN THIS OFF BEFORE HANDIN / SYSTEM TESTS
 	//XXX DEBUG MODE
 	
 	//Precompiled regex patterns to make split and replace faster. 
@@ -32,7 +32,11 @@ public class Constants {
 	public static final double GEO_DIMENSION_FACTOR = 0.02;
 	public static final double MIN_ZOOM = 0.05; //x5 times more zoom out (from original submission)
 	public static final double MAX_ZOOM = 12.0;
-	public static final double MIN_RENDER_LENGTH = 3;
+<<<<<<< HEAD
+	public static final double MIN_RENDER_LENGTH = 16;
+=======
+	public static final double MIN_RENDER_LENGTH = 2;
+>>>>>>> df39694592e75685f85a20f8f32e99f4ef6752da
 	public static final double ARROW_KEY_MOVEMENT = 0.04d;
 	
 	//Some colors
