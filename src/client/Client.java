@@ -34,6 +34,8 @@ import shared.WayResponse;
 import backend.Constants;
 import backend.Util;
 import frontend.Frontend;
+import frontend.LocalRenderThread;
+import frontend.MapPane;
 
 /**
  * A Client Class that sends and receives messages from and to the server.
@@ -41,15 +43,15 @@ import frontend.Frontend;
 public class Client {
 
 	private Socket _socket;
-	private volatile boolean _running, _serverReady;
+	private volatile boolean _running, hasServer;
 	private int _port;
 	private ObjectOutputStream _output;
 	private ObjectInputStream _input;
 	private ReceiveThread _thread;
 	private String _hostName;
 	private Queue<Request> _requests;
-	ExecutorService _wayCacher;
-	ExecutorService _localPainter;
+	ExecutorService _wayCacher, _localPainter;
+;
 	Frontend _frontend;
 	
 	private double _minLat, _maxLat, _minLon, _maxLon; //we use these to check the recent-ness of the waysinrange response
@@ -125,7 +127,7 @@ public class Client {
 
 	public void run() {
 		while (_running && !_socket.isClosed()) {
-			if (!_requests.isEmpty() && _serverReady) {
+			if (!_requests.isEmpty() && hasServer) {
 				try {
 					Util.debug("Sending Request");
 					_output.writeObject(_requests.poll());
@@ -173,16 +175,13 @@ public class Client {
 		request(new NeighborsRequest(i, kd, isSource));
 	}
 
-	public void requestWaysInRange(double minLat, double maxLat, double minLon, double maxLon, double zoom) {
+	public void requestWaysInRange(MapPane map, double minLat, double maxLat, double minLon, double maxLon) {
 		Util.debug("Requesting Ways");
 		_minLat = minLat; _maxLat = maxLat; _minLon = minLon; _maxLon = maxLon;
-<<<<<<< HEAD
-		request(new WayRequest(minLat, maxLat, minLon, maxLon));
-		_localPainter.execute(new LocalRenderThread(_frontend, minLat, maxLat, minLon, maxLon));
-=======
-		request(new WayRequest(minLat, maxLat, minLon, maxLon, zoom));
-		_frontend.addWays(MapFactory.getLocalWaysInRange(minLat, maxLat, minLon, maxLon));
->>>>>>> df39694592e75685f85a20f8f32e99f4ef6752da
+		if (hasServer)
+			request(new WayRequest(minLat, maxLat, minLon, maxLon, map.scale));
+		else
+			_localPainter.submit(new LocalRenderThread(map, minLat, maxLat, minLon, maxLon));
 	}
 
 	public void requestPath(Node start, Node end, int timeout) {
@@ -194,7 +193,7 @@ public class Client {
 	}
 
 	public boolean serverReady() {
-		return _serverReady;
+		return hasServer;
 	}
 
 	/**
@@ -225,7 +224,7 @@ public class Client {
 				_frontend.guiMessage(pathResp.getMsg());
 			} else {
 				_frontend.giveDirections(pathResp.getPath(), pathResp.getStart(), pathResp.getEnd());
-				_wayCacher.submit(new CacheThread(pathResp.getPath()));
+				_wayCacher.submit(new CacheThread(pathResp.getPath(), true));
 			}
 			break;
 		case SERVER_STATUS:
@@ -234,7 +233,7 @@ public class Client {
 			//to display messages to the user.
 			ServerStatus statResp = (ServerStatus) resp;
 			Util.debug(statResp.toString());
-			_serverReady = statResp.isServerUp();
+			hasServer = statResp.isServerUp();
 			if (_frontend != null)
 				_frontend.guiMessage(statResp.getMsg());
 			break;
@@ -246,7 +245,7 @@ public class Client {
 			//TODO: maybe turn back on
 			if (matchesRange(wayResp.getMinMaxLatLon())) {
 				_frontend.setWays(wayResp.getWays());
-				_wayCacher.submit(new CacheThread(wayResp.getWays()));
+				_wayCacher.submit(new CacheThread(wayResp.getWays(), false));
 			}
 			break;
 		case TRAFFIC:
