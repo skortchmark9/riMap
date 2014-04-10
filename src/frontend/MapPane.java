@@ -131,12 +131,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				} else if (way.getTraffic() > 1){
 					g2d.setColor(Constants.LOW_TRAFFIC);
 				}
-				//If the road is less than Constants.MIN_RENDER_LENGTH, don't paint it.
-				if (scale < 0.8) 
-					if (Math.pow(start[0] - start[1], 2) +
-						Math.pow(end[0] - end[1], 2) <= Constants.MIN_RENDER_LENGTH)
-					continue;
-				
 				g2d.drawLine(start[0], start[1], end[0], end[1]);
 			}
 		}
