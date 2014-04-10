@@ -45,6 +45,8 @@ public class Util {
 	private static String composeString(Object...varg) {
 		String str = "";
 		for (Object o : varg) {
+			if (o == null)
+				continue;
 			String s;
 			
 			if (o instanceof String) s = (String)o;
