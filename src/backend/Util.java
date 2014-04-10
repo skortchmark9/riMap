@@ -23,14 +23,7 @@ public class Util {
 	 * spaces added between args (think console.log() in js) 
 	 */
 	public static void out(Object...varg) {
-		String str = "";
-		for (Object o : varg) {
-			if (str.equals(""))
-				str += o;
-			else
-				str += " " + o;
-		}
-		System.out.println(str);
+		System.out.println(composeString(varg));
 	}
 	
 	/**
@@ -39,30 +32,29 @@ public class Util {
 	 * spaces added between args (think console.log() in js) 
 	 */
 	public static void err(Object...varg) {
-		String str = "";
-		for (Object o : varg) {
-			if (str.equals(""))
-				str += o;
-			else
-				str += " " + o;
-		}
-		System.err.println(str);
+		System.err.println(composeString(varg));
 	}
 	
 	
 	public static void debug(Object...varg) {
-		if (!Constants.DEBUG_MODE)
-			return; //only continue if debug mode is on
-		String str = "";
-		for (Object o : varg) {
-			if (str.equals(""))
-				str += o;
-			else
-				str += " " + o;
+		if (Constants.DEBUG_MODE) {
+			System.out.println(composeString(varg));
 		}
-		System.out.println(str);
 	}
 	
+	private static String composeString(Object...varg) {
+		String str = "";
+		for (Object o : varg) {
+			String s;
+			
+			if (o instanceof String) s = (String)o;
+			else s = o.toString();
+			
+			if (str.equals("")) str += s;
+			else str += " " + s;
+		}
+		return str;
+	}
 	
 	/**
 	 * Logs the current state of the 
