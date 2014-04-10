@@ -32,6 +32,7 @@ import javax.swing.SwingConstants;
 import maps.Node;
 import maps.Way;
 import backend.Constants;
+import backend.Util;
 import client.Client;
 
 /**
@@ -168,7 +169,9 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 			@Override public void componentHidden(ComponentEvent e) {}
 		});
 		
-		
+		//notify user of current state of the traffic connection
+		Util.out("Attempting to display traffic status info", "\nStatus = ", _client.hasTrafficConnection());
+		this.trafficConnection(_client.hasTrafficConnection());
 		revalidate();		
 		_box1.requestFocusInWindow();
 	}
@@ -421,11 +424,12 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 
 	public void trafficConnection(boolean status) {
 		if (loading) {
-			guiMessage(status ? "Connected to traffic server" : "WARNING: Traffic server unavailable");
-		} else if (_desktop != null) {
+			guiMessage(status ? "Connected to traffic server" : "Traffic server unavailable");
+		} else {
+			Util.out("* * Attempting to display traffic status popup");
 			_trafficBar = new NotifierPopup(_desktop);
 			_trafficBar.setColor(status ? Color.green : Color.red);
-			_trafficBar.displayInformation(status ? "Reconnected to traffic server" : "Traffic server currently unavailable");
+			_trafficBar.displayInformation(status ? "Connected to traffic server" : "Traffic server currently unavailable");
 		}
 	}
 }
