@@ -48,7 +48,8 @@ public class Client {
 	private ReceiveThread _thread;
 	private String _hostName;
 	private Queue<Request> _requests;
-	ExecutorService _executor;
+	ExecutorService _wayCacher;
+	ExecutorService _localPainter;
 	Frontend _frontend;
 	
 	private double _minLat, _maxLat, _minLon, _maxLon; //we use these to check the recent-ness of the waysinrange response
@@ -60,7 +61,8 @@ public class Client {
 	 * @param port the port number the client will connect to
 	 */
 	public Client(String hostName, int port) {
-		_executor = Executors.newFixedThreadPool(2);
+		_wayCacher = Executors.newSingleThreadExecutor();
+		_localPainter = Executors.newCachedThreadPool();
 		_port = port;
 		_hostName = hostName;
 	}
@@ -153,7 +155,7 @@ public class Client {
 		Util.debug("Requesting Ways");
 		_minLat = minLat; _maxLat = maxLat; _minLon = minLon; _maxLon = maxLon;
 		request(new WayRequest(minLat, maxLat, minLon, maxLon));
-		_frontend.addWays(MapFactory.getLocalWaysInRange(minLat, maxLat, minLon, maxLon));
+		_localPainter.execute(new LocalRenderThread(_frontend, minLat, maxLat, minLon, maxLon));
 	}
 
 	public void requestPath(Node start, Node end, int timeout) {
@@ -196,7 +198,7 @@ public class Client {
 				_frontend.guiMessage(pathResp.getMsg());
 			} else {
 				_frontend.giveDirections(pathResp.getPath(), pathResp.getStart(), pathResp.getEnd());
-				_executor.submit(new CacheThread(pathResp.getPath()));
+				_wayCacher.submit(new CacheThread(pathResp.getPath()));
 			}
 			break;
 		case SERVER_STATUS:
@@ -215,7 +217,7 @@ public class Client {
 			WayResponse wayResp = (WayResponse) resp;
 			if (matchesRange(wayResp.getMinMaxLatLon())) {
 				_frontend.setWays(wayResp.getWays());
-				_executor.submit(new CacheThread(wayResp.getWays()));
+				_wayCacher.submit(new CacheThread(wayResp.getWays()));
 			}
 			break;
 		case TRAFFIC:

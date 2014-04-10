@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -110,6 +111,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
+		g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
+
 		
 		//===================================
 		//Render Ways
@@ -130,8 +133,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 				}
 				//If the road is less than Constants.MIN_RENDER_LENGTH, don't paint it.
 				if (scale < 0.8) 
-					if (Math.abs(start[0] - start[1]) <= Constants.MIN_RENDER_LENGTH &&
-						Math.abs(end[0] - end[1]) <= Constants.MIN_RENDER_LENGTH)
+					if (Math.pow(start[0] - start[1], 2) +
+						Math.pow(end[0] - end[1], 2) <= Constants.MIN_RENDER_LENGTH)
 					continue;
 				
 				g2d.drawLine(start[0], start[1], end[0], end[1]);
