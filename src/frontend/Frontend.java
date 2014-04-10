@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.beans.PropertyVetoException;
+import java.text.ParseException;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -31,7 +32,6 @@ import javax.swing.SwingConstants;
 import maps.Node;
 import maps.Way;
 import backend.Constants;
-import backend.Util;
 import client.Client;
 
 /**
@@ -396,8 +396,8 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	public void actionPerformed(ActionEvent e) {
 		//Get Directions from the Screen points (defined by clicking)
 		if (e.getSource() == _getDirections) {
-			trafficConnection(true);
-/*			Node start;
+			//trafficConnection(true);
+			Node start;
 			Node end;
 			String xs1S = _box1.getText();
 			String xs2S = _box2.getText();
@@ -412,7 +412,6 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 			} catch (ParseException e1) {
 			}
 			_client.requestPath(start, end, timeOut, xs1S, xs2S, xs1E, xs2E);
-*/
 
 		} else if (e.getSource() == _clear) {
 			clear();
@@ -421,18 +420,12 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	}
 
 	public void trafficConnection(boolean status) {
-		if (status) {
-			if (_trafficBar != null) {
-				_trafficBar.setColor(Color.green);
-				_trafficBar.displayInformation("Regained connection with traffic server");
-			}
-		} else {
-			Util.out("Showing traffic status bar");
+		if (loading) {
+			guiMessage(status ? "Connected to traffic server" : "WARNING: Traffic server unavailable");
+		} else if (_desktop != null) {
 			_trafficBar = new NotifierPopup(_desktop);
-			_trafficBar.setColor(Color.RED);
-			_trafficBar.displayInformation("Traffic server unavailable");
-			_desktop.add(_trafficBar);
+			_trafficBar.setColor(status ? Color.green : Color.red);
+			_trafficBar.displayInformation(status ? "Reconnected to traffic server" : "Traffic server currently unavailable");
 		}
-		
 	}
 }
