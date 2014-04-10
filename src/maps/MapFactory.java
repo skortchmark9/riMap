@@ -370,7 +370,7 @@ public class MapFactory {
 	 * @param maxLon - the maxLon of the block
 	 * @return - 
 	 */
-	public static synchronized List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+	public static synchronized List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon, double zoom) {
 		Util.debug("Looking for Ways in Range");
 		Util.resetClock();
 		if (wayArray == null) {
@@ -386,7 +386,7 @@ public class MapFactory {
 
 			for(double i = minLat; i <= maxLat + 0.01; i+=0.01) {
 				for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
-					ways.addAll(getWaysSquare(i, j));
+					ways.addAll(getWaysSquare(i, j, zoom));
 				}
 			}
 		return ways;

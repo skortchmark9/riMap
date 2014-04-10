@@ -35,7 +35,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static double scale = 1.0;
+	public static double scale = 1.0;
 	private static int _pixelWidth;
 	private static int _pixelHeight;
 	private List<Way> renderedWays, calculatedRoute;
@@ -43,8 +43,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	private ClickNeighbor _dest;
 	private Client _client;
 	private boolean clickSwitch = true;
-	ExecutorService _localPainter;
-	public static double scale = 1.0;
 	
 	/**
 	 * Construct a MapPane linked to the given backend.
