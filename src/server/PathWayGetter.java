@@ -16,15 +16,18 @@ import backend.Util;
 
 /**
  * @author samkortchmar
+ * This class is responsible for getting paths from a client.
+ * It implements a timer so that no exhaustive searches take place.
+ * It also uses futurees 
  */
 public class PathWayGetter extends Thread {
 
-	ClientHandler _owner;
-	CallableWays _worker;
-	volatile boolean _running;
-	ThreadPoolExecutor _executor;
-	Future<PathResponse> waysFuture;
-	int _timeout;
+	ClientHandler _owner; //The owning client handler - used to serve messages to the client.
+	CallableWays _worker; //The current worker finding a path.
+	volatile boolean _running; //Whether not this thread should continue running
+	ThreadPoolExecutor _executor; //A small executor for handling workers. 
+	Future<PathResponse> waysFuture; //The current future we are waiting on.
+	int _timeout; //The timeout that we are waiting for.
 
 	public PathWayGetter(ClientHandler owner) {
 		super("PathWayGetter");
@@ -33,6 +36,12 @@ public class PathWayGetter extends Thread {
 		_executor = Util.defaultThreadPool("PathWayGetter", 2, 2);
 	}
 
+	/**
+	 * Cancel any previous pathfinding attempts and start a new one.
+	 * @param start - the node to start at
+	 * @param end - the node to end at
+	 * @param seconds - the number of seconds to wait.
+	 */
 	public void findPath(Node start, Node end, int seconds) {
 		if (waysFuture != null) {
 			waysFuture.cancel(true);
@@ -55,10 +64,9 @@ public class PathWayGetter extends Thread {
 					PathResponse result = waysFuture.get(_timeout, TimeUnit.SECONDS);
 					_owner._responseQueue.add(result);
 				} catch (InterruptedException | CancellationException e) {
-					e.printStackTrace();
 					continue;
 				} catch (ExecutionException e) {
-					Util.err("ERROR: Execution Exception in PathWayGetter...not sure why");
+					Util.err("ERROR: Execution Exception in PathWayGetter...usually caused by null pointer.");
 				} catch (TimeoutException e) {
 					waysFuture.cancel(true);
 					waysFuture = null;
