@@ -113,28 +113,24 @@ public class ClientHandler extends Thread {
 	 * A response containing the data received from the backend.
 	 */
 	private void processRequest(Request req) {
-		Util.debug("Processing Request...");
+		Util.debug("Processing Request...\n", req);
 		switch (req.getType()) {
 		case AUTO_CORRECTIONS:
 			AutocorrectRequest aReq = (AutocorrectRequest) req;
-			Util.out(aReq.toString());
 			_sugGetter.suggestFor(aReq.getInput(), aReq.getBoxNo()); //start a new thread for request box #
 			break;
 
 		case NEAREST_NEIGHBORS:
 			NeighborsRequest nReq = (NeighborsRequest) req;
-			Util.out(nReq.toString());
 			_nbrGetter.getNeighbors(nReq.getNumNeighbors(), nReq.getLocation(), nReq.isSource()); //start a new worker thread in getter
 			break;
 
 		case WAYS:
 			WayRequest wReq = (WayRequest) req;
-			Util.out(wReq.toString());
 			_wayGetter.getWays(wReq.getMinLat(), wReq.getMaxLat(), wReq.getMinLon(), wReq.getMaxLon()); //start a new worker thread in the getter
 			break;
 		case PATH:
 			PathRequest pReq = (PathRequest) req;
-			Util.out(pReq.toString());
 			//We check if there are intersections to be found
 			Node source =  MapFactory.createIntersection(pReq.getCrossStreet(true, 1), pReq.getCrossStreet(true, 2));
 			Node dest = MapFactory.createIntersection(pReq.getCrossStreet(false, 1), pReq.getCrossStreet(false, 2));

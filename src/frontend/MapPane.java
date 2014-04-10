@@ -129,8 +129,10 @@ public class MapPane extends JPanel implements MouseWheelListener {
 					g2d.setColor(Constants.LOW_TRAFFIC);
 				}
 				//If the road is less than Constants.MIN_RENDER_LENGTH, don't paint it.
-				//if (Point.distance(start[0], start[1], end[0], end[1]) < Constants.MIN_RENDER_LENGTH)
-					//continue;
+				if (scale < 0.8) 
+					if (Math.abs(start[0] - start[1]) <= Constants.MIN_RENDER_LENGTH &&
+						Math.abs(end[0] - end[1]) <= Constants.MIN_RENDER_LENGTH)
+					continue;
 				
 				g2d.drawLine(start[0], start[1], end[0], end[1]);
 			}
@@ -644,7 +646,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		 */
 		private static void reposition(double lat, double lon) {
 			double height = Constants.GEO_DIMENSION_FACTOR / scale;
-			Util.out("PHeighT:", _pixelHeight, "\nPWidtH:", _pixelWidth);
+		//	Util.out("PHeighT:", _pixelHeight, "\nPWidtH:", _pixelWidth);
 			double rat = (double)_pixelHeight / (double)_pixelWidth;
 			double width = height * rat;
 			

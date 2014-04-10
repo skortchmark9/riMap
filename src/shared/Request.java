@@ -21,4 +21,5 @@ public interface Request extends Serializable {
 		PATH, //A search for a path - rendering a path between points on map.
 	}
 	RequestType getType();
+	String toString();
 }

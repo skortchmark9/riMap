@@ -207,7 +207,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		_box4 = new AutoFillField(_client, "Cross Street 2", 4);
 
 		//These are buttons for finding and removing paths
-		_getDirections = new JButton("Get Directions");
+		_getDirections = new JButton("Directions");
 		_getDirections.addActionListener(this);
 
 		_clear = new JButton("Clear");
@@ -223,51 +223,50 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		//was made with WindowBuilder.
 		GroupLayout gl_searchButtonsPanel = new GroupLayout(searchButtonsPanel);
 		gl_searchButtonsPanel.setHorizontalGroup(
-				gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING)
+			gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_searchButtonsPanel.createSequentialGroup()
-						.addContainerGap()
-						.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_searchButtonsPanel.createSequentialGroup()
-										.addComponent(lblTimeouts)
-										.addPreferredGap(ComponentPlacement.RELATED)
-										.addComponent(timeOutSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(ComponentPlacement.RELATED)
-										.addComponent(_getDirections, GroupLayout.PREFERRED_SIZE, 121, Short.MAX_VALUE)
-										.addPreferredGap(ComponentPlacement.RELATED)
-										.addComponent(_clear, GroupLayout.PREFERRED_SIZE, 65, GroupLayout.PREFERRED_SIZE)
-										.addGap(10))
-										.addGroup(gl_searchButtonsPanel.createSequentialGroup()
-												.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING, false)
-														.addComponent(_box3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-														.addComponent(_box1, GroupLayout.DEFAULT_SIZE, 151, Short.MAX_VALUE))
-														.addPreferredGap(ComponentPlacement.UNRELATED)
-														.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING, false)
-																.addComponent(_box4, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-																.addComponent(_box2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-																.addGap(17)))
-																.addContainerGap())
-				);
+					.addContainerGap()
+					.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_searchButtonsPanel.createSequentialGroup()
+							.addComponent(lblTimeouts)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(timeOutSpinner, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(_getDirections, GroupLayout.PREFERRED_SIZE, 99, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(_clear, GroupLayout.PREFERRED_SIZE, 65, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_searchButtonsPanel.createSequentialGroup()
+							.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING, false)
+								.addComponent(_box3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(_box1, GroupLayout.DEFAULT_SIZE, 151, Short.MAX_VALUE))
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING, false)
+								.addComponent(_box4, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(_box2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
 		gl_searchButtonsPanel.setVerticalGroup(
-				gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING)
+			gl_searchButtonsPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_searchButtonsPanel.createSequentialGroup()
-						.addContainerGap()
-						.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(_box1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(_box2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-								.addPreferredGap(ComponentPlacement.RELATED)
-								.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.BASELINE)
-										.addComponent(_box3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-										.addComponent(_box4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-										.addPreferredGap(ComponentPlacement.RELATED)
-										.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.BASELINE)
-												.addComponent(_getDirections, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-												.addComponent(lblTimeouts)
-												.addComponent(timeOutSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-												.addComponent(_clear, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-				);
+					.addContainerGap()
+					.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(_box1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(_box2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(_box3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(_box4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_searchButtonsPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblTimeouts)
+						.addComponent(timeOutSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(_getDirections, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(_clear, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+		);
 		gl_searchButtonsPanel.setAutoCreateContainerGaps(true);
 		gl_searchButtonsPanel.setAutoCreateGaps(true);
 		searchButtonsPanel.setLayout(gl_searchButtonsPanel);
+
 
 		//Create a control panel.
 		_controlPanel = new JInternalFrame("Controls", false, false, false, false);
