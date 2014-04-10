@@ -58,8 +58,8 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		this.setFocusable(true);
 		
 		//set up dimensions
-		_pixelWidth = this.getPreferredSize().height;
-		_pixelHeight = this.getPreferredSize().width;
+		_pixelWidth = this.getSize().width;
+		_pixelHeight = this.getSize().height;
 		Corners.reposition(Constants.INITIAL_LAT, Constants.INITIAL_LON); //init to home depot (lol)
 		
 		Util.debug("Corners:");
@@ -93,17 +93,15 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * @param d - the new dimension of its parent, ye olde JFrame called Frontend 
 	 */
 	public void updatePixelDimension(Dimension d) {
-		/*
-		
 		//resize this pane
+		Util.out("New size:\n", "w =", d.width, "\n", "h = ", d.height);
 		this.setPreferredSize(d);
+		this.setSize(d);
 		
 		//set instances to new vals
-		_pixelWidth = this.getPreferredSize().width;
-		_pixelHeight = this.getPreferredSize().height;
-		Corners.reposition(Corners.topLeft[0], Corners.topLeft[1]);
-		
-		*/
+		_pixelWidth = d.width;
+		_pixelHeight = d.height;
+		recalibrateMap(Corners.topLeft[0], Corners.topLeft[1]);
 	}
 
 	@Override
@@ -133,7 +131,6 @@ public class MapPane extends JPanel implements MouseWheelListener {
 					if (Math.abs(start[0] - start[1]) <= Constants.MIN_RENDER_LENGTH &&
 						Math.abs(end[0] - end[1]) <= Constants.MIN_RENDER_LENGTH)
 					continue;
-				
 				g2d.drawLine(start[0], start[1], end[0], end[1]);
 			}
 		}
@@ -196,8 +193,12 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * the returned array will be in the form <strong>{x, y}</strong>
 	 */
 	private int[] geo2pixel(double[] coordinates) {
-		double geoWidth = Corners.topRight[1] - Corners.topLeft[1]; //geoWidth = current width of the view in terms of latitude/longitude degrees
-		double geoHeight = Corners.topLeft[0] - Corners.bottomLeft[0];
+		double geoHeight = Constants.GEO_DIMENSION_FACTOR / scale;
+		double crossProduct = this.getWidth() * geoHeight; 
+		double geoWidth = crossProduct / (double)this.getHeight();
+		
+//		double geoHeight = Corners.topLeft[0] - Corners.bottomLeft[0];
+//		double geoWidth = Corners.topRight[1] - Corners.topLeft[1]; //geoWidth = current width of the view in terms of latitude/longitude degrees
 		double[] offset = Corners.offsetFromTopLeft(coordinates); //offset = array of rise/run of latitude/longitude coordinates when compared to top left corner
 		int x = (int) Math.round(offset[1]/geoWidth * this.getPreferredSize().width); //get ratio of longitude offset in view, and multiply that ratio by the pixel width of the view.
 		int y = (int) Math.round((offset[0]/geoHeight) * this.getPreferredSize().height); //get ratio of latitude offset in view, and multiply that ratio by the pixel height of the view.
@@ -218,8 +219,11 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	 * 
 	 */
 	private double[] pixel2geo(int x, int y) {
-		double geoWidth = Corners.topRight[1] - Corners.topLeft[1]; //geoWidth = current width of the view in terms of latitude/longitude degrees
-		double geoHeight = Corners.topLeft[0] - Corners.bottomLeft[0];
+		double geoHeight = Constants.GEO_DIMENSION_FACTOR / scale;
+		double crossProduct = this.getWidth() * geoHeight; 
+		double geoWidth = crossProduct / (double)this.getHeight();
+//		double geoWidth = Corners.topRight[1] - Corners.topLeft[1]; //geoWidth = current width of the view in terms of latitude/longitude degrees
+//		double geoHeight = Corners.topLeft[0] - Corners.bottomLeft[0];
 		double lonOffset = ((double)x) / ((double)this.getPreferredSize().width) * geoWidth; //the number of degrees of the longitude offset of the point from the left of the view.
 		double latOffset = ((double)y) / ((double)this.getPreferredSize().height) * geoHeight; //the number of degrees of the latitude offset of the point from the top of the view.
 		double lat = Corners.topLeft[0] - latOffset;
@@ -645,14 +649,15 @@ public class MapPane extends JPanel implements MouseWheelListener {
 		 * @param lon - the new longitude of the top left corner.
 		 */
 		private static void reposition(double lat, double lon) {
-			double height = Constants.GEO_DIMENSION_FACTOR / scale;
-		//	Util.out("PHeighT:", _pixelHeight, "\nPWidtH:", _pixelWidth);
-			double rat = (double)_pixelHeight / (double)_pixelWidth;
-			double width = height * rat;
+			Util.debug("px H:", _pixelHeight, "\npx W:", _pixelWidth);
+			
+			double geoHeight = Constants.GEO_DIMENSION_FACTOR / scale;
+			double crossProduct = _pixelWidth * geoHeight; 
+			double geoWidth = crossProduct / (double)_pixelHeight;
 			
 			//Check to make sure move is in bounds
-			if (lat > Constants.MAXIMUM_LATITUDE + 0.002 || lat-height < Constants.MINIMUM_LATITUDE - 0.002 ||
-					lon < Constants.MINIMUM_LONGITUDE - 0.002 || lon+width > Constants.MAXIMUM_LONGITUDE + 0.002) {
+			if (lat > Constants.MAXIMUM_LATITUDE + 0.002 || lat-geoHeight < Constants.MINIMUM_LATITUDE - 0.002 ||
+					lon < Constants.MINIMUM_LONGITUDE - 0.002 || lon+geoWidth > Constants.MAXIMUM_LONGITUDE + 0.002) {
 				return;
 			}
 			
@@ -660,9 +665,9 @@ public class MapPane extends JPanel implements MouseWheelListener {
 			topLeft[1] = lon;
 			
 			topRight[0] = topLeft[0]; //topRight has same latitude as topLeft
-			topRight[1] = topLeft[1] + width; //longitude is topLeft's longitude + width 
+			topRight[1] = topLeft[1] + geoWidth; //longitude is topLeft's longitude + width 
 			
-			bottomLeft[0] = topLeft[0] - height; //bottomLeft latitude is topLeft latitude - height
+			bottomLeft[0] = topLeft[0] - geoHeight; //bottomLeft latitude is topLeft latitude - height
 			bottomLeft[1] = topLeft[1]; //longitude is same as topLeft
 			
 			bottomRight[0] = bottomLeft[0]; //bottomRight has same latitude as bottomLeft
