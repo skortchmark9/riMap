@@ -393,20 +393,20 @@ public class MapFactory {
 	 * @param maxLon - the maxLon of the block
 	 * @return - 
 	 */
-	public static List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
+	public static synchronized List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon) {
 		Util.debug("Looking for Ways in Range");
 		Util.resetClock();
-		if (wayArray == null) {
-			int size = (int) Math.ceil((Constants.MAXIMUM_LATITUDE - Constants.MINIMUM_LATITUDE) * 100);
-			wayArray = new HashMap<>(size);
-		}
-
 		List<Way> ways = new LinkedList<>();
-		for(double i = minLat; i <= maxLat + 0.01; i+=0.01) {
-			for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
-				ways.addAll(getWaysSquare(i, j));
+			if (wayArray == null) {
+				int size = (int) Math.ceil((Constants.MAXIMUM_LATITUDE - Constants.MINIMUM_LATITUDE) * 100);
+				wayArray = new HashMap<>(size);
 			}
-		}
+
+			for(double i = minLat; i <= maxLat + 0.01; i+=0.01) {
+				for(double j = maxLon; j >= minLon - 0.01; j-=0.01) {
+					ways.addAll(getWaysSquare(i, j));
+				}
+			}
 		return ways;
 	}
 	
@@ -437,14 +437,20 @@ public class MapFactory {
 	static List<Way> getWaysSquare(double lat, double lon) {
 		List<Way> ways = new LinkedList<>();
 		String searchCode = "/w/" + Util.getFirst4Digits(lat) + "." + Util.getFirst4Digits(lon); //lAT/LNG
-		List<String> wayIDsInRange = wayArray.get(searchCode);
+		List<String> wayIDsInRange;
+		
+		wayIDsInRange = wayArray.get(searchCode); //already synched on wayArray
+		
 		if (wayIDsInRange !=null) {
 			for(String wayID : wayIDsInRange) {
 				ways.add(createWay(wayID));
 			}
 		} else {				
 			List<List<String>> chunk = new LinkedList<>();
+			
+			
 			chunk = Resources.waysFile.searchMultiples(searchCode, SearchType.WILDCARD, "id", "name", "start", "end");
+			
 			List<String> wayIDsInBlock = new LinkedList<>();
 			for (List<String> wayInfo : chunk) {
 				if (wayInfo != null && !wayInfo.isEmpty()) {
@@ -455,7 +461,8 @@ public class MapFactory {
 					wayIDsInBlock.add(wayInfo.get(0));
 				}
 			}
-			wayArray.put(searchCode, wayIDsInBlock);
+			
+			wayArray.put(searchCode, wayIDsInBlock); //already synched on wayArray
 		}
 		return ways;
 	}
