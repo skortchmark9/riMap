@@ -1,7 +1,7 @@
 package shared;
 
 /**
- * A Request for autocorrections
+ * A Request for autocorrections - given the specific input
  * @author samkortchmar
  */
 public class AutocorrectRequest implements Request {

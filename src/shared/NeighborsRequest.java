@@ -5,6 +5,7 @@ import kdtree.KDimensionable;
 /**
  * A request for nearest neighbors to be sent by the client to the server.
  * @author samkortchmar
+ * Note that more detailed comments are available in the Request Interface
  */
 public class NeighborsRequest implements Request {
 	
