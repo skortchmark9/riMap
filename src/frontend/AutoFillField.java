@@ -36,8 +36,18 @@ public class AutoFillField extends JTextField {
 	private String initialText;
 	private List<String> suggestions;
 	private final int boxNo;
+	//Suppress prevents the autocorrections from revealing after the document change listener
+	//detects a change due to an accepted suggestion
 	private boolean popped, suppress = false;
 
+	
+	/**
+	 * This class is the autofillfield for the GUI - we have four
+	 *  of them, one for each intersection we handle.
+	 * @param client
+	 * @param startField
+	 * @param boxNo
+	 */
 	public AutoFillField(Client client, String startField, int boxNo) {
 		super(10);
 		this.client = client;
@@ -47,6 +57,7 @@ public class AutoFillField extends JTextField {
 		setText(initialText);
 		setOpaque(true);
 
+		//The autofillfield is implemented as a single column table
 		searchTableModel = new DefaultTableModel();
 		searchTable = new JTable(searchTableModel);
 		searchTable.setFillsViewportHeight(true);
@@ -209,6 +220,11 @@ public class AutoFillField extends JTextField {
 		}
 	}
 
+	/** A request will be sent from the client to the server, 
+	 * and when it gets a response it will call this method.
+	 * 
+	 * @param suggestions
+	 */
 	public void setSuggestions(List<String> suggestions) {
 		this.suggestions = suggestions;
 		if (suppress) {
@@ -264,6 +280,9 @@ public class AutoFillField extends JTextField {
 				client.requestAutocorrections(this.getText(), boxNo);
 	}
 	
+	/**
+	 * Resets the autofillfield to its initial value
+	 */
 	public void reset() {
 		setForeground(Color.DARK_GRAY);
 		populateField(initialText, true);
