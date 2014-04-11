@@ -3,6 +3,7 @@ package shared;
 /**
  * A Request for autocorrections - given the specific input
  * @author samkortchmar
+ * Note that more detailed comments are available in the Request Interface
  */
 public class AutocorrectRequest implements Request {
 
