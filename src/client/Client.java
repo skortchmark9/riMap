@@ -41,6 +41,7 @@ import frontend.MapPane;
  * A Client Class that sends and receives messages from and to the server.
  */
 public class Client {
+	
 
 	private Socket _socket;
 	private volatile boolean _running, hasServer;
