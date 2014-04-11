@@ -179,6 +179,7 @@ public class Client {
 		request(new NeighborsRequest(i, kd, isSource));
 	}
 
+	@SuppressWarnings("static-access")
 	public void requestWaysInRange(MapPane map, double minLat, double maxLat, double minLon, double maxLon) {
 		Util.debug("Requesting Ways");
 		_minLat = minLat; _maxLat = maxLat; _minLon = minLon; _maxLon = maxLon;

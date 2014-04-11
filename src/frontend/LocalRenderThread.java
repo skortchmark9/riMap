@@ -14,6 +14,7 @@ public class LocalRenderThread implements Runnable {
 	private MapPane _map;
 	private double _minLat, _maxLat, _minLon, _maxLon, _zoom;
 	
+	@SuppressWarnings("static-access")
 	public LocalRenderThread(MapPane map, double minLat, double maxLat, double minLon, double maxLon) {
 		_map = map;
 		_minLat = minLat;
