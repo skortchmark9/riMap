@@ -20,13 +20,14 @@ public class TrafficSocket extends Thread {
 	private BufferedReader _input;
 	private volatile boolean _connected = false;
 	private Server _server;
-	
+	private boolean _very_first;
 	/**
 	 * Default constructor
 	 */
 	public TrafficSocket(int port, Server server) {
 			_server = server;
 			_port = port;
+			_very_first = true;
 	}
 	
 	/**
@@ -51,6 +52,7 @@ public class TrafficSocket extends Thread {
 						}
 					}
 				}
+				throw new IOException();
 			} catch (IOException e) {
 				Util.err("ERROR: Connection dropped by traffic bot");
 				_connected = false;
@@ -67,7 +69,8 @@ public class TrafficSocket extends Thread {
 	
 	/**
 	 * Persistently tries to connect to the 
-	 * traffic bot.
+	 * traffic bot. 
+	 * Also notifies the clients if the connection status changes.
 	 */
 	private void keepTryingToConnect() {
 		boolean first = true;
@@ -81,12 +84,16 @@ public class TrafficSocket extends Thread {
 				if (first) {
 					Util.err("WARNING: Unable to connect to traffic bot. Continuing without traffic data.");
 					_server.trafficUpdate("", 0.0, false);
-					first = false;
+					//this ensures that the GUI will see the status when it starts up
+					if (_very_first)
+						_very_first = false;
+					else
+						first = false;
 				}
 				
 				//sleep for a bit and then try to reconnect.
 				try {
-					Thread.sleep(10000); //try to connect again in 10 seconds
+					Thread.sleep(7000); //try to connect again in 10 seconds
 				} catch (InterruptedException e1) {
 					Util.err("ERROR connecting to traffic bot.");
 				}

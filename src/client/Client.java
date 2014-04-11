@@ -51,6 +51,7 @@ public class Client {
 	private String _hostName;
 	private Queue<Request> _requests;
 	ExecutorService _wayCacher, _localPainter;
+	private boolean _trafficConnected;
 	Frontend _frontend;
 	
 	private double _minLat, _maxLat, _minLon, _maxLon; //we use these to check the recent-ness of the waysinrange response
@@ -67,6 +68,7 @@ public class Client {
 		_port = port;
 		_hostName = hostName;
 		_running = false;
+		_trafficConnected = false;
 	}
 
 	/**
@@ -252,10 +254,15 @@ public class Client {
 			TrafficResponse tResp = (TrafficResponse) resp;
 			if (tResp.getStatus()) {
 				MapFactory.putTrafficValue(tResp.getName(), tResp.getVal());//put traffic value i server side map
-				_frontend.trafficConnection(true); //tell GUI that the traffic connection is solid
+				if (!_trafficConnected) {
+					//only want to notify of reconnection once
+					_frontend.trafficConnection(true); //tell GUI that the traffic connection is solid
+					_trafficConnected = true;
+				}
 				_frontend.refreshMap(); //repaint map pane
 			} else {
 				_frontend.trafficConnection(false); //tell GUI traffic connection is bad
+				_trafficConnected = false;
 			}
 			break;
 		case CLIENT_CONNECT:
@@ -270,6 +277,10 @@ public class Client {
 		default:
 			throw new IllegalArgumentException("Unsupported Response type");
 		}
+	}
+	
+	public boolean hasTrafficConnection() {
+		return _trafficConnected;
 	}
 	
 	private boolean matchesRange(double[] respCorners) {
@@ -307,8 +318,8 @@ public class Client {
 					processResponse(received);
 				} catch (IOException e) {
 					if (_running == false || e instanceof EOFException) {
-						Util.err("Error message:", e.getMessage());
-						Util.out("Input Stream Closed");
+						Util.out("Server has closed.");
+						_frontend.guiMessage("WARNING: Server unavailable", 7);
 						return;
 					} else if (e instanceof SocketException) {
 						Util.err("Server unavailable. Please try again later");
