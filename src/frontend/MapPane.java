@@ -92,8 +92,7 @@ public class MapPane extends JPanel implements MouseWheelListener {
 	}
 
 	/**
-	 * This method is intended to resize the map pane.
-	 * however it does not work.
+	 * This method is  resize the map pane.
 	 * @param d - the new dimension of its parent, ye olde JFrame called Frontend 
 	 */
 	public void updatePixelDimension(Dimension d) {

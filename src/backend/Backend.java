@@ -58,7 +58,7 @@ public class Backend {
 		}
 	}
 
-	/** Initializes the backend in a separate thread so that the server can accept connections
+	/** Initializes the backend in a separate thread so that the server can accept connections*/
 	public void initBackend() {
 		new BackendInitializer().start();;
 	}
