@@ -320,7 +320,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	}
 
 	/**
-	 * Passes info about paths to the mapPane.
+	 * Passes info about paths to the mapPane and draws the directionPopup
 	 * @param path - the list of ways to be drawn as the path
 	 * @param source - the source node to be drawn as the start of the path
 	 * @param end - the end node to be drawn as the end of the path
@@ -366,7 +366,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	}
 
 	/**
-	 * Resets the autofill boxes and 
+	 * Resets the autofill boxes, path, and points on the map 
 	 */
 	private void clear() {
 		//Resets boxes 1-4
@@ -426,6 +426,10 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		}
 	}
 
+	/**
+	 * A method which displays information about the status of the traffic server. 
+	 * @param status
+	 */
 	public void trafficConnection(boolean status) {
 		if (loading) {
 			guiMessage(status ? "Connected to traffic server" : "Traffic server unavailable");
