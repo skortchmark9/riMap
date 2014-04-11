@@ -10,6 +10,14 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.Timer;
 
+/**
+ * This class is used for displaying basic status messages from the server
+ * It pops up briefly and then recedes into the background on click or after
+ * a certain time period. For example, we use them tog ive information about
+ * the traffic bot's condition.
+ * @author samkortchmar
+ *
+ */
 public class NotifierPopup extends JPopupMenu implements ActionListener {
 	
 	private static final long serialVersionUID = 1L;

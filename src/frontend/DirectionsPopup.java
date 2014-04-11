@@ -12,7 +12,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 import maps.Way;
@@ -20,9 +19,6 @@ import backend.Constants;
 
 public class DirectionsPopup extends JPopupMenu {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	JComponent _parent;
 	private JTable searchTable;
@@ -33,6 +29,10 @@ public class DirectionsPopup extends JPopupMenu {
 	public final static int DRIVING = 40;
 
 
+	/**
+	 * Constructs the Directions Popup with a reference to the parent
+	 * @param parent - responsible for giving the popup information about its size.
+	 */
 	DirectionsPopup(JComponent parent) {
 		super();
 		_parent = parent;
@@ -40,6 +40,8 @@ public class DirectionsPopup extends JPopupMenu {
 		setBackground(Color.WHITE);
 		setVisible(false);
 		setEnabled(false);
+		
+		//We'll have a scrolling table of street names, their length, and their walkable distance
 		searchTableModel = new DefaultTableModel();
 		searchTable = new JTable(searchTableModel);
 		searchTable.getTableHeader().setReorderingAllowed(false);
@@ -55,7 +57,7 @@ public class DirectionsPopup extends JPopupMenu {
 
 
 	/**
-	 * Hides the autosuggestions.
+	 * Hides the popup.
 	 */
 	public void hidePopup() {
 		if (isVisible()) {
@@ -63,6 +65,12 @@ public class DirectionsPopup extends JPopupMenu {
 		}
 	}
 
+	/**
+	 * Shows the popup near the _parent component
+	 * @param ways - the ways in the path we are drawing.
+	 * @param speed - the speed of travel, in km per hour. We ran out of time 
+	 * to implement different 
+	 */
 	public void showPopup(List<Way> ways, int speed) {
 		if (ways.isEmpty())
 			return;
@@ -75,6 +83,13 @@ public class DirectionsPopup extends JPopupMenu {
 		}
 	}
 
+	/**
+	 * Aggregates ways into streets, and then stores their distance and the time
+	 * it would take to walk them in the data[][]
+	 * @param ways - the list of ways to be processed
+	 * @param speed - the walking speed.
+	 * @return - a data[][] for 
+	 */
 	private String[][] provideDirectionData(List<Way> ways, int speed) {
 		ArrayList<String[]> data = new ArrayList<>();
 		Iterator<Way> wayItr = ways.iterator();

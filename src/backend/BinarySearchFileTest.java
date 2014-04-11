@@ -15,8 +15,8 @@ import org.junit.Test;
 import backend.BinarySearchFile.SearchType;
 
 public class BinarySearchFileTest {
-	String films = "./data/baconfiles/films.tsv";
-	String ways = "./data/mapsfiles/ways.tsv";
+	String films = "./data/films.tsv";
+	String ways = "./data/ways.tsv";
 	
 	@Test
 	public void searchForWeirdWay2() {
@@ -30,7 +30,7 @@ public class BinarySearchFileTest {
 
 	@Test
 	public void testSearchMultiples() {
-		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
+		try (BinarySearchFile b = new BinarySearchFile("./data/index.tsv", "name", "name", "nodes")) {
 			List<List<String>> results = b.searchMultiples("10th Avenue", "name", "nodes");
 			assertTrue(results.size() == 3);
 			for(List<String> list : results) {
@@ -44,7 +44,7 @@ public class BinarySearchFileTest {
 
 	@Test
 	public void testSearchSingleMultiple() {
-		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
+		try (BinarySearchFile b = new BinarySearchFile("./data/index.tsv", "name", "name", "nodes")) {
 			List<List<String>> results = b.searchMultiples("Olive St", "name", "nodes");
 			assertTrue(results.get(0).get(0).equals("Olive St"));
 			assertTrue(results.size() == 1);
@@ -56,7 +56,7 @@ public class BinarySearchFileTest {
 
 	@Test
 	public void wildCardMultipleTest() {
-		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
+		try (BinarySearchFile b = new BinarySearchFile("./data/index.tsv", "name", "name", "nodes")) {
 			List<List<String>> results = b.searchMultiples("2nd ", SearchType.WILDCARD, "name", "nodes");
 			assertTrue(results.size() == 26);
 		} catch (IOException e) {
@@ -96,7 +96,7 @@ public class BinarySearchFileTest {
 
 	@Test
 	public void wildCardTest() {
-		try (BinarySearchFile b = new BinarySearchFile("./data/mapsfiles/index.tsv", "name", "name", "nodes")) {
+		try (BinarySearchFile b = new BinarySearchFile("./data/index.tsv", "name", "name", "nodes")) {
 			assertTrue(b.search("Olive Str", SearchType.WILDCARD).equals("Olive Street	/n/4192.7140.201402759,/n/4192.7140.201402766"));
 		} catch (IOException e) {
 			assertTrue(false);
@@ -107,14 +107,6 @@ public class BinarySearchFileTest {
 	public void testDecimalDigitTest() {
 		double testValue = Constants.INITIAL_LAT;
 		assertTrue(Util.getFirst4Digits(testValue).equals("4184"));
-	}
-
-	@Test
-	public void testReadChunks() throws IOException {
-		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
-		//		System.out.println(b.readChunks("name", "id"));
-		b.close();
-		assertTrue(true);
 	}
 
 	@Test
@@ -141,55 +133,6 @@ public class BinarySearchFileTest {
 	}
 
 
-
-	@Test
-	public void FindUTF8() throws IOException {
-		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/index.tsv", "name", "name", "id");
-		b.close();
-	}
-
-	//Why does the below work but not the above ?
-
-	@Test
-	public void FindUTF8Again() throws IOException {
-		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/index.tsv", "name", "name", "id");
-		b.close();
-	}
-
-	@Test
-	public void jCompSpecialsTest() throws IOException {
-		BufferedReader r = new BufferedReader(new FileReader("./data/baconfiles/special-chars/index_any_special.tsv"));
-		String line = r.readLine(); //reads the header
-		String line2 = "blah"; //so that line2 does not start as null
-		while(line != null && line2 != null) {
-			line = r.readLine();
-			if(line == null) continue;
-			String name1 = line.split("\t")[0];
-			line2 = r.readLine();
-			if (line2 == null) continue;
-			String name2 = line2;
-			//System.out.println(name1 + " : " + name2);
-			int cmp = BinarySearchFile.jCompare(name1.getBytes(), name2.getBytes(), 0);
-			if (!(cmp < 0)) {
-				int follow = line.charAt(name1.length());
-				if (!(follow == '\t' || follow == '\n')) {
-					System.err.println("jCompare Failed! Compare returned: " + cmp);
-					System.err.println("\tfirst: " + name1);
-					System.err.println("\tsecond: " + name2);
-					assertTrue(false);
-				}
-			}
-		}
-		r.close();
-	}
-
-
-	@Test
-	public void FindFifty() throws IOException {
-		BinarySearchFile b = new BinarySearchFile("./data/baconfiles/ta-files/testIndex.tsv", "name", "name", "id");
-		assertTrue(b.getXsByY("50 Cent", "id")[0].equals("/m/01vvyc_"));
-		b.close();
-	}
 
 	@Test
 	public void TestXsByY() throws Exception {
