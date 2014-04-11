@@ -42,7 +42,7 @@ After Maps, our project actually didn't require many changes to its underlying p
 
 In maps, we already had a reasonably clean break between our backend and our frontend - the bridge was a static called MapFactory. We still use MapFactory, but almost all of its functionality has been moved to the server side of things.
 
-our protocol uses object input stream and object output stream. we have two types of objects being sent across the network: Responses and Requests. Both Response and Request objects are interfaces. these interfaces contain an ENUM and a method called getType() the getType method relies on the enum, for example if you create an autocorrect response object accross the network, the receiver (client) will only know that it is a response object. It can then call getType on the generic response object and depending on the value of the returned enum it knows what type of response it is. it can then cast the response to , say, AutoCorrectResponse and handle it appropriately.
+our protocol uses object input stream and object output stream, but we have two types of objects being sent across the network: Responses and Requests. Both Response and Request objects are interfaces. these interfaces contain an ENUM and a method called getType() the getType method relies on the enum, for example if you create an autocorrect response object accross the network, the receiver (client) will only know that it is a response object. It can then call getType on the generic response object and depending on the value of the returned enum it knows what type of response it is. it can then cast the response to , say, AutoCorrectResponse and handle it appropriately.
 
 The protocol design was made much easier by the choice to use ObjectInputStream and ObjectOutputStream as we didn't have to stringify anything to send it across the network; we could just send the Response objects as they were. Response / Request objects simply contained the necessary info they needed. For example, A request to Get ways in range only needs to contain the minimum / maximum latitude longitude pairs defining the bounding box of the ways we want to get. Coversely, the way response object simple contains a list of ways within the range of the response.
 
@@ -71,9 +71,10 @@ There are a bunch of extra festures and cool gizmos in our traffic project. We h
 		- In BSF, we cache the position of newlines to make searching for line stars and ends faster. These positions are stored in a Guava TreeSet. The TreeSet allows us to create ranges that define the length of a line. The gaps between the ranges represent newlines.
 		- In MapFactory, when we load Ways & Nodes from disk (from resource files) we also cache these in a HashMap. The idea here is that every time we need to go to disk to get a Way or a Node, we first check the HashMap to see if we have already grabbed the node and/or way info. This way we can get way/node info we have already cached in O(1) instead of however long it takes to Binary Search the file.
 
-		- filtering out smaller ways onzoom out
+		- filtering out smaller ways on zoom out
 		- Dijkstra's has a timeout. most paths (even huge ones) are able to be found within 5 seconds.
 		- lots and lots of threading all over the place
+		- local cacheing of ways in the event of server loss
 
 ==========================================
 
