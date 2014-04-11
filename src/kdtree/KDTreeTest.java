@@ -24,11 +24,9 @@ import backend.Resources;
  */
 public class KDTreeTest {
 	
-	
-	
 	@Test
 	public void testGettingBounds() throws IOException {
-		new Resources("./data/mapsfiles/ways.tsv", "./data/mapsfiles/nodes.tsv", "./data/mapsfiles/index.tsv");
+		new Resources("./data/ways.tsv", "./data/nodes.tsv", "./data/index.tsv");
 		KDTree<Node> kd = MapFactory.createKDTree();
 		assertTrue(kd.getMax(0) == Constants.MAXIMUM_LATITUDE);
 		assertTrue(kd.getMin(0) == Constants.MINIMUM_LATITUDE);
