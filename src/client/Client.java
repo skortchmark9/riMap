@@ -135,7 +135,7 @@ public class Client {
 					_output.writeObject(_requests.poll());
 					_output.flush();
 				} catch (IOException e) {
-					e.printStackTrace();
+					Util.out("Server closed");
 				}
 			}
 		}
