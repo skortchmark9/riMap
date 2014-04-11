@@ -56,6 +56,10 @@ public class PathWayGetter extends Thread {
 		_running = false;
 	}
 
+	
+	/**
+	 * This thread runs other threads - canceling them if they are not the most recent
+	 */
 	@Override
 	public void run() {
 		while(_running) {

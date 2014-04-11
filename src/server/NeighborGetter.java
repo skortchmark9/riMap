@@ -23,8 +23,8 @@ class NeighborGetter {
 	private Executor _exec;
 	
 	/**
-	 * 
-	 * @param owner
+	 * @param owner - the clienthandler in charge of the neighbor getter,
+	 * used for sending results of computation
 	 */
 	NeighborGetter(ClientHandler owner) {
 		_owner = owner;
@@ -34,19 +34,16 @@ class NeighborGetter {
 	
 	
 	/**
-	 * 
-	 * @param num
-	 * @param loc
+	 * Gets neighbors
+	 * @param num - the number of neighbors, usually 1
+	 * @param loc - KDimensionable nearest to neighbors
 	 */
 	void getNeighbors(int num, KDimensionable loc, boolean isSource) {
 		_exec.execute(new NeighborWorker(num, loc, isSource));
 	}
 	
-	
 	/**
-	 * 
-	 * @author emc3
-	 *
+	 * Thread for getting nearest neighbors without hanging up the server
 	 */
 	private class NeighborWorker implements Runnable {
 		int _id, _numNeighbors;
@@ -66,6 +63,7 @@ class NeighborGetter {
 		
 		@Override
 		public void run() {
+			//The id is responsible for ensuring this is the most recent query thread
 			_id = _threadCount.incrementAndGet();
 			Node n = _owner._b.getNearestNeighbors(_numNeighbors, _location).get(0);
 			List<String> intersectingStreets = MapFactory.getIntersectingStreets(n);

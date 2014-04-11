@@ -22,7 +22,7 @@ public class ClientPool {
 	
 	
 	/**
-	 * Add a new client to the chat room.
+	 * Add a new client.
 	 * @param client to add
 	 */
 	public synchronized void add(ClientHandler client) {
