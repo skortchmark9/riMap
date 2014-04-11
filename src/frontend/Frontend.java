@@ -430,7 +430,6 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		if (loading) {
 			guiMessage(status ? "Connected to traffic server" : "Traffic server unavailable");
 		} else if (_desktop != null) {
-			Util.out("* * Attempting to display traffic status popup");
 			_trafficBar = new NotifierPopup(_desktop);
 			_trafficBar.setColor(status ? Color.green : Color.red);
 			_trafficBar.displayInformation(status ? "Connected to traffic server" : "Traffic server currently unavailable");
