@@ -136,6 +136,7 @@ public class Client {
 					_output.flush();
 				} catch (IOException e) {
 					Util.out("Server closed");
+					kill();
 				}
 			}
 		}
@@ -155,7 +156,7 @@ public class Client {
 		} catch (IOException | InterruptedException e) {
 			if (e instanceof IOException) Util.err("ERROR closing streams and/or socket");
 			else Util.err("ERROR joining receive thread");
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 
