@@ -9,6 +9,7 @@ import java.io.Serializable;
  * is no confusion about what the server is receiving. Usually, the server
  * will switch on the RequestType and then determine how to generate the
  * appropriate Response.
+ * 
  * @author samkortchmar
  *
  */

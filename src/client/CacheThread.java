@@ -6,6 +6,12 @@ import java.util.List;
 import maps.MapFactory;
 import maps.Way;
 
+/**
+ * The cachethread caches ways received from the client so that 
+ * in the event of a sever cras it can continue painting the amp.
+ * @author samkortchmar
+ *
+ */
 public class CacheThread implements Runnable {
 	
 	List<Way> _ways;

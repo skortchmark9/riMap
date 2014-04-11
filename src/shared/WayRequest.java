@@ -1,10 +1,10 @@
 package shared;
 
 /**
- * A Request for ways within a 2d range.
- * @author samkortchmar
- *
- */
+* A Request for ways within a 2d range.
+* @author samkortchmar
+* Note that more detailed comments are available in the Request Interface
+*/
 public class WayRequest implements Request {
 	
 	private static final long serialVersionUID = 1L;

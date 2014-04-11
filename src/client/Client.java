@@ -41,6 +41,7 @@ import frontend.MapPane;
  * A Client Class that sends and receives messages from and to the server.
  */
 public class Client {
+	
 
 	private Socket _socket;
 	private volatile boolean _running, hasServer;
@@ -178,6 +179,7 @@ public class Client {
 		request(new NeighborsRequest(i, kd, isSource));
 	}
 
+	@SuppressWarnings("static-access")
 	public void requestWaysInRange(MapPane map, double minLat, double maxLat, double minLon, double maxLon) {
 		Util.debug("Requesting Ways");
 		_minLat = minLat; _maxLat = maxLat; _minLon = minLon; _maxLon = maxLon;

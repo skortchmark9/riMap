@@ -8,8 +8,8 @@ import maps.Way;
 
 /**
  * A response from the server to the client in the event of a PathRequest
- * @author samkortchmar
- *
+ * Note that a more detailed understanding of Responses can be found in the Response interface
+ * Contains a path - a list of ways denoting a path from source to dest
  */
 public class PathResponse implements Response {
 	

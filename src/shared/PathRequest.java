@@ -5,6 +5,7 @@ import maps.Node;
 /**
  * A request for a path from the client to the server.
  * @author samkortchmar
+ * Note that more detailed comments are available in the Request Interface
  */
 public class PathRequest implements Request {
 

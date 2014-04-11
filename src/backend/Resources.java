@@ -16,7 +16,7 @@ public class Resources {
 	public Resources(int i) throws IOException {
 		waysFile = new BinarySearchFile("./data/films.tsv", "id", "id", "name", "starring");
 		nodesFile = new BinarySearchFile("./data/actors.tsv", "id", "id", "name", "film");
-		indexFile =  new BinarySearchFile("./data/index.tsv", "name", "name", "id");
+		indexFile =  new BinarySearchFile("./data/baconindex.tsv", "name", "name", "id");
 	}
 	
 	public Resources() throws IOException {

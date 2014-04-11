@@ -163,6 +163,10 @@ public class ClientHandler extends Thread {
 		}
 	}
 
+	/**
+	 * A very important class - responsible for pushing thread responses to the client
+	 *
+	 */
 	private class PushThread extends Thread {
 
 		@Override

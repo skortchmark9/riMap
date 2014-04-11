@@ -4,6 +4,7 @@ import java.util.List;
 /**
  * A Response to an Autocorrect Request
  * @author samkortchmar
+ * Note that a more detailed understanding of Responses can be found in the Response interface
  */
 public class AutocorrectResponse implements Response {
 	

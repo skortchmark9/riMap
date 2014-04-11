@@ -8,7 +8,7 @@ import maps.Way;
  * A Response to a client's WayRequest - contains a list of all ways in the
  * requested Range.
  * @author samkortchmar
- *
+ * Note that a more detailed understanding of Responses can be found in the Response interface
  */
 public class WayResponse implements Response {
 	

@@ -24,7 +24,8 @@ class WayGetter extends Thread {
 	private volatile boolean _running;
 
 	/**
-	 * @param owner
+	 * @param owner - the owning clienthandler - we need to access it for sending
+	 * responses to the client
 	 */
 	public WayGetter(ClientHandler owner) {
 		super("WayGetter");
@@ -32,6 +33,9 @@ class WayGetter extends Thread {
 		_exec = Util.defaultThreadPool("CopyOfWayGetter", 2, 2);
 	}
 
+	/**
+	 * Runs the waygetter, which iterrupts itself as it goes.
+	 */
 	public void run() {
 		_running = true;
 		WayResponse resp;
@@ -48,6 +52,9 @@ class WayGetter extends Thread {
 		}
 	}
 
+	/**
+	 * Shuts down the waygetter and all its threads
+	 */
 	public void close() {
 		_running = false;
 		_exec.shutdownNow();
@@ -58,7 +65,7 @@ class WayGetter extends Thread {
 	}
 
 	/**
-	 * 
+	 *  - Gets the ways in range between minlat/maxlat, minlon/maxlong. 
 	 * @param minLat
 	 * @param maxLat
 	 * @param minLon
@@ -74,6 +81,11 @@ class WayGetter extends Thread {
 			futureWays = _exec.submit(new WayWorker(minLat, maxLat, minLon, maxLon, zoom));
 	}
 
+	/**
+	 * A runnable wrapper for the backend method getWaysInRange
+	 * @author samkortchmar
+	 *
+	 */
 	class WayWorker implements Callable<WayResponse> {
 		double _minLat, _maxLat, _minLon, _maxLon, _zoom;
 

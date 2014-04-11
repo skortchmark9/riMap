@@ -45,6 +45,10 @@ public class Backend {
 		_server = server;
 	}
 
+	/**
+	 * Sends a message - depending on the backend's done status, it will be okay or not okay.
+	 * @param s
+	 */
 	public void sendStatusMessage(String s) {
 		if (_server != null) {
 			if (done) 
@@ -54,6 +58,7 @@ public class Backend {
 		}
 	}
 
+	/** Initializes the backend in a separate thread so that the server can accept connections*/
 	public void initBackend() {
 		new BackendInitializer().start();;
 	}
@@ -103,8 +108,9 @@ public class Backend {
 
 	/**
 	 * Initializes the AutoCorrect tree by querying the MapFactory
+	 * This method also (sneak attack) initializes the map of streetnames/node lengths
 	 */
-	private void initAutoCorrect() {
+	private void initAutoCorrectAndRoadLength() {
 		long start = 0; //XXX: FOR DEBUGGING
 		if (Constants.DEBUG_MODE) {
 			start = Util.resetClock();
@@ -135,8 +141,8 @@ public class Backend {
 	}
 
 	/**
-	 * @param name
-	 * @return
+	 * @param name - gets autocorrections from a given input.
+	 * @return - returns a list of strings that are the suggestions
 	 */
 	public List<String> getAutoCorrections(String name) {
 		if (autoCorrectEngine != null) {
@@ -147,6 +153,12 @@ public class Backend {
 		}
 	}
 
+	/**
+	 * Gets a path from the source and dest nodes. PathFinder wraps the nodes independently for each request.
+	 * @param source
+	 * @param dest
+	 * @return
+	 */
 	public List<Way> getPath(Node source, Node dest) {
 		PathFinder<PathNodeWrapper, Node> p = new PathFinder<>(new PathNodeWrapper(source), new PathNodeWrapper(dest));
 		List<Way> ways = new LinkedList<>();
@@ -156,6 +168,15 @@ public class Backend {
 		return ways;
 	}
 
+	/**
+	 * Gets all the ways in range 
+	 * @param minLat - S.E.
+	 * @param maxLat
+	 * @param minLon
+	 * @param maxLon
+	 * @param zoom - the zoom factor of the map pane
+	 * @return
+	 */
 	public List<Way> getWaysInRange(double minLat, double maxLat, double minLon, double maxLon, double zoom) {
 		long start = System.currentTimeMillis();		
 		List<Way> results = MapFactory.getWaysInRange(minLat, maxLat, minLon, maxLon, zoom);
@@ -163,6 +184,12 @@ public class Backend {
 		return results;
 	}
 
+	/**
+	 * Gets a nearest neighbors from the KD tree - returning a node.
+	 * @param num - the number of nearest neighbors - almost always 1.
+	 * @param testPoint - ththe testpoint - the nearest possible kDImensionable to the node we are looking fo.
+	 * @return - the node closest to the testpoint. 
+	 */
 	public List<Node> getNearestNeighbors(int num, KDimensionable testPoint) {
 		if (kd != null) {
 			return kd.getNearestNeighbors(num, testPoint);
@@ -172,19 +199,29 @@ public class Backend {
 		}
 	}
 	
+	/**
+	 * The initaliz ways from the backend - the client loads to these 
+	 * ways at the beginning so we cache them.
+	 * @return
+	 */
 	public List<Way> getInitialWays() {
 		sendStatusMessage("Finding Ways...");
 		//TODO: is this too wide?
 		return MapFactory.getWaysInRange(Constants.INITIAL_LAT - Constants.GEO_DIMENSION_FACTOR, Constants.INITIAL_LAT, Constants.INITIAL_LON, Constants.INITIAL_LON + (Constants.GEO_DIMENSION_FACTOR*2), 1);
 	}
 
+	/**
+	 * A separate thread for initializing the backend so the server stays responsive. 
+	 * @author samkortchmar
+	 *
+	 */
 	public class BackendInitializer extends Thread {
 
 		@Override
 		public void run() {
 			sendStatusMessage("Building backend");
 			initKDTree();
-			initAutoCorrect();
+			initAutoCorrectAndRoadLength();
 			initBoundaries();
 			List<Way> ways = getInitialWays();
 			Util.debug("!! NUM INIT WAYS:", ways.size());

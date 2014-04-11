@@ -1,8 +1,6 @@
 package backend;
 import static org.junit.Assert.assertTrue;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
@@ -24,7 +22,6 @@ public class BinarySearchFileTest {
 			List<List<String>> results = b.searchMultiples("/w/4183.7140", SearchType.WILDCARD, "id", "name", "start", "end");
 			Util.out(results);
 		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -101,12 +98,6 @@ public class BinarySearchFileTest {
 		} catch (IOException e) {
 			assertTrue(false);
 		}
-	}
-
-	@Test
-	public void testDecimalDigitTest() {
-		double testValue = Constants.INITIAL_LAT;
-		assertTrue(Util.getFirst4Digits(testValue).equals("4184"));
 	}
 
 	@Test

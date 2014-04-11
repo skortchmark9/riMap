@@ -1,6 +1,9 @@
 package shared;
 
-
+/**
+ * Note that a more detailed understanding of Responses can be found in the Response interface
+ * This response gives the client information about the current traffic gotten from the traffic bot
+ */
 public class TrafficResponse implements Response {
 	private static final long serialVersionUID = 1L;
 	private final String _name;
