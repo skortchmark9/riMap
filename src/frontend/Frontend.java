@@ -176,7 +176,7 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		});
 		
 		//notify user of current state of the traffic connection
-		Util.out("Attempting to display traffic status info", "\nStatus = ", _client.hasTrafficConnection());
+		//Util.out("Attempting to display traffic status info", "\nStatus = ", _client.hasTrafficConnection());
 		this.trafficConnection(_client.hasTrafficConnection());
 		revalidate();		
 		_box1.requestFocusInWindow();

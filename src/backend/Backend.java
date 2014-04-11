@@ -29,7 +29,7 @@ import autocorrect.RadixTree;
  */
 public class Backend {
 
-	KDTree<Node> kd = null; //the KDTree!
+	KDTree<Node> kd = null; //the KDTree! s
 	Engine autoCorrectEngine = null;
 	volatile boolean done;
 	Server _server;
