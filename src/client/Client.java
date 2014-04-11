@@ -51,7 +51,6 @@ public class Client {
 	private String _hostName;
 	private Queue<Request> _requests;
 	ExecutorService _wayCacher, _localPainter;
-;
 	Frontend _frontend;
 	
 	private double _minLat, _maxLat, _minLon, _maxLon; //we use these to check the recent-ness of the waysinrange response
@@ -112,6 +111,7 @@ public class Client {
 			catch (IOException ex) {
 				Util.out("ERROR: Can't connect to server");
 				_frontend.guiMessage("Server unavailable!");
+				hasServer = false;
 				try {
 					Thread.sleep(2500);
 					_frontend.guiMessage("Attempting to reconnect...");

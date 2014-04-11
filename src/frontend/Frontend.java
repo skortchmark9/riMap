@@ -124,13 +124,15 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		setCursor(Cursor.getDefaultCursor());
 		//Initializing the rest of the Frontend.
 		initMainScreen();
-		_directionPopup = new DirectionsPopup(_controlPanel);
 	}
 
 	void initMainScreen() {
 
 		//A JInternal frame to hold all the controls.
 		createControlPanel();
+		
+		//A JInternal frame to display directions, if we need them
+		_directionPopup = new DirectionsPopup(_controlPanel);
 
 		//Initializes a JDesktopPane to hold the control panel and the map.
 		_desktop = new JDesktopPane();
@@ -141,7 +143,6 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 		//a layoutManager to center it, even though JDesktopPane does not support one.
 		_map = new MapPane(_client);
 		_map.setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100));
-		//JPanel backgroundPanel = new JPanel(new GridBagLayout());
 		_bgPanel = new JPanel();
 		_bgPanel.setBackground(Color.BLACK);
 		_bgPanel.setLayout(null);
@@ -150,6 +151,10 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 
 		//Adds the controlPanel and Map/BackgroundPanel to the desktop.
 		_desktop.add(_controlPanel);
+		
+//		_desktop.add(_directionPopup);
+
+		
 		_desktop.add(_bgPanel);
 		setContentPane(_desktop);
 		setControlPanelFocus(true);
@@ -275,11 +280,9 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 
 		//Create a control panel.
 		_controlPanel = new JInternalFrame("Controls", false, false, false, false);
-		
 		_controlPanel.add(sidePanel);
 		_controlPanel.pack();
-		_controlPanel.setVisible(true);
-		
+		_controlPanel.setVisible(true);		
 	}
 
 	/**
@@ -322,7 +325,8 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	public void giveDirections(List<Way> path, Node source, Node end) {
 		_map.setCalculatedRoute(path);
 		_map.setPoints(source, end);
-		_directionPopup.showPopup(path, DirectionsPopup.DRIVING);
+		_directionPopup.showPopup(path, DirectionsPopup.WALKING);
+		revalidate();
 	}
 
 	/**
@@ -397,7 +401,6 @@ public class Frontend extends JFrame implements ActionListener, Runnable {
 	public void actionPerformed(ActionEvent e) {
 		//Get Directions from the Screen points (defined by clicking)
 		if (e.getSource() == _getDirections) {
-			trafficConnection(true);
 			Node start;
 			Node end;
 			String xs1S = _box1.getText();

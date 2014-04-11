@@ -27,11 +27,10 @@ public class DirectionsPopup extends JPopupMenu {
 	JComponent _parent;
 	private JTable searchTable;
 	private DefaultTableModel searchTableModel;
-	public final static int WALKING = 1;
-	public final static int RUNNING = 1;
-	public final static int BIKING = 1;
-	public final static int DRIVING = 10;
-
+	public final static int WALKING = 5;
+	public final static int RUNNING = 10;
+	public final static int BIKING = 20;
+	public final static int DRIVING = 40;
 
 
 	DirectionsPopup(JComponent parent) {
@@ -43,13 +42,14 @@ public class DirectionsPopup extends JPopupMenu {
 		setEnabled(false);
 		searchTableModel = new DefaultTableModel();
 		searchTable = new JTable(searchTableModel);
+		searchTable.getTableHeader().setReorderingAllowed(false);
 		searchTable.getColumnModel().setColumnSelectionAllowed(false);
 		searchTable.setGridColor(Constants.MIDNIGHT);
 		searchTable.setEnabled(false);
+		searchTable.setAutoscrolls(true);
 		JScrollPane scrollPane = new JScrollPane(searchTable);
-		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.setPreferredSize(new Dimension(_parent.getWidth() - 10, _parent.getHeight()));
-//		searchTable.setFillsViewportHeight(true);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setPreferredSize(new Dimension(_parent.getWidth() - 20, _parent.getHeight()));
 		add(new JPanel().add(scrollPane));
 	}
 
@@ -72,33 +72,6 @@ public class DirectionsPopup extends JPopupMenu {
 				show(_parent, 4, (_parent.getHeight() - 4));
 				setVisible(true);
 			}
-		}
-	}
-
-
-
-	/**
-	 * Moves up to the previous search result.
-	 */
-	private void cycleTableSelectionUp() {
-		ListSelectionModel selModel = searchTable.getSelectionModel();
-		int index0 = selModel.getMinSelectionIndex();
-		if(index0 > 0) {
-			selModel.setSelectionInterval(index0-1, index0-1);
-		}
-	}
-
-	/**
-	 * Moves down to the next search result.
-	 */
-	private void cycleTableSelectionDown() {
-		ListSelectionModel selModel = searchTable.getSelectionModel();
-		int index0 = selModel.getMinSelectionIndex();
-		if(index0 == -1) {
-			selModel.setSelectionInterval(0, 0);
-		}
-		else if(index0 > -1) {
-			selModel.setSelectionInterval(index0+1, index0+1);
 		}
 	}
 
@@ -151,8 +124,7 @@ public class DirectionsPopup extends JPopupMenu {
 		//The table determines the size of the autocompletion suggestions,
 		//so we wait until the text field has its size assigned by the gui
 		//manager.
-		searchTable.setPreferredSize(new Dimension(_parent.getWidth() - 8, 80));
-		String[] columns = new String[] {"Streets", "Distance (km)", "Time (s)"};
+		String[] columns = new String[] {"Streets", "Distance (km)", "Walking Time (m)"};
 		searchTableModel.setDataVector(data, columns);
 	}
 }
