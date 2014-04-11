@@ -14,15 +14,15 @@ public class Resources {
 	}
 	
 	public Resources(int i) throws IOException {
-		waysFile = new BinarySearchFile("./data/baconfiles/films.tsv", "id", "id", "name", "starring");
-		nodesFile = new BinarySearchFile("./data/baconfiles/actors.tsv", "id", "id", "name", "film");
-		indexFile =  new BinarySearchFile("./data/baconfiles/index.tsv", "name", "name", "id");
+		waysFile = new BinarySearchFile("./data/films.tsv", "id", "id", "name", "starring");
+		nodesFile = new BinarySearchFile("./data/actors.tsv", "id", "id", "name", "film");
+		indexFile =  new BinarySearchFile("./data/index.tsv", "name", "name", "id");
 	}
 	
 	public Resources() throws IOException {
-		waysFile = new BinarySearchFile("./data/baconfiles/films.tsv", "id", "id", "name", "start", "end");
-		nodesFile = new BinarySearchFile("./data/baconfiles/actors.tsv", "id", "id", "latitude", "longitude");
-		indexFile =  new BinarySearchFile("./data/baconfiles/index.tsv", "name", "name", "nodes");
+		waysFile = new BinarySearchFile("./data/films.tsv", "id", "id", "name", "start", "end");
+		nodesFile = new BinarySearchFile("./data/actors.tsv", "id", "id", "latitude", "longitude");
+		indexFile =  new BinarySearchFile("./data/index.tsv", "name", "name", "nodes");
 	}
 
 	public static void closeResources() {
