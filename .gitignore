@@ -5,8 +5,4 @@
 /data/*.tsv
 /**/.DS_Store
 /build
-bin/client
-bin/server
-/bin/client
-/bin/server
 .metadata/
