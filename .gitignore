@@ -3,6 +3,7 @@
 /data/baconfiles/
 /data/mapsfiles/
 /data/*.tsv
+/data/
 /**/.DS_Store
 /build
 .metadata/
